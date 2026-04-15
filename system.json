@@ -2,7 +2,7 @@
   "id": "through-the-breach",
   "title": "Through the Breach",
   "description": "Unofficial Through the Breach system for Foundry VTT",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "compatibility": {
     "minimum": 13,
     "verified": "13.350",
