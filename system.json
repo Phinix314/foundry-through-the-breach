@@ -15,5 +15,7 @@
     "Actor": {
       "character": {}
     }
-  }
+  },
+  "manifest": "https://raw.githubusercontent.com/Phinix314/foundry-through-the-breach/refs/heads/main/system.json",
+  "download": "https://github.com/Phinix314/foundry-through-the-breach/archive/refs/heads/main.zip"
 }
