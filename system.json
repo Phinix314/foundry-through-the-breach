@@ -8,7 +8,9 @@
     "verified": 14
   },
   "authors": [
-    { "name": "Phinix" }
+    {
+      "name": "Phinix"
+    }
   ],
   "esmodules": ["ttb.mjs"],
   "documentTypes": {
