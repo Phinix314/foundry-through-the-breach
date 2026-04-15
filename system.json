@@ -11,21 +11,9 @@
     { "name": "Phinix" }
   ],
   "esmodules": ["ttb.mjs"],
-  "styles": ["styles/ttb.css"],
-  "languages": [
-    { "lang": "en", "name": "English", "path": "lang/en.json" }
-  ],
   "documentTypes": {
     "Actor": {
-      "character": {},
-      "npc": {}
-    },
-    "Item": {
-      "skill": {},
-      "weapon": {},
-      "pursuit": {},
-      "spell": {}
+      "character": {}
     }
-  },
-  "socket": true
+  }
 }
