@@ -14,6 +14,7 @@
     }
   ],
   "esmodules": ["ttb.mjs"],
+  "background": "systems/through-the-breach/assets/images/TTBCore.webp",
   "documentTypes": {
     "Actor": {
       "character": {}

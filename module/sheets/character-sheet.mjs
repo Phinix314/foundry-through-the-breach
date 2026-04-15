@@ -12,6 +12,7 @@ export class TTBCharacterSheet extends ActorSheet {
     }
 
     async getData(options = {}) {
-        return await super.getData(options);
+        const data = await super.getData(options);
+        return data;
     }
 }
