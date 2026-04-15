@@ -5,21 +5,13 @@ export class TTBCharacterSheet extends ActorSheet {
         return foundry.utils.mergeObject(super.defaultOptions, {
             classes: [SYSTEM_ID, "sheet", "actor"],
             template: `systems/${SYSTEM_ID}/templates/actor/character-sheet.hbs`,
-            width: 650,
-            height: 700,
-            resizable: true,
-            submitOnChange: true,
-            closeOnSubmit: false
+            width: 600,
+            height: 400,
+            resizable: true
         });
     }
 
-    get title() {
-        return this.actor.name || "Character";
-    }
-
     async getData(options = {}) {
-        const context = await super.getData(options);
-        context.system = this.actor.system;
-        return context;
+        return await super.getData(options);
     }
 }

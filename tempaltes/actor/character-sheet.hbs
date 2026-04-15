@@ -1,57 +1,17 @@
 <form class="{{cssClass}}" autocomplete="off">
-    <header class="sheet-header" style="display:flex; gap:1rem; align-items:flex-start; margin-bottom:1rem;">
+    <header style="display:flex; gap:1rem; align-items:center; padding:1rem;">
         <img
                 src="{{actor.img}}"
                 data-edit="img"
                 title="{{actor.name}}"
-                height="96"
                 width="96"
-                style="border:0;"
+                height="96"
         />
 
         <div style="flex:1;">
-            <div style="margin-bottom:0.5rem;">
-                <label>Name</label>
-                <input type="text" name="name" value="{{actor.name}}" />
-            </div>
-
-            <div style="margin-bottom:0.5rem;">
-                <label>Ancestry</label>
-                <input type="text" name="system.ancestry" value="{{system.ancestry}}" />
-            </div>
-
-            <div style="margin-bottom:0.5rem;">
-                <label>Pursuit</label>
-                <input type="text" name="system.pursuit" value="{{system.pursuit}}" />
-            </div>
-
-            <div>
-                <label>Fate</label>
-                <input type="text" name="system.fate" value="{{system.fate}}" />
-            </div>
+            <label>Name</label>
+            <input type="text" name="name" value="{{actor.name}}" />
+            <p>Type: {{actor.type}}</p>
         </div>
     </header>
-
-    <section class="sheet-body">
-        <h2>Aspects</h2>
-
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem 1rem; margin-bottom:1rem;">
-            <label>Might <input type="number" name="system.aspects.might" value="{{system.aspects.might}}" /></label>
-            <label>Grace <input type="number" name="system.aspects.grace" value="{{system.aspects.grace}}" /></label>
-            <label>Speed <input type="number" name="system.aspects.speed" value="{{system.aspects.speed}}" /></label>
-            <label>Resilience <input type="number" name="system.aspects.resilience" value="{{system.aspects.resilience}}" /></label>
-            <label>Intellect <input type="number" name="system.aspects.intellect" value="{{system.aspects.intellect}}" /></label>
-            <label>Charm <input type="number" name="system.aspects.charm" value="{{system.aspects.charm}}" /></label>
-            <label>Cunning <input type="number" name="system.aspects.cunning" value="{{system.aspects.cunning}}" /></label>
-            <label>Tenacity <input type="number" name="system.aspects.tenacity" value="{{system.aspects.tenacity}}" /></label>
-        </div>
-
-        <h2>Resources</h2>
-
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.5rem 1rem;">
-            <label>Wounds <input type="number" name="system.wounds" value="{{system.wounds}}" /></label>
-            <label>Destiny <input type="number" name="system.destiny" value="{{system.destiny}}" /></label>
-            <label>Fortune <input type="number" name="system.fortune" value="{{system.fortune}}" /></label>
-        </div>
-    </section>
 </form>
