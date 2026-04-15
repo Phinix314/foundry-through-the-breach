@@ -6,7 +6,7 @@
   "compatibility": {
     "minimum": 13,
     "verified": "13.350",
-    "maximum": 13
+    "maximum": 14
   },
   "authors": [
     {
@@ -14,12 +14,12 @@
     }
   ],
   "esmodules": ["ttb.mjs"],
+  "styles": ["styles/ttb.css"],
   "documentTypes": {
     "Actor": {
       "character": {}
     }
   },
-  "background" : "module/assets/images/TTBCore.webp",
   "manifest": "https://raw.githubusercontent.com/Phinix314/foundry-through-the-breach/refs/heads/main/system.json",
   "download": "https://github.com/Phinix314/foundry-through-the-breach/archive/refs/heads/main.zip"
 }

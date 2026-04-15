@@ -1,0 +1,13 @@
+.ttb-character-sheet .window-content {
+    background:
+            linear-gradient(rgba(20, 14, 10, 0.55), rgba(20, 14, 10, 0.55)),
+            url("../assets/images/TTBCore.webp") center center / cover no-repeat;
+}
+
+.ttb-character-sheet form {
+    background: rgba(245, 235, 220, 0.78);
+    min-height: 100%;
+    box-sizing: border-box;
+    padding: 1rem;
+    color: #20140f;
+}
