@@ -1,13 +1,142 @@
+.through-the-breach.sheet.actor,
+.ttb-character-sheet {
+    min-width: 800px;
+}
+
 .ttb-character-sheet .window-content {
-    background:
-            linear-gradient(rgba(20, 14, 10, 0.55), rgba(20, 14, 10, 0.55)),
-            url("../assets/images/TTBCore.webp") center center / cover no-repeat;
+    padding: 0;
 }
 
 .ttb-character-sheet form {
-    background: rgba(245, 235, 220, 0.78);
-    min-height: 100%;
+    padding: 12px;
+    background: #d8c39b;
+    color: #21160f;
+}
+
+.ttb-header {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.ttb-header .profile-img {
+    border: 1px solid #3a2618;
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.ttb-header-fields {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.ttb-character-sheet label {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-weight: bold;
+}
+
+.ttb-character-sheet input,
+.ttb-character-sheet textarea {
+    width: 100%;
     box-sizing: border-box;
-    padding: 1rem;
-    color: #20140f;
+    background: rgba(255, 250, 230, 0.88);
+    border: 1px solid #5a4028;
+    color: #1c120c;
+}
+
+.ttb-character-sheet textarea {
+    min-height: 60px;
+    resize: vertical;
+}
+
+.ttb-character-sheet .sheet-tabs {
+    display: flex;
+    gap: 4px;
+    margin: 8px 0 12px;
+    border-bottom: 2px solid #3a2618;
+}
+
+.ttb-character-sheet .sheet-tabs .item {
+    padding: 6px 10px;
+    background: #2b1a12;
+    color: #e8d49f;
+    border: 1px solid #3a2618;
+    border-bottom: none;
+}
+
+.ttb-character-sheet .sheet-tabs .item.active {
+    background: #5a321f;
+}
+
+.ttb-grid {
+    display: grid;
+    gap: 12px;
+}
+
+.ttb-grid.two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ttb-grid.four {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.ttb-grid.compact {
+    gap: 8px;
+}
+
+.span-two {
+    grid-column: 1 / -1;
+}
+
+.ttb-box {
+    border: 2px solid #3a2618;
+    background: rgba(255, 244, 213, 0.55);
+    padding: 10px;
+    margin-bottom: 12px;
+}
+
+.ttb-box h2 {
+    margin: 0 0 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #3a2618;
+    font-size: 18px;
+    text-transform: uppercase;
+}
+
+.ttb-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ttb-table th,
+.ttb-table td {
+    border: 1px solid #5a4028;
+    padding: 3px;
+}
+
+.ttb-table th {
+    background: #2b1a12;
+    color: #e8d49f;
+}
+
+.ttb-table input {
+    border: none;
+    background: rgba(255, 250, 230, 0.65);
+}
+
+.attack-block textarea {
+    min-height: 70px;
+}
+
+.destiny-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 80px 28px;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 8px;
 }
