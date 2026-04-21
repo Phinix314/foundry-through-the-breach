@@ -4,8 +4,8 @@
   "description": "Unofficial Through the Breach system for Foundry VTT",
   "version": "0.0.3",
   "compatibility": {
-    "minimum": 13,
-    "verified": "13.350",
+    "minimum": 14,
+    "verified": "14.350",
     "maximum": 14
   },
   "authors": [
