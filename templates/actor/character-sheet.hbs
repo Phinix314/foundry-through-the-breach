@@ -1,249 +1,38 @@
-<form class="{{cssClass}}" autocomplete="off">
-    <header class="ttb-header">
-        <img
-                class="profile-img"
-                src="{{actor.img}}"
-                data-edit="img"
-                title="{{actor.name}}"
-                width="96"
-                height="96"
-        />
+<header class="ttb-header">
+    <img
+            class="profile-img"
+            src="{{actor.img}}"
+            data-edit="img"
+            title="{{actor.name}}"
+            width="96"
+            height="96"
+    />
 
-        <div class="ttb-header-fields">
-            <label>
-                Actor Name
-                <input type="text" name="name" value="{{actor.name}}" />
-            </label>
+    <div class="ttb-header-fields">
+        <label>
+            Actor Name
+            <input type="text" name="name" value="{{actor.name}}" />
+        </label>
 
-            <label>
-                Fated Name
-                <input type="text" name="system.fatedName" value="{{system.fatedName}}" />
-            </label>
+        <label>
+            Fated Name
+            <input type="text" name="system.fatedName" value="{{system.fatedName}}" />
+        </label>
 
-            <label>
-                Player Name
-                <input type="text" name="system.playerName" value="{{system.playerName}}" />
-            </label>
+        <label>
+            Player Name
+            <input type="text" name="system.playerName" value="{{system.playerName}}" />
+        </label>
 
-            <label>
-                Allegiance
-                <input type="text" name="system.allegiance" value="{{system.allegiance}}" />
-            </label>
-        </div>
-    </header>
+        <label>
+            Allegiance
+            <input type="text" name="system.allegiance" value="{{system.allegiance}}" />
+        </label>
+    </div>
 
-    <nav class="sheet-tabs tabs" data-group="primary">
-        <a class="item" data-tab="main">Main</a>
-        <a class="item" data-tab="skills">Skills</a>
-        <a class="item" data-tab="combat">Combat</a>
-        <a class="item" data-tab="notes">Talents & Gear</a>
-        <a class="item" data-tab="destiny">Destiny</a>
-    </nav>
-
-    <section class="sheet-body">
-        <div class="tab" data-group="primary" data-tab="main">
-            <section class="ttb-grid two">
-                <div class="ttb-box">
-                    <h2>Pursuits</h2>
-
-                    <label>
-                        Pursuits
-                        <textarea name="system.pursuits">{{system.pursuits}}</textarea>
-                    </label>
-
-                    <label>
-                        Current Pursuit
-                        <input type="text" name="system.currentPursuit" value="{{system.currentPursuit}}" />
-                    </label>
-
-                    <label>
-                        Characteristics
-                        <input type="text" name="system.characteristics" value="{{system.characteristics}}" />
-                    </label>
-                </div>
-
-                <div class="ttb-box">
-                    <h2>Aspects</h2>
-
-                    <div class="ttb-grid two compact">
-                        <label>Might <input type="number" name="system.aspects.might" value="{{system.aspects.might}}" /></label>
-                        <label>Intellect <input type="number" name="system.aspects.intellect" value="{{system.aspects.intellect}}" /></label>
-
-                        <label>Grace <input type="number" name="system.aspects.grace" value="{{system.aspects.grace}}" /></label>
-                        <label>Charm <input type="number" name="system.aspects.charm" value="{{system.aspects.charm}}" /></label>
-
-                        <label>Speed <input type="number" name="system.aspects.speed" value="{{system.aspects.speed}}" /></label>
-                        <label>Cunning <input type="number" name="system.aspects.cunning" value="{{system.aspects.cunning}}" /></label>
-
-                        <label>Resilience <input type="number" name="system.aspects.resilience" value="{{system.aspects.resilience}}" /></label>
-                        <label>Tenacity <input type="number" name="system.aspects.tenacity" value="{{system.aspects.tenacity}}" /></label>
-                    </div>
-                </div>
-
-                <div class="ttb-box span-two">
-                    <h2>Derived Aspects</h2>
-
-                    <div class="ttb-grid four compact">
-                        <label>Defense <input type="text" name="system.derived.defense" value="{{system.derived.defense}}" /></label>
-                        <label>Armor <input type="text" name="system.derived.armor" value="{{system.derived.armor}}" /></label>
-                        <label>Willpower <input type="text" name="system.derived.willpower" value="{{system.derived.willpower}}" /></label>
-                        <label>Wounds <input type="text" name="system.derived.wounds" value="{{system.derived.wounds}}" /></label>
-
-                        <label>Walk <input type="text" name="system.derived.walk" value="{{system.derived.walk}}" /></label>
-                        <label>Charge <input type="text" name="system.derived.charge" value="{{system.derived.charge}}" /></label>
-                        <label>Initiative <input type="text" name="system.derived.initiative" value="{{system.derived.initiative}}" /></label>
-                        <label>Height <input type="text" name="system.derived.height" value="{{system.derived.height}}" /></label>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <div class="tab" data-group="primary" data-tab="skills">
-            <div class="ttb-box">
-                <h2>Skills</h2>
-
-                <table class="ttb-table">
-                    <thead>
-                    <tr>
-                        <th>Skill</th>
-                        <th>AV</th>
-                        <th>Rating</th>
-                        <th>Aspect</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {{#each rows.skills as |row|}}
-                        <tr>
-                            <td><input type="text" name="system.skills.{{row.index}}.name" value="{{row.data.name}}" /></td>
-                            <td><input type="text" name="system.skills.{{row.index}}.av" value="{{row.data.av}}" /></td>
-                            <td><input type="text" name="system.skills.{{row.index}}.rating" value="{{row.data.rating}}" /></td>
-                            <td><input type="text" name="system.skills.{{row.index}}.aspect" value="{{row.data.aspect}}" /></td>
-                        </tr>
-                    {{/each}}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="tab" data-group="primary" data-tab="combat">
-            {{#each rows.attacks as |row|}}
-                <div class="ttb-box attack-block">
-                    <h2>Attack</h2>
-
-                    <div class="ttb-grid four compact">
-                        <label>Name <input type="text" name="system.attacks.{{row.index}}.name" value="{{row.data.name}}" /></label>
-                        <label>AV <input type="text" name="system.attacks.{{row.index}}.av" value="{{row.data.av}}" /></label>
-                        <label>Range <input type="text" name="system.attacks.{{row.index}}.range" value="{{row.data.range}}" /></label>
-                        <label>Damage <input type="text" name="system.attacks.{{row.index}}.damage" value="{{row.data.damage}}" /></label>
-
-                        <label>Special <input type="text" name="system.attacks.{{row.index}}.special" value="{{row.data.special}}" /></label>
-                        <label>Capacity <input type="text" name="system.attacks.{{row.index}}.capacity" value="{{row.data.capacity}}" /></label>
-                        <label>Reload <input type="text" name="system.attacks.{{row.index}}.reload" value="{{row.data.reload}}" /></label>
-                        <label>TN <input type="text" name="system.attacks.{{row.index}}.tn" value="{{row.data.tn}}" /></label>
-                    </div>
-
-                    <label>
-                        Triggers
-                        <textarea name="system.attacks.{{row.index}}.triggers">{{row.data.triggers}}</textarea>
-                    </label>
-                </div>
-            {{/each}}
-        </div>
-
-        <div class="tab" data-group="primary" data-tab="notes">
-            <section class="ttb-grid two">
-                <div class="ttb-box">
-                    <h2>Talents / Manifested Powers / Magical Theories</h2>
-
-                    <table class="ttb-table">
-                        <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {{#each rows.talents as |row|}}
-                            <tr>
-                                <td><input type="text" name="system.talents.{{row.index}}.name" value="{{row.data.name}}" /></td>
-                                <td><input type="text" name="system.talents.{{row.index}}.description" value="{{row.data.description}}" /></td>
-                            </tr>
-                        {{/each}}
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="ttb-box">
-                    <h2>Equipment</h2>
-
-                    <table class="ttb-table">
-                        <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Notes</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {{#each rows.equipment as |row|}}
-                            <tr>
-                                <td><input type="text" name="system.equipment.{{row.index}}.name" value="{{row.data.name}}" /></td>
-                                <td><input type="text" name="system.equipment.{{row.index}}.notes" value="{{row.data.notes}}" /></td>
-                            </tr>
-                        {{/each}}
-                        </tbody>
-                    </table>
-
-                    <label>
-                        Scrip
-                        <input type="text" name="system.scrip" value="{{system.scrip}}" />
-                    </label>
-
-                    <h2>Grimoire</h2>
-
-                    <label>
-                        Magia
-                        <textarea name="system.grimoire.magia">{{system.grimoire.magia}}</textarea>
-                    </label>
-
-                    <label>
-                        Immuto
-                        <textarea name="system.grimoire.immuto">{{system.grimoire.immuto}}</textarea>
-                    </label>
-
-                    <label>
-                        Special
-                        <textarea name="system.grimoire.special">{{system.grimoire.special}}</textarea>
-                    </label>
-                </div>
-            </section>
-        </div>
-
-        <div class="tab" data-group="primary" data-tab="destiny">
-            <section class="ttb-grid two">
-                <div class="ttb-box">
-                    <h2>Destiny</h2>
-
-                    {{#each rows.destiny as |row|}}
-                        <div class="destiny-row">
-                            <input type="text" name="system.destiny.{{row.index}}.label" value="{{row.data.label}}" />
-                            <input type="text" name="system.destiny.{{row.index}}.text" value="{{row.data.text}}" placeholder="Destiny text" />
-                            <input type="text" name="system.destiny.{{row.index}}.card" value="{{row.data.card}}" placeholder="Card" />
-                            <input type="checkbox" name="system.destiny.{{row.index}}.checked" {{checked row.data.checked}} />
-                        </div>
-                    {{/each}}
-                </div>
-
-                <div class="ttb-box">
-                    <h2>Twist Deck</h2>
-
-                    <div class="ttb-grid two compact">
-                        <label>Masks <input type="text" name="system.twistDeck.masks" value="{{system.twistDeck.masks}}" /></label>
-                        <label>Tomes <input type="text" name="system.twistDeck.tomes" value="{{system.twistDeck.tomes}}" /></label>
-                        <label>Rams <input type="text" name="system.twistDeck.rams" value="{{system.twistDeck.rams}}" /></label>
-                        <label>Crows <input type="text" name="system.twistDeck.crows" value="{{system.twistDeck.crows}}" /></label>
-                    </div>
-                </div>
-            </section>
-        </div>
-    </section>
-</form>
+    <div class="ttb-header-actions">
+        <button type="button" class="ttb-flip-button" data-action="flip-fate">
+            Flip Fate Card
+        </button>
+    </div>
+</header>

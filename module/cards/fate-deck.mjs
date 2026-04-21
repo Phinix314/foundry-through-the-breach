@@ -1,9 +1,12 @@
 const SYSTEM_ID = "through-the-breach";
 
 export const FATE_DECK_NAME = "Fate Deck";
+export const CONFLICT_PILE_NAME = "Current Conflict";
 
 const CARD_IMAGE = "icons/svg/card-joker.svg";
 const CARD_BACK_IMAGE = "icons/svg/card-joker.svg";
+
+const PLAYER_OWNERSHIP = CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER;
 
 const SUITS = [
     { key: "rams", label: "Rams" },
@@ -52,6 +55,7 @@ function makeNumberCard(suit, value, sort) {
                 deck: "fate",
                 fateId,
                 suit: suit.key,
+                suitLabel: suit.label,
                 value,
                 joker: false
             }
@@ -91,6 +95,7 @@ function makeJoker(color, value, sort) {
                 deck: "fate",
                 fateId,
                 suit: "joker",
+                suitLabel: "Joker",
                 value,
                 joker: true,
                 color: color.toLowerCase()
@@ -122,10 +127,24 @@ function getCardFateId(card) {
     return card.getFlag(SYSTEM_ID, "fateId");
 }
 
+async function setPublicOwnership(cardsDocument) {
+    if (!game.user.isGM) return cardsDocument;
+
+    const currentDefault = cardsDocument.ownership?.default;
+
+    if (currentDefault !== PLAYER_OWNERSHIP) {
+        await cardsDocument.update({
+            "ownership.default": PLAYER_OWNERSHIP
+        });
+    }
+
+    return cardsDocument;
+}
+
 export async function ensureFateDeck({ notify = false } = {}) {
     if (!game.user.isGM) {
         console.warn(`${SYSTEM_ID} | Only a GM may create or repair the Fate Deck.`);
-        return null;
+        return game.cards.getName(FATE_DECK_NAME) ?? null;
     }
 
     let deck = game.cards.getName(FATE_DECK_NAME);
@@ -138,6 +157,9 @@ export async function ensureFateDeck({ notify = false } = {}) {
             img: CARD_IMAGE,
             description: "Shared Through the Breach Fate Deck.",
             displayCount: true,
+            ownership: {
+                default: PLAYER_OWNERSHIP
+            },
             flags: {
                 [SYSTEM_ID]: {
                     deck: "fate",
@@ -148,6 +170,8 @@ export async function ensureFateDeck({ notify = false } = {}) {
 
         createdDeck = true;
     }
+
+    await setPublicOwnership(deck);
 
     const expectedCards = buildFateDeckCards();
 
@@ -166,17 +190,15 @@ export async function ensureFateDeck({ notify = false } = {}) {
         await deck.createEmbeddedDocuments("Card", missingCards);
     }
 
-    const finalCount = deck.cards.size + missingCards.length;
+    if (createdDeck) {
+        await deck.shuffle({ chatNotification: false });
+    }
 
-    console.log(
-        `${SYSTEM_ID} | Fate Deck ready`,
-        {
-            createdDeck,
-            addedCards: missingCards.length,
-            expectedCards: expectedCards.length,
-            finalCount
-        }
-    );
+    console.log(`${SYSTEM_ID} | Fate Deck ready`, {
+        createdDeck,
+        addedCards: missingCards.length,
+        cardsInDeck: deck.cards.size
+    });
 
     if (notify && (createdDeck || missingCards.length > 0)) {
         ui.notifications.info(
@@ -185,4 +207,142 @@ export async function ensureFateDeck({ notify = false } = {}) {
     }
 
     return deck;
+}
+
+export async function ensureConflictPile({ notify = false } = {}) {
+    if (!game.user.isGM) {
+        console.warn(`${SYSTEM_ID} | Only a GM may create or repair the Conflict pile.`);
+        return game.cards.getName(CONFLICT_PILE_NAME) ?? null;
+    }
+
+    let pile = game.cards.getName(CONFLICT_PILE_NAME);
+    let createdPile = false;
+
+    if (!pile) {
+        pile = await Cards.implementation.create({
+            name: CONFLICT_PILE_NAME,
+            type: "pile",
+            img: CARD_IMAGE,
+            description: "Public pile for currently flipped Fate cards.",
+            displayCount: true,
+            ownership: {
+                default: PLAYER_OWNERSHIP
+            },
+            flags: {
+                [SYSTEM_ID]: {
+                    deck: "conflict",
+                    version: 1
+                }
+            }
+        });
+
+        createdPile = true;
+    }
+
+    await setPublicOwnership(pile);
+
+    console.log(`${SYSTEM_ID} | Conflict pile ready`, {
+        createdPile,
+        cardsInPile: pile.cards.size
+    });
+
+    if (notify && createdPile) {
+        ui.notifications.info("Through the Breach Conflict pile ready.");
+    }
+
+    return pile;
+}
+
+function getCardFaceImage(card) {
+    const face = card.faces?.[card.face ?? 0];
+    return face?.img ?? card.img ?? CARD_IMAGE;
+}
+
+function getFlippedCardData(card) {
+    return {
+        name: card.name,
+        suit: card.getFlag(SYSTEM_ID, "suit") ?? card.suit ?? "",
+        suitLabel: card.getFlag(SYSTEM_ID, "suitLabel") ?? card.suit ?? "",
+        value: card.getFlag(SYSTEM_ID, "value") ?? card.value ?? "",
+        joker: card.getFlag(SYSTEM_ID, "joker") ?? false,
+        color: card.getFlag(SYSTEM_ID, "color") ?? "",
+        img: getCardFaceImage(card)
+    };
+}
+
+function renderFlipChatContent(cardData, actor = null) {
+    const actorName = actor?.name ? `<p><strong>Actor:</strong> ${actor.name}</p>` : "";
+
+    const jokerLine = cardData.joker
+        ? `<p><strong>Joker:</strong> ${cardData.color}</p>`
+        : "";
+
+    return `
+    <div class="ttb-chat-card ttb-fate-flip">
+      <h2>Fate Flip</h2>
+      ${actorName}
+      <div style="display:flex; gap:10px; align-items:center;">
+        <img src="${cardData.img}" width="64" height="64" style="border:0;" />
+        <div>
+          <p><strong>Card:</strong> ${cardData.name}</p>
+          <p><strong>Value:</strong> ${cardData.value}</p>
+          <p><strong>Suit:</strong> ${cardData.suitLabel}</p>
+          ${jokerLine}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+export async function flipTopCardToConflict({ actor = null } = {}) {
+    const deck = game.cards.getName(FATE_DECK_NAME);
+    const conflictPile = game.cards.getName(CONFLICT_PILE_NAME);
+
+    if (!deck) {
+        ui.notifications.error("Fate Deck does not exist yet. A GM must reload or run deck setup.");
+        return null;
+    }
+
+    if (!conflictPile) {
+        ui.notifications.error("Current Conflict pile does not exist yet. A GM must reload or run deck setup.");
+        return null;
+    }
+
+    if (deck.cards.size < 1) {
+        ui.notifications.warn("The Fate Deck is empty. Recall or reshuffle the deck before flipping.");
+        return null;
+    }
+
+    const drawMode = CONST.CARD_DRAW_MODES?.TOP ?? CONST.CARD_DRAW_MODES?.FIRST ?? 0;
+
+    const drawnCards = await conflictPile.draw(
+        deck,
+        1,
+        { chatNotification: false },
+        drawMode,
+        {}
+    );
+
+    const card = drawnCards?.[0];
+
+    if (!card) {
+        ui.notifications.warn("No Fate card could be flipped.");
+        return null;
+    }
+
+    const cardData = getFlippedCardData(card);
+
+    await ChatMessage.create({
+        speaker: ChatMessage.getSpeaker({ actor }),
+        content: renderFlipChatContent(cardData, actor),
+        flags: {
+            [SYSTEM_ID]: {
+                type: "fateFlip",
+                card: cardData,
+                actorUuid: actor?.uuid ?? null
+            }
+        }
+    });
+
+    return card;
 }

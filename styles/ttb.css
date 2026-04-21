@@ -140,3 +140,35 @@
     align-items: center;
     margin-bottom: 8px;
 }
+
+.ttb-header-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ttb-flip-button {
+    min-width: 140px;
+    padding: 8px 10px;
+    font-weight: bold;
+    background: #2b1a12;
+    color: #e8d49f;
+    border: 1px solid #3a2618;
+}
+
+.ttb-flip-button:hover {
+    background: #5a321f;
+    color: #fff0bd;
+}
+
+.ttb-chat-card.ttb-fate-flip {
+    border: 2px solid #3a2618;
+    background: #d8c39b;
+    color: #21160f;
+    padding: 8px;
+}
+
+.ttb-chat-card.ttb-fate-flip h2 {
+    margin: 0 0 6px;
+    border-bottom: 1px solid #3a2618;
+}
