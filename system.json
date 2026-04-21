@@ -22,6 +22,13 @@
       "src": "styles/ttb.css"
     }
   ],
+  "media": [
+    {
+      "type": "setup",
+      "url": "systems/through-the-breach/assets/images/TTBCore.webp",
+      "thumbnail": "systems/through-the-breach/assets/images/TTBCore.webp"
+    }
+  ],
   "documentTypes": {
     "Actor": {
       "character": {}

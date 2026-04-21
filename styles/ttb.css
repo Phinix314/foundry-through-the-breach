@@ -1,7 +1,7 @@
 .ttb-character-sheet .window-content {
     background:
             linear-gradient(rgba(20, 14, 10, 0.55), rgba(20, 14, 10, 0.55)),
-            url("../module/assets/images/TTBCore.webp") center center / cover no-repeat;
+            url("../assets/images/TTBCore.webp") center center / cover no-repeat;
 }
 
 .ttb-character-sheet form {
