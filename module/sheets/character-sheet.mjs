@@ -1,9 +1,7 @@
-import { flipTopCardToConflict } from "../cards/fate-deck.mjs";
-
 const SYSTEM_ID = "through-the-breach";
 
 function rowData(array, count, fallback = {}) {
-    return Array.from({ length: count }, (_, index) => ({
+    return Array.from({length: count}, (_, index) => ({
         index,
         data: array?.[index] ?? fallback
     }));
@@ -50,21 +48,6 @@ export class TTBCharacterSheet extends ActorSheet {
         console.log("TTB | getData done", context);
 
         return context;
-    }
-
-    activateListeners(html) {
-        super.activateListeners(html);
-
-        html.find("[data-action='flip-fate']").on("click", async (event) => {
-            event.preventDefault();
-
-            try {
-                await flipTopCardToConflict({ actor: this.actor });
-            } catch (error) {
-                console.error("TTB | Failed to flip Fate card", error);
-                ui.notifications.error("Failed to flip Fate card. Check console.");
-            }
-        });
     }
 
     setPosition(position = {}) {

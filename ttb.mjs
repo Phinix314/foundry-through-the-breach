@@ -5,6 +5,10 @@ import {
     ensureConflictPile,
     flipTopCardToConflict
 } from "./module/cards/fate-deck.mjs";
+import {
+    ensureFlipFateMacro,
+    setupFlipFateMacroForCurrentUser
+} from "./module/macros/fate-macros.mjs";
 
 const SYSTEM_ID = "through-the-breach";
 
@@ -25,16 +29,29 @@ Hooks.once("ready", async () => {
     game.throughTheBreach = {
         ensureFateDeck,
         ensureConflictPile,
-        flipTopCardToConflict
+        flipTopCardToConflict,
+        ensureFlipFateMacro,
+        setupFlipFateMacroForCurrentUser
     };
 
-    if (!game.user.isGM) return;
+    if (game.user.isGM) {
+        try {
+            await ensureFateDeck({ notify: true });
+            await ensureConflictPile({ notify: true });
+            await ensureFlipFateMacro({ notify: true });
+        } catch (error) {
+            console.error(`${SYSTEM_ID} | Failed to prepare TTB system`, error);
+            ui.notifications.error("Through the Breach | Failed to prepare system. Check console.");
+        }
+    }
 
     try {
-        await ensureFateDeck({ notify: true });
-        await ensureConflictPile({ notify: true });
+        await setupFlipFateMacroForCurrentUser({ notify: false });
+
+        window.setTimeout(() => {
+            setupFlipFateMacroForCurrentUser({ notify: false });
+        }, 2000);
     } catch (error) {
-        console.error(`${SYSTEM_ID} | Failed to prepare card stacks`, error);
-        ui.notifications.error("Through the Breach | Failed to prepare card stacks. Check console.");
+        console.error(`${SYSTEM_ID} | Failed to assign flip macro`, error);
     }
 });

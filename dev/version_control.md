@@ -19,3 +19,4 @@
   - Create/Update Fatedeck from Characktersheet.
   - Link Aspect and Skills
   - Ability to pop out/Improve Talents.
+- Improved Display of current conflict. 
