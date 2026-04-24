@@ -1,10 +1,10 @@
 # Versions
-- 0.0.1  initial boot
-- 0.0.2  actor data model
-- 0.0.3  basic Fate Deck creation
-- 0.0.4  flip button
-- 0.0.5  player Decks.
-- 0.0.6  cheats
+- 0.0.0  initial boot
+- 0.0.1  actor data model
+- 0.0.2  basic Fate Deck creation
+- 0.0.3  flip button
+- 0.0.4  player Decks.
+- 0.0.5  Flips, Cheat and Discards.
 - 0.1.0  first usable table prototype
 
 

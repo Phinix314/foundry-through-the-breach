@@ -1,5 +1,5 @@
-import { TTBCharacterData } from "./module/data/character-data.mjs";
-import { TTBCharacterSheet } from "./module/sheets/character-sheet.mjs";
+import {TTBCharacterData} from "./module/data/character-data.mjs";
+import {TTBCharacterSheet} from "./module/sheets/character-sheet.mjs";
 import {
     ensureFateDeck,
     ensureConflictPile,
@@ -32,6 +32,14 @@ import {
     setupTwistMacrosForCurrentUser
 } from "./module/macros/twist-macros.mjs";
 
+import {
+    ensureFateDiscard,
+    ensureActorTwistDiscard,
+    ensureActorTwistDiscards,
+    getActorTwistDiscard,
+    syncActorTwistDiscardOwnership
+} from "./module/cards/discard-piles.mjs";
+
 const SYSTEM_ID = "through-the-breach";
 
 Hooks.once("init", () => {
@@ -50,13 +58,19 @@ Hooks.once("ready", async () => {
 
     game.throughTheBreach = {
         ensureFateDeck,
+        ensureFateDiscard,
         ensureConflictPile,
-        flipTopCardToConflict,
-
-
 
         ensureActorTwistDeck,
+        ensureActorTwistHand,
+        ensureActorTwistDiscard,
+
+        ensureActorTwistDiscards,
+        getActorTwistDiscard,
+        syncActorTwistDiscardOwnership,
+
         ensureActorCardStacks,
+        flipTopCardToConflict,
 
         ensureActorTwistDecks,
         getActorTwistDeck,
@@ -65,7 +79,6 @@ Hooks.once("ready", async () => {
         syncActorTwistDeckOwnership,
         listFateCardIds,
 
-        ensureActorTwistHand,
         ensureActorTwistHands,
         getActorTwistHand,
         syncActorTwistHandOwnership,
@@ -79,15 +92,16 @@ Hooks.once("ready", async () => {
 
     if (game.user.isGM) {
         try {
-            await ensureFateDeck({ notify: true });
-            await ensureConflictPile({ notify: true });
+            await ensureFateDeck({notify: true});
+            await ensureFateDiscard({notify: true});
+            await ensureConflictPile({notify: true});
 
             for (const actor of game.actors.filter(a => a.type === "character")) {
-                await ensureActorCardStacks(actor, { notify: true });
+                await ensureActorCardStacks(actor, {notify: true});
             }
 
-            await ensureFlipFateMacro({ notify: true });
-            await ensureTwistMacros({ notify: true });
+            await ensureFlipFateMacro({notify: true});
+            await ensureTwistMacros({notify: true});
         } catch (error) {
             console.error(`${SYSTEM_ID} | Failed to prepare TTB system`, error);
             ui.notifications.error("Through the Breach | Failed to prepare system. Check console.");
@@ -102,11 +116,14 @@ Hooks.once("ready", async () => {
         });
     }
 
-    async function ensureActorCardStacks(actor, { notify = false } = {}) {
-        await ensureActorTwistDeck(actor, { notify });
-        await ensureActorTwistHand(actor, { notify });
+    async function ensureActorCardStacks(actor, {notify = false} = {}) {
+        await ensureActorTwistDeck(actor, {notify});
+        await ensureActorTwistHand(actor, {notify});
+        await ensureActorTwistDiscard(actor, {notify});
+
         await syncActorTwistDeckOwnership(actor);
         await syncActorTwistHandOwnership(actor);
+        await syncActorTwistDiscardOwnership(actor);
     }
 
     Hooks.on("createActor", async (actor) => {
@@ -122,7 +139,7 @@ Hooks.once("ready", async () => {
 
     function actorCardStacksNeedSync(changes) {
         const flat = foundry.utils.flattenObject(changes ?? {});
-        return Object.keys(flat).some(key => key === "name" || key.startsWith("ownership"));
+        return Object.keys(flat).some((key) => key === "name" || key.startsWith("ownership"));
     }
 
     Hooks.on("updateActor", async (actor, changes) => {
@@ -138,21 +155,21 @@ Hooks.once("ready", async () => {
     });
 
     try {
-        await setupFlipFateMacroForCurrentUser({ notify: false });
+        await setupFlipFateMacroForCurrentUser({notify: false});
 
         window.setTimeout(() => {
-            setupFlipFateMacroForCurrentUser({ notify: false });
+            setupFlipFateMacroForCurrentUser({notify: false});
         }, 2000);
     } catch (error) {
         console.error(`${SYSTEM_ID} | Failed to assign flip macro`, error);
     }
     try {
-        await setupFlipFateMacroForCurrentUser({ notify: false });
-        await setupTwistMacrosForCurrentUser({ notify: false });
+        await setupFlipFateMacroForCurrentUser({notify: false});
+        await setupTwistMacrosForCurrentUser({notify: false});
 
         window.setTimeout(() => {
-            setupFlipFateMacroForCurrentUser({ notify: false });
-            setupTwistMacrosForCurrentUser({ notify: false });
+            setupFlipFateMacroForCurrentUser({notify: false});
+            setupTwistMacrosForCurrentUser({notify: false});
         }, 2000);
     } catch (error) {
         console.error(`${SYSTEM_ID} | Failed to assign macros`, error);
