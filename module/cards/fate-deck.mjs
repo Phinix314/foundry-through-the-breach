@@ -1,5 +1,7 @@
 const SYSTEM_ID = "through-the-breach";
 
+import { markCardEnteredConflict } from "./conflict-resolution.mjs";
+
 export const FATE_DECK_NAME = "Fate Deck";
 export const CONFLICT_PILE_NAME = "Current Conflict";
 
@@ -329,6 +331,11 @@ export async function flipTopCardToConflict({ actor = null } = {}) {
         ui.notifications.warn("No Fate card could be flipped.");
         return null;
     }
+
+    await markCardEnteredConflict(card, {
+        sourceStack: "fate",
+        sourceActorUuid: null
+    });
 
     const cardData = getFlippedCardData(card);
 

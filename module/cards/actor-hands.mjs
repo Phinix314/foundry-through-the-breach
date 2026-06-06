@@ -4,6 +4,7 @@ import {
     getCharacterActors,
     getActorCardStackOwnership
 } from "./actor-card-permissions.mjs";
+import { markCardEnteredConflict } from "./conflict-resolution.mjs";
 
 const SYSTEM_ID = "through-the-breach";
 export const ACTOR_HAND_PREFIX = "Hand";
@@ -283,6 +284,11 @@ export async function cheatFateCardFromActorHand(actorOrIdOrNameOrUuid, cardId) 
 
     const movedCard = movedCards?.[0];
     if (!movedCard) return null;
+
+    await markCardEnteredConflict(movedCard, {
+        sourceStack: "twist",
+        sourceActorUuid: actor.uuid
+    });
 
     const cardData = getCardData(movedCard);
 

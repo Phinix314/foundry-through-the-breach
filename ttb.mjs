@@ -27,6 +27,7 @@ import {
     cheatFateCardFromActorHand,
     openCheatFateDialogForActor
 } from "./module/cards/actor-hands.mjs";
+
 import {
     ensureTwistMacros,
     setupTwistMacrosForCurrentUser
@@ -39,6 +40,17 @@ import {
     getActorTwistDiscard,
     syncActorTwistDiscardOwnership
 } from "./module/cards/discard-piles.mjs";
+
+import {
+    resolveCurrentConflict,
+    getTopDiscardCards
+} from "./module/cards/conflict-resolution.mjs";
+
+import {
+    ensureResolveConflictMacro,
+    setupResolveConflictMacroForCurrentUser
+} from "./module/macros/conflict-macros.mjs";
+
 
 const SYSTEM_ID = "through-the-breach";
 
@@ -64,6 +76,9 @@ Hooks.once("ready", async () => {
         ensureActorTwistDeck,
         ensureActorTwistHand,
         ensureActorTwistDiscard,
+
+        resolveCurrentConflict,
+        getTopDiscardCards,
 
         ensureActorTwistDiscards,
         getActorTwistDiscard,
@@ -95,6 +110,7 @@ Hooks.once("ready", async () => {
             await ensureFateDeck({notify: true});
             await ensureFateDiscard({notify: true});
             await ensureConflictPile({notify: true});
+            await ensureResolveConflictMacro({ notify: true });
 
             for (const actor of game.actors.filter(a => a.type === "character")) {
                 await ensureActorCardStacks(actor, {notify: true});
@@ -102,6 +118,11 @@ Hooks.once("ready", async () => {
 
             await ensureFlipFateMacro({notify: true});
             await ensureTwistMacros({notify: true});
+            await setupResolveConflictMacroForCurrentUser({ notify: false });
+
+            window.setTimeout(() => {
+                setupResolveConflictMacroForCurrentUser({ notify: false });
+            }, 2000);
         } catch (error) {
             console.error(`${SYSTEM_ID} | Failed to prepare TTB system`, error);
             ui.notifications.error("Through the Breach | Failed to prepare system. Check console.");
