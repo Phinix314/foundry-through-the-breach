@@ -1,6 +1,7 @@
 const SYSTEM_ID = "through-the-breach";
 
 import { markCardEnteredConflict } from "./conflict-resolution.mjs";
+import { prepareFateDeckForDraw } from "./deck-recycling.mjs";
 
 export const FATE_DECK_NAME = "Fate Deck";
 export const CONFLICT_PILE_NAME = "Current Conflict";
@@ -314,6 +315,9 @@ export async function flipTopCardToConflict({ actor = null } = {}) {
         ui.notifications.warn("The Fate Deck is empty. Recall or reshuffle the deck before flipping.");
         return null;
     }
+
+    const canDraw = await prepareFateDeckForDraw(1);
+    if (!canDraw) return null;
 
     const drawMode = CONST.CARD_DRAW_MODES?.TOP ?? CONST.CARD_DRAW_MODES?.FIRST ?? 0;
 

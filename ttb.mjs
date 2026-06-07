@@ -50,7 +50,14 @@ import {
     ensureResolveConflictMacro,
     setupResolveConflictMacroForCurrentUser
 } from "./module/macros/conflict-macros.mjs";
-
+import {
+    recycleFateDeckIfEmpty,
+    recycleActorTwistDeckIfEmpty,
+    prepareFateDeckForDraw,
+    prepareActorTwistDeckForDraw,
+    announceActorTwistDraw,
+    getAvailableCardCountForStack
+} from "./module/cards/deck-recycling.mjs";
 
 const SYSTEM_ID = "through-the-breach";
 
@@ -79,6 +86,13 @@ Hooks.once("ready", async () => {
 
         resolveCurrentConflict,
         getTopDiscardCards,
+
+        recycleFateDeckIfEmpty,
+        recycleActorTwistDeckIfEmpty,
+        prepareFateDeckForDraw,
+        prepareActorTwistDeckForDraw,
+        announceActorTwistDraw,
+
 
         ensureActorTwistDiscards,
         getActorTwistDiscard,

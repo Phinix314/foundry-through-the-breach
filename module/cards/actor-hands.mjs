@@ -1,3 +1,7 @@
+import {
+    prepareActorTwistDeckForDraw,
+    announceActorTwistDraw
+} from "./deck-recycling.mjs";
 import { CONFLICT_PILE_NAME } from "./fate-deck.mjs";
 import { getActorTwistDeck } from "./actor-decks.mjs";
 import {
@@ -224,10 +228,8 @@ export async function drawTwistCardsForActor(actorOrIdOrNameOrUuid, number = 1) 
         return [];
     }
 
-    if (deck.cards.size < number) {
-        ui.notifications.warn(`${actor.name}'s Twist Deck does not have enough cards.`);
-        return [];
-    }
+    const canDraw = await prepareActorTwistDeckForDraw(actor, number);
+    if (!canDraw) return [];
 
     const drawMode = CONST.CARD_DRAW_MODES?.TOP ?? CONST.CARD_DRAW_MODES?.FIRST ?? 0;
 
@@ -239,7 +241,9 @@ export async function drawTwistCardsForActor(actorOrIdOrNameOrUuid, number = 1) 
         {}
     );
 
-    ui.notifications.info(`${actor.name} drew ${drawnCards.length} Twist card(s).`);
+    if (drawnCards.length > 0) {
+        await announceActorTwistDraw(actor, drawnCards.length);
+    }
 
     return drawnCards;
 }
