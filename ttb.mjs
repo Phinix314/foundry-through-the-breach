@@ -10,6 +10,10 @@ import {
     setupFlipFateMacroForCurrentUser
 } from "./module/macros/fate-macros.mjs";
 import {
+    ensureDiscardMacros,
+    setupDiscardMacrosForCurrentUser
+} from "./module/macros/discard-macros.mjs";
+import {
     ensureActorTwistDeck,
     ensureActorTwistDecks,
     getActorTwistDeck,
@@ -43,7 +47,11 @@ import {
 
 import {
     resolveCurrentConflict,
-    getTopDiscardCards
+    getTopDiscardCards,
+    peekFateDiscard,
+    peekActorTwistDiscard,
+    showPeekFateDiscard,
+    showPeekActorTwistDiscard
 } from "./module/cards/conflict-resolution.mjs";
 
 import {
@@ -86,6 +94,10 @@ Hooks.once("ready", async () => {
 
         resolveCurrentConflict,
         getTopDiscardCards,
+        peekFateDiscard,
+        peekActorTwistDiscard,
+        showPeekFateDiscard,
+        showPeekActorTwistDiscard,
 
         recycleFateDeckIfEmpty,
         recycleActorTwistDeckIfEmpty,
@@ -125,6 +137,7 @@ Hooks.once("ready", async () => {
             await ensureFateDiscard({notify: true});
             await ensureConflictPile({notify: true});
             await ensureResolveConflictMacro({ notify: true });
+            await ensureDiscardMacros({ notify: true });
 
             for (const actor of game.actors.filter(a => a.type === "character")) {
                 await ensureActorCardStacks(actor, {notify: true});
@@ -190,17 +203,10 @@ Hooks.once("ready", async () => {
     });
 
     try {
-        await setupFlipFateMacroForCurrentUser({notify: false});
 
-        window.setTimeout(() => {
-            setupFlipFateMacroForCurrentUser({notify: false});
-        }, 2000);
-    } catch (error) {
-        console.error(`${SYSTEM_ID} | Failed to assign flip macro`, error);
-    }
-    try {
         await setupFlipFateMacroForCurrentUser({notify: false});
         await setupTwistMacrosForCurrentUser({notify: false});
+        await setupDiscardMacrosForCurrentUser({ notify: false });
 
         window.setTimeout(() => {
             setupFlipFateMacroForCurrentUser({notify: false});

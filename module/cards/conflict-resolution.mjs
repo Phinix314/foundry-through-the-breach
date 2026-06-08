@@ -1,6 +1,7 @@
 import { CONFLICT_PILE_NAME } from "./fate-deck.mjs";
 import { FATE_DISCARD_NAME, getActorTwistDiscard } from "./discard-piles.mjs";
 
+
 const SYSTEM_ID = "through-the-breach";
 
 function getTtbFlag(card, key, fallback = null) {
@@ -164,4 +165,140 @@ export function getTopDiscardCards(discardPile, count = 1) {
             return bSeq - aSeq;
         })
         .slice(0, count);
+}
+
+
+
+function formatPeekCard(card) {
+    const suitLabel =
+        card.getFlag(SYSTEM_ID, "suitLabel") ??
+        card.suit ??
+        "";
+
+    const value =
+        card.getFlag(SYSTEM_ID, "value") ??
+        card.value ??
+        "";
+
+    return {
+        id: card.id,
+        name: card.name,
+        suitLabel,
+        value,
+        discardSeq: Number(card.getFlag(SYSTEM_ID, "discardSeq") ?? 0)
+    };
+}
+
+async function resolveActor(actorOrIdOrNameOrUuid) {
+    if (!actorOrIdOrNameOrUuid) return null;
+
+    if (actorOrIdOrNameOrUuid instanceof Actor) {
+        return actorOrIdOrNameOrUuid;
+    }
+
+    if (typeof actorOrIdOrNameOrUuid !== "string") {
+        return null;
+    }
+
+    if (actorOrIdOrNameOrUuid.startsWith("Actor.")) {
+        return await fromUuid(actorOrIdOrNameOrUuid);
+    }
+
+    return (
+        game.actors.get(actorOrIdOrNameOrUuid) ??
+        game.actors.getName(actorOrIdOrNameOrUuid) ??
+        null
+    );
+}
+
+export function peekFateDiscard(count = 1) {
+    const discard = game.cards.getName(FATE_DISCARD_NAME);
+    if (!discard) {
+        ui.notifications.error("Fate Discard does not exist.");
+        return [];
+    }
+
+    return getTopDiscardCards(discard, count).map(formatPeekCard);
+}
+
+export async function peekActorTwistDiscard(actorOrIdOrNameOrUuid, count = 1) {
+    const actor = await resolveActor(actorOrIdOrNameOrUuid);
+    if (!actor) {
+        ui.notifications.warn("Select a token or assign a character first.");
+        return [];
+    }
+
+    const discard = getActorTwistDiscard(actor);
+    if (!discard) {
+        ui.notifications.error(`Twist Discard missing for ${actor.name}.`);
+        return [];
+    }
+
+    return getTopDiscardCards(discard, count).map(formatPeekCard);
+}
+
+function renderPeekList(title, cards) {
+    if (!cards.length) {
+        return `
+      <div class="ttb-chat-card ttb-fate-flip">
+        <h2>${foundry.utils.escapeHTML(title)}</h2>
+        <p>No cards found.</p>
+      </div>
+    `;
+    }
+
+    const items = cards.map((card, index) => {
+        return `
+      <li>
+        <strong>#${index + 1}</strong>:
+        ${foundry.utils.escapeHTML(card.name)}
+        (${foundry.utils.escapeHTML(String(card.value))} ${foundry.utils.escapeHTML(card.suitLabel)})
+      </li>
+    `;
+    }).join("");
+
+    return `
+    <div class="ttb-chat-card ttb-fate-flip">
+      <h2>${foundry.utils.escapeHTML(title)}</h2>
+      <ol>${items}</ol>
+    </div>
+  `;
+}
+
+export async function showPeekFateDiscard(count = 1) {
+    const cards = peekFateDiscard(count);
+
+    await ChatMessage.create({
+        speaker: {
+            alias: "Through the Breach"
+        },
+        content: renderPeekList(`Top ${count} Fate Discard`, cards),
+        flags: {
+            [SYSTEM_ID]: {
+                type: "peekFateDiscard"
+            }
+        }
+    });
+
+    return cards;
+}
+
+export async function showPeekActorTwistDiscard(actorOrIdOrNameOrUuid, count = 1) {
+    const actor = await resolveActor(actorOrIdOrNameOrUuid);
+    if (!actor) return [];
+
+    const cards = await peekActorTwistDiscard(actor, count);
+
+    await ChatMessage.create({
+        speaker: ChatMessage.getSpeaker({ actor }),
+        content: renderPeekList(`Top ${count} Twist Discard - ${actor.name}`, cards),
+        flags: {
+            [SYSTEM_ID]: {
+                type: "peekTwistDiscard",
+                actorUuid: actor.uuid
+            }
+        }
+    });
+
+    return cards;
 }
