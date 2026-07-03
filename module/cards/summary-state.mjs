@@ -83,7 +83,6 @@ export async function syncActorCardSummary(actorOrIdOrNameOrUuid) {
     await actor.setFlag(SYSTEM_ID, "cardSummary", summary);
 
     ui.players?.render?.(true);
-    game.throughTheBreach?.rerenderTtbCardDock?.();
 
     return summary;
 }
@@ -95,7 +94,7 @@ export async function syncAllActorCardSummaries() {
         await syncActorCardSummary(actor);
     }
 
-    game.throughTheBreach?.rerenderTtbCardDock?.();
+    ui.players?.render?.(true);
 
     return true;
 }

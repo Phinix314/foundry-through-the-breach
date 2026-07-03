@@ -61,19 +61,21 @@ async function onAction(event) {
         ui.notifications.error("TTB dock action failed. Check console.");
     }
 
-    await rerenderTtbCardDock();
+    ui.players?.render?.(true);
 }
 
 function activateDockListeners(root) {
-    root.find("[data-action]").off("click.ttbDock");
-    root.find("[data-action]").on("click.ttbDock", onAction);
+    root.querySelectorAll("[data-action]").forEach((el) => {
+        el.removeEventListener("click", onAction);
+        el.addEventListener("click", onAction);
+    });
 }
 
 export async function renderTtbCardDock(app, html) {
     try {
-        const list = html.find("#player-list");
-        if (!list.length) {
-            console.warn(`${SYSTEM_ID} | Could not find #player-list for card dock.`);
+        const root = html instanceof HTMLElement ? html : html?.[0];
+        if (!root) {
+            console.warn(`${SYSTEM_ID} | Could not resolve Players root element.`);
             return;
         }
 
@@ -85,20 +87,18 @@ export async function renderTtbCardDock(app, html) {
             data
         );
 
-        html.find("#ttb-card-dock").remove();
-        list.before(dockHtml);
+        root.querySelector("#ttb-card-dock")?.remove();
+        root.insertAdjacentHTML("afterbegin", dockHtml);
 
-        activateDockListeners(html);
+        const dock = root.querySelector("#ttb-card-dock");
+        if (dock) activateDockListeners(dock);
     } catch (error) {
         console.error(`${SYSTEM_ID} | Failed to render card dock`, error);
     }
 }
 
-export async function rerenderTtbCardDock() {
-    const html = ui.players?.element;
-    if (!html?.length) return;
-
-    await renderTtbCardDock(ui.players, html);
+export function rerenderTtbCardDock() {
+    ui.players?.render?.(true);
 }
 
 export function initializeTtbCardDock() {
@@ -110,10 +110,10 @@ export function initializeTtbCardDock() {
     Hooks.on("ready", () => {
         console.log(`${SYSTEM_ID} | Initializing card dock rerender`);
 
-        rerenderTtbCardDock();
+        ui.players?.render?.(true);
 
         window.setTimeout(() => {
-            rerenderTtbCardDock();
+            ui.players?.render?.(true);
         }, 500);
     });
 }

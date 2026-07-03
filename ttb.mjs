@@ -180,6 +180,7 @@ Hooks.once("ready", async () => {
             }
 
             await syncAllActorCardSummaries();
+            await rerenderTtbCardDock();
 
             await ensureFlipFateMacro({ notify: true });
             await ensureTwistMacros({ notify: true });
@@ -214,6 +215,7 @@ Hooks.on("createActor", async (actor) => {
 
     try {
         await ensureActorCardStacks(actor, { notify: true });
+        await rerenderTtbCardDock();
     } catch (error) {
         console.error(`${SYSTEM_ID} | Failed to create actor card stacks`, error);
     }
@@ -226,6 +228,7 @@ Hooks.on("updateActor", async (actor, changes) => {
 
     try {
         await ensureActorCardStacks(actor);
+        await rerenderTtbCardDock();
     } catch (error) {
         console.error(`${SYSTEM_ID} | Failed to sync actor card stacks`, error);
     }
