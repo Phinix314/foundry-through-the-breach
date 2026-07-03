@@ -1,0 +1,163 @@
+<section id="ttb-card-dock" class="ttb-card-dock">
+    <header class="ttb-card-dock__header">
+        <h3>Through the Breach</h3>
+    </header>
+
+    <div class="ttb-card-dock__section">
+        <div class="ttb-card-dock__label">Shared</div>
+
+        <div class="ttb-stack">
+            <div class="ttb-stack__title">
+                <span>Fate Deck</span>
+                <span class="ttb-badge">{{global.fateDeck.count}}</span>
+            </div>
+
+            <div class="ttb-preview ttb-preview--backs">
+                {{#each global.fateDeck.previewBacks}}
+                    <div class="ttb-card ttb-card--back"></div>
+                {{/each}}
+            </div>
+
+            <div class="ttb-stack__actions">
+                <button type="button" data-action="flip-fate">Flip</button>
+            </div>
+        </div>
+
+        <div class="ttb-stack">
+            <div class="ttb-stack__title">
+                <span>Fate Discard</span>
+                <span class="ttb-badge">{{global.fateDiscard.count}}</span>
+            </div>
+
+            <div class="ttb-preview ttb-preview--faces">
+                {{#each global.fateDiscard.cards as |card|}}
+                    <div class="ttb-card ttb-card--face" title="{{card.name}}">
+                        <div class="ttb-card__value">{{card.value}}</div>
+                        <div class="ttb-card__suit">{{card.suitLabel}}</div>
+                    </div>
+                {{/each}}
+            </div>
+
+            <div class="ttb-stack__actions">
+                <button type="button" data-action="peek-fate-discard">Peek</button>
+            </div>
+        </div>
+
+        <div class="ttb-stack">
+            <div class="ttb-stack__title">
+                <span>Current Conflict</span>
+                <span class="ttb-badge">{{global.conflict.count}}</span>
+            </div>
+
+            <div class="ttb-preview ttb-preview--faces">
+                {{#each global.conflict.cards as |card|}}
+                    <div class="ttb-card ttb-card--face" title="{{card.name}}">
+                        <div class="ttb-card__value">{{card.value}}</div>
+                        <div class="ttb-card__suit">{{card.suitLabel}}</div>
+                    </div>
+                {{/each}}
+            </div>
+
+            <div class="ttb-stack__actions">
+                <button type="button" data-action="resolve-conflict">Resolve</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="ttb-card-dock__section">
+        <div class="ttb-card-dock__label">Actors</div>
+
+        {{#each actors as |actor|}}
+            <div class="ttb-actor-block">
+                <div class="ttb-actor-block__title">
+                    <img src="{{actor.actorImg}}" alt="{{actor.actorName}}" />
+                    <span>{{actor.actorName}}</span>
+                </div>
+
+                <div class="ttb-stack">
+                    <div class="ttb-stack__title">
+                        <span>Twist Deck</span>
+                        <span class="ttb-badge">{{actor.twistDeck.count}}</span>
+                    </div>
+
+                    <div class="ttb-preview ttb-preview--backs">
+                        {{#each actor.twistDeck.previewBacks}}
+                            <div class="ttb-card ttb-card--back"></div>
+                        {{/each}}
+                    </div>
+
+                    {{#if actor.ownsPrivate}}
+                        <div class="ttb-stack__actions">
+                            <button
+                                    type="button"
+                                    data-action="draw-twist"
+                                    data-actor-uuid="{{actor.actorUuid}}"
+                            >
+                                Draw
+                            </button>
+                        </div>
+                    {{/if}}
+                </div>
+
+                <div class="ttb-stack">
+                    <div class="ttb-stack__title">
+                        <span>Hand</span>
+                        <span class="ttb-badge">{{actor.hand.count}}</span>
+                    </div>
+
+                    {{#if actor.ownsPrivate}}
+                        <div class="ttb-preview ttb-preview--faces">
+                            {{#each actor.hand.cards as |card|}}
+                                <div class="ttb-card ttb-card--face" title="{{card.name}}">
+                                    <div class="ttb-card__value">{{card.value}}</div>
+                                    <div class="ttb-card__suit">{{card.suitLabel}}</div>
+                                    <button
+                                            type="button"
+                                            class="ttb-card__action"
+                                            data-action="cheat-card"
+                                            data-actor-uuid="{{actor.actorUuid}}"
+                                            data-card-id="{{card.id}}"
+                                    >
+                                        Cheat
+                                    </button>
+                                </div>
+                            {{/each}}
+                        </div>
+                    {{else}}
+                        <div class="ttb-preview ttb-preview--backs">
+                            {{#each actor.hand.previewBacks}}
+                                <div class="ttb-card ttb-card--back"></div>
+                            {{/each}}
+                        </div>
+                    {{/if}}
+                </div>
+
+                <div class="ttb-stack">
+                    <div class="ttb-stack__title">
+                        <span>Twist Discard</span>
+                        <span class="ttb-badge">{{actor.twistDiscard.count}}</span>
+                    </div>
+
+                    <div class="ttb-preview ttb-preview--faces">
+                        {{#each actor.twistDiscard.cards as |card|}}
+                            <div class="ttb-card ttb-card--face" title="{{card.name}}">
+                                <div class="ttb-card__value">{{card.value}}</div>
+                                <div class="ttb-card__suit">{{card.suitLabel}}</div>
+                            </div>
+                        {{/each}}
+                    </div>
+
+                    <div class="ttb-stack__actions">
+                        <button
+                                type="button"
+                                data-action="peek-twist-discard"
+                                data-actor-uuid="{{actor.actorUuid}}"
+                        >
+                            Peek
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {{/each}}
+    </div>
+</section>

@@ -245,6 +245,8 @@ export async function drawTwistCardsForActor(actorOrIdOrNameOrUuid, number = 1) 
         await announceActorTwistDraw(actor, drawnCards.length);
     }
 
+    await game.throughTheBreach?.syncActorCardSummary?.(actor);
+
     return drawnCards;
 }
 
@@ -307,6 +309,8 @@ export async function cheatFateCardFromActorHand(actorOrIdOrNameOrUuid, cardId) 
             }
         }
     });
+
+    await game.throughTheBreach?.syncActorCardSummary?.(actor);
 
     return movedCard;
 }

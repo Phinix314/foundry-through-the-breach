@@ -18,9 +18,8 @@
     "ttb.mjs"
   ],
   "styles": [
-    {
-      "src": "styles/ttb.css"
-    }
+    "styles/ttb.css",
+    "styles/ttb-card-dock.css"
   ],
   "media": [
     {

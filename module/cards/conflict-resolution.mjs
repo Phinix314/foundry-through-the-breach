@@ -119,6 +119,7 @@ export async function resolveCurrentConflict({ chat = true } = {}) {
     }
 
     const moved = [];
+    const touchedActorUuids = new Set();
 
     for (const card of conflictCards) {
         const destination = await resolveDiscardDestination(card);
@@ -130,6 +131,9 @@ export async function resolveCurrentConflict({ chat = true } = {}) {
                 card: movedCard,
                 destination: destination.name
             });
+
+            const actorUuid = movedCard.getFlag(SYSTEM_ID, "actorUuid");
+            if (actorUuid) touchedActorUuids.add(actorUuid);
         }
     }
 
@@ -153,6 +157,12 @@ export async function resolveCurrentConflict({ chat = true } = {}) {
             }
         });
     }
+
+    for (const actorUuid of touchedActorUuids) {
+        await game.throughTheBreach?.syncActorCardSummary?.(actorUuid);
+    }
+
+    ui.players?.render?.(true);
 
     return moved;
 }

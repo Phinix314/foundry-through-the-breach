@@ -121,6 +121,8 @@ export async function recycleActorTwistDeckIfEmpty(actorOrIdOrNameOrUuid, { noti
         await announce(`<p><strong>${foundry.utils.escapeHTML(actor.name)}</strong>'s Twist Deck has been shuffled from its discard pile.</p>`);
     }
 
+    await game.throughTheBreach?.syncActorCardSummary?.(actor);
+
     return true;
 }
 

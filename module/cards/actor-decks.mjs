@@ -221,6 +221,8 @@ export async function addFateCardsToActorDeck(
         await deck.shuffle({ chatNotification: false });
     }
 
+    await game.throughTheBreach?.syncActorCardSummary?.(actor);
+
     if (notify) {
         ui.notifications.info(`Added ${cardsToCreate.length} card(s) to ${deck.name}.`);
     }
@@ -258,6 +260,8 @@ export async function setActorDeckComposition(
         shuffle,
         notify: false
     });
+
+    await game.throughTheBreach?.syncActorCardSummary?.(actor);
 
     if (notify) {
         ui.notifications.info(`Set ${deck.name} to ${fateIds.length} card(s).`);
