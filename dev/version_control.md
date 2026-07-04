@@ -5,6 +5,9 @@
 - 0.0.3  flip button
 - 0.0.4  player Decks.
 - 0.0.5  Flips, Cheat and Discards.
+- 0.0.6  Card Docks / Improved Card Display.
+  - 0.0.6.1 First implementation of card dock
+  - 0.0.6.2 GM Assignment Macro
 - 0.1.0  first usable table prototype
 
 

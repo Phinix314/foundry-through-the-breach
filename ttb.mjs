@@ -34,8 +34,6 @@ import {
 } from "./module/cards/actor-decks.mjs";
 import {
     ensureActorTwistHand,
-    ensureActorTwistHands,
-    getActorTwistHand,
     syncActorTwistHandOwnership,
     drawTwistCardsForActor,
     cheatFateCardFromActorHand,
@@ -74,8 +72,12 @@ import {
     prepareFateDeckForDraw,
     prepareActorTwistDeckForDraw,
     announceActorTwistDraw,
-    getAvailableCardCountForStack
 } from "./module/cards/deck-recycling.mjs";
+import {
+    ensureGmDeckToolsMacro,
+    setupGmDeckToolsMacroForCurrentUser,
+    openAssignTwistDeckDialogFromApi
+} from "./module/macros/gm-deck-tools.mjs";
 
 const SYSTEM_ID = "through-the-breach";
 
@@ -126,6 +128,10 @@ Hooks.once("ready", async () => {
         syncActorTwistDiscardOwnership,
 
         ensureActorCardStacks,
+
+        ensureGmDeckToolsMacro,
+        setupGmDeckToolsMacroForCurrentUser,
+        openAssignTwistDeckDialog: openAssignTwistDeckDialogFromApi,
 
         resolveCurrentConflict,
         getTopDiscardCards,
@@ -186,6 +192,7 @@ Hooks.once("ready", async () => {
             await ensureTwistMacros({ notify: true });
             await ensureResolveConflictMacro({ notify: true });
             await ensureDiscardMacros({ notify: true });
+            await ensureGmDeckToolsMacro({ notify: true });
         } catch (error) {
             console.error(`${SYSTEM_ID} | Failed to prepare TTB system`, error);
             ui.notifications.error("Through the Breach | Failed to prepare system. Check console.");
@@ -197,12 +204,14 @@ Hooks.once("ready", async () => {
         await setupTwistMacrosForCurrentUser({ notify: false });
         await setupResolveConflictMacroForCurrentUser({ notify: false });
         await setupDiscardMacrosForCurrentUser({ notify: false });
+        await setupGmDeckToolsMacroForCurrentUser({ notify: false });
 
         window.setTimeout(() => {
             setupFlipFateMacroForCurrentUser({ notify: false });
             setupTwistMacrosForCurrentUser({ notify: false });
             setupResolveConflictMacroForCurrentUser({ notify: false });
             setupDiscardMacrosForCurrentUser({ notify: false });
+            setupGmDeckToolsMacroForCurrentUser({ notify: false });
         }, 2000);
     } catch (error) {
         console.error(`${SYSTEM_ID} | Failed to assign macros`, error);
