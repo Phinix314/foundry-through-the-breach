@@ -3,8 +3,8 @@ import { getActorDockPresentation, getGlobalDockPresentation } from "../cards/su
 const SYSTEM_ID = "through-the-breach";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-let dockPopoutInstance = null;
-let dockPopoutClosing = false;
+const dockPopoutInstances = new Map();
+const dockPopoutClosing = new Set();
 
 function visibleActorPresentations() {
     const actors = game.actors
@@ -14,20 +14,6 @@ function visibleActorPresentations() {
 
     if (game.user.isGM) return actors;
     return actors.filter((actor) => actor.ownsPrivate);
-}
-
-function buildDockTabs() {
-    const actorDocks = visibleActorPresentations();
-
-    return [
-        { key: "fate", label: "Fate", type: "fate" },
-        ...actorDocks.map((actor) => ({
-            key: `actor:${actor.actorUuid}`,
-            label: actor.actorName,
-            type: "actor",
-            actor
-        }))
-    ];
 }
 
 function buildActivePresentation(cards, actorUuid = null) {
@@ -51,11 +37,11 @@ function buildActivePresentation(cards, actorUuid = null) {
     };
 }
 
-function buildSelectedDock(selectedKey) {
+function buildDockDefinition(dockKey = "fate") {
     const global = getGlobalDockPresentation();
     const actorDocks = visibleActorPresentations();
 
-    if (selectedKey === "fate") {
+    if (dockKey === "fate") {
         return {
             key: "fate",
             type: "fate",
@@ -64,7 +50,8 @@ function buildSelectedDock(selectedKey) {
                 { action: "flip-fate-one", label: "Flip 1" },
                 { action: "flip-fate-two", label: "Flip 2" },
                 { action: "resolve-conflict", label: "Resolve" },
-                { action: "reshuffle-fate", label: "Reshuffle" }
+                { action: "reshuffle-fate", label: "Reshuffle" },
+                { action: "close-popout", label: "Close", dockKey: "fate" }
             ],
             source: {
                 title: "Fate Deck",
@@ -82,8 +69,7 @@ function buildSelectedDock(selectedKey) {
         };
     }
 
-    const actor = actorDocks.find((a) => `actor:${a.actorUuid}` === selectedKey) ?? actorDocks[0];
-
+    const actor = actorDocks.find((a) => `actor:${a.actorUuid}` === dockKey);
     if (!actor) {
         return {
             key: "fate",
@@ -93,7 +79,8 @@ function buildSelectedDock(selectedKey) {
                 { action: "flip-fate-one", label: "Flip 1" },
                 { action: "flip-fate-two", label: "Flip 2" },
                 { action: "resolve-conflict", label: "Resolve" },
-                { action: "reshuffle-fate", label: "Reshuffle" }
+                { action: "reshuffle-fate", label: "Reshuffle" },
+                { action: "close-popout", label: "Close", dockKey: "fate" }
             ],
             source: {
                 title: "Fate Deck",
@@ -120,7 +107,7 @@ function buildSelectedDock(selectedKey) {
             { action: "draw-twist-one", label: "Draw 1", actorUuid: actor.actorUuid },
             { action: "draw-twist-two", label: "Draw 2", actorUuid: actor.actorUuid },
             { action: "reshuffle-actor", label: "Reshuffle", actorUuid: actor.actorUuid },
-            { action: "close-popout", label: "Close" }
+            { action: "close-popout", label: "Close", dockKey: `actor:${actor.actorUuid}` }
         ],
         source: {
             title: "Twist Deck",
@@ -212,21 +199,16 @@ async function handleAction(event) {
     const button = event.currentTarget;
     const action = button.dataset.action;
     const actorUuid = button.dataset.actorUuid ?? null;
+    const dockKey = button.dataset.dockKey ?? "fate";
 
     try {
         switch (action) {
-            case "select-dock": {
-                dockPopoutInstance?.setSelectedDock(button.dataset.dockKey);
-                await rerenderTtbCardDockPopout();
-                return;
-            }
-
             case "close-popout":
-                await dockPopoutInstance?.close();
+                await closeTtbCardDockPopout(dockKey);
                 return;
 
             case "open-active-overflow": {
-                const dock = buildSelectedDock(dockPopoutInstance?.selectedDockKey ?? "fate");
+                const dock = buildDockDefinition(dockKey);
                 await openActiveOverflowDialog(dock);
                 return;
             }
@@ -294,31 +276,8 @@ async function handleAction(event) {
     await rerenderTtbCardDockPopout();
 }
 
-export async function openTtbCardDockPopout() {
-    if (!dockPopoutInstance) {
-        dockPopoutInstance = new TTBCardDockPopout();
-    }
-
-    await dockPopoutInstance.render(true);
-    return dockPopoutInstance;
-}
-
-export async function rerenderTtbCardDockPopout() {
-    if (dockPopoutClosing) return null;
-    if (!dockPopoutInstance) return null;
-    if (!dockPopoutInstance.rendered) return null;
-
-    await dockPopoutInstance.render();
-    return dockPopoutInstance;
-}
-
-export function isTtbCardDockPopoutOpen() {
-    return !!dockPopoutInstance?.rendered;
-}
-
 export class TTBCardDockPopout extends HandlebarsApplicationMixin(ApplicationV2) {
     static DEFAULT_OPTIONS = {
-        id: "ttb-card-dock-popout",
         tag: "section",
         classes: ["through-the-breach", "ttb-card-dock-popout-app"],
         position: {
@@ -326,7 +285,6 @@ export class TTBCardDockPopout extends HandlebarsApplicationMixin(ApplicationV2)
             height: 760
         },
         window: {
-            title: "Through the Breach Card Dock",
             resizable: true
         }
     };
@@ -337,40 +295,44 @@ export class TTBCardDockPopout extends HandlebarsApplicationMixin(ApplicationV2)
         }
     };
 
-    constructor(options = {}) {
-        super(options);
-        this.selectedDockKey = "fate";
+    constructor(dockKey = "fate", options = {}) {
+        const safeDockKey = String(dockKey).replace(/[^a-zA-Z0-9_-]/g, "-");
+
+        const mergedOptions = foundry.utils.mergeObject(
+            {
+                id: `ttb-card-dock-popout-${safeDockKey}`,
+                window: {
+                    title: buildDockDefinition(dockKey).label,
+                    resizable: true
+                }
+            },
+            options,
+            { inplace: false }
+        );
+
+        super(mergedOptions);
+
+        this.dockKey = dockKey;
     }
 
-    setSelectedDock(key) {
-        this.selectedDockKey = key || "fate";
+    get title() {
+        return buildDockDefinition(this.dockKey).label;
     }
 
-    async _preClose(options) {
-        dockPopoutClosing = true;
-        dockPopoutInstance = null;
-        if (super._preClose) return super._preClose(options);
-    }
+    async close(options = {}) {
+        dockPopoutClosing.add(this.dockKey);
+        dockPopoutInstances.delete(this.dockKey);
 
-    _onClose(options) {
-        if (super._onClose) super._onClose(options);
-        dockPopoutClosing = false;
+        try {
+            return await super.close(options);
+        } finally {
+            dockPopoutClosing.delete(this.dockKey);
+        }
     }
 
     async _prepareContext(_options) {
-        const tabs = buildDockTabs();
-
-        const validKeys = new Set(tabs.map((tab) => tab.key));
-        if (!validKeys.has(this.selectedDockKey)) {
-            this.selectedDockKey = "fate";
-        }
-
         return {
-            tabs: tabs.map((tab) => ({
-                ...tab,
-                active: tab.key === this.selectedDockKey
-            })),
-            dock: buildSelectedDock(this.selectedDockKey)
+            dock: buildDockDefinition(this.dockKey)
         };
     }
 
@@ -385,4 +347,49 @@ export class TTBCardDockPopout extends HandlebarsApplicationMixin(ApplicationV2)
             el.addEventListener("click", handleAction);
         });
     }
+}
+
+export async function openTtbCardDockPopout(dockKey = "fate") {
+    let instance = dockPopoutInstances.get(dockKey);
+
+    if (!instance) {
+        instance = new TTBCardDockPopout(dockKey);
+        dockPopoutInstances.set(dockKey, instance);
+    }
+
+    await instance.render(true);
+    return instance;
+}
+
+export async function closeTtbCardDockPopout(dockKey = "fate") {
+    const instance = dockPopoutInstances.get(dockKey);
+    if (!instance) return null;
+
+    await instance.close();
+    return null;
+}
+
+export async function rerenderTtbCardDockPopout(dockKey = null) {
+    if (dockKey) {
+        if (dockPopoutClosing.has(dockKey)) return null;
+
+        const instance = dockPopoutInstances.get(dockKey);
+        if (!instance || !instance.rendered) return null;
+
+        await instance.render();
+        return instance;
+    }
+
+    for (const [key, instance] of dockPopoutInstances.entries()) {
+        if (dockPopoutClosing.has(key)) continue;
+        if (!instance?.rendered) continue;
+        await instance.render();
+    }
+
+    return null;
+}
+
+export function isTtbCardDockPopoutOpen(dockKey = "fate") {
+    const instance = dockPopoutInstances.get(dockKey);
+    return !!instance?.rendered;
 }

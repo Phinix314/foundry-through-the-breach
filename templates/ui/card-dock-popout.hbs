@@ -1,17 +1,8 @@
 <section id="ttb-card-dock-popout" class="ttb-card-dock-popout">
     <header class="ttb-card-dock-popout__header">
-        <nav class="ttb-card-dock-popout__tabs">
-            {{#each tabs as |tab|}}
-                <button
-                        type="button"
-                        class="ttb-popout-tab {{#if tab.active}}active{{/if}}"
-                        data-action="select-dock"
-                        data-dock-key="{{tab.key}}"
-                >
-                    {{tab.label}}
-                </button>
-            {{/each}}
-        </nav>
+        <div class="ttb-card-dock-popout__title">
+            <h2>{{dock.label}}</h2>
+        </div>
 
         <div class="ttb-card-dock-popout__controls">
             {{#each dock.controls as |control|}}
@@ -19,14 +10,11 @@
                         type="button"
                         data-action="{{control.action}}"
                         data-actor-uuid="{{control.actorUuid}}"
+                        data-dock-key="{{control.dockKey}}"
                 >
                     {{control.label}}
                 </button>
             {{/each}}
-
-            <button type="button" data-action="close-popout">
-                Close
-            </button>
         </div>
     </header>
 
@@ -80,6 +68,7 @@
                                 type="button"
                                 class="ttb-pop-card ttb-pop-card--overflow"
                                 data-action="open-active-overflow"
+                                data-dock-key="{{dock.key}}"
                                 title="Show all active cards"
                         >
                             <div class="ttb-pop-card__value">

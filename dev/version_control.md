@@ -9,6 +9,7 @@
   - 0.0.6.1 First implementation of card dock
   - 0.0.6.2 GM Assignment Macro
   - 0.0.6.3 card dock pop out
+  - 0.0.6.4 Improved Card Dock and have unique for fate/players.
 - 0.0.9  Add Fatecards instead of Prototypes
 - 0.1.0  first usable table prototype
 

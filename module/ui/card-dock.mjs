@@ -10,7 +10,8 @@ async function getDockData() {
     const actors = game.actors
         .filter((actor) => actor.type === "character")
         .sort((a, b) => a.name.localeCompare(b.name))
-        .map((actor) => getActorDockPresentation(actor, game.user));
+        .map((actor) => getActorDockPresentation(actor, game.user))
+        .filter((actor) => game.user.isGM || actor.ownsPrivate);
 
     return {
         global: getGlobalDockPresentation(),
@@ -25,11 +26,16 @@ async function onAction(event) {
     const button = event.currentTarget;
     const action = button.dataset.action;
     const actorUuid = button.dataset.actorUuid ?? null;
+    const dockKey = button.dataset.dockKey ?? "fate";
 
     try {
         switch (action) {
-            case "open-popout":
-                await game.throughTheBreach.openTtbCardDockPopout();
+            case "open-fate-popout":
+                await game.throughTheBreach.openTtbCardDockPopout("fate");
+                break;
+
+            case "open-actor-popout":
+                await game.throughTheBreach.openTtbCardDockPopout(dockKey);
                 break;
 
             case "flip-fate":
