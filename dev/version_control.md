@@ -8,6 +8,8 @@
 - 0.0.6  Card Docks / Improved Card Display.
   - 0.0.6.1 First implementation of card dock
   - 0.0.6.2 GM Assignment Macro
+  - 0.0.6.3 card dock pop out
+- 0.0.9  Add Fatecards instead of Prototypes
 - 0.1.0  first usable table prototype
 
 
@@ -23,3 +25,7 @@
   - Link Aspect and Skills
   - Ability to pop out/Improve Talents.
 - Improved Display of current conflict. 
+
+# Known Issues: 
+- delete player decks of deleted charackters
+- Pop Out migth not close

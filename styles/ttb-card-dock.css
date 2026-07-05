@@ -1,4 +1,4 @@
-#ttb-card-dock.ttb-card-dock {
+#players #ttb-card-dock {
     width: 100%;
     max-width: 100%;
     margin: 0 0 6px 0;
@@ -6,24 +6,36 @@
     box-sizing: border-box;
     border: 1px solid var(--color-border-dark-3);
     border-radius: 6px;
-    background: rgba(0, 0, 0, 0.35);
+    background: rgba(15, 10, 10, 0.88);
+    pointer-events: all;
+    position: relative;
+    z-index: 2;
 }
 
-#ttb-card-dock * {
+#players #ttb-card-dock * {
     box-sizing: border-box;
+    pointer-events: all;
 }
 
-#ttb-card-dock .ttb-card-dock__header h3 {
-    margin: 0 0 6px;
+#players #ttb-card-dock .ttb-card-dock__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+#players #ttb-card-dock .ttb-card-dock__header h3 {
+    margin: 0;
     font-size: 14px;
     line-height: 1.2;
 }
 
-#ttb-card-dock .ttb-card-dock__section {
+#players #ttb-card-dock .ttb-card-dock__section {
     margin-bottom: 8px;
 }
 
-#ttb-card-dock .ttb-card-dock__label {
+#players #ttb-card-dock .ttb-card-dock__label {
     margin-bottom: 4px;
     font-size: 10px;
     text-transform: uppercase;
@@ -31,13 +43,13 @@
     opacity: 0.8;
 }
 
-#ttb-card-dock .ttb-actor-block {
+#players #ttb-card-dock .ttb-actor-block {
     margin-bottom: 8px;
     padding-top: 6px;
     border-top: 1px solid var(--color-border-dark-4);
 }
 
-#ttb-card-dock .ttb-actor-block__title {
+#players #ttb-card-dock .ttb-actor-block__title {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -46,7 +58,7 @@
     font-weight: 700;
 }
 
-#ttb-card-dock .ttb-actor-block__title img {
+#players #ttb-card-dock .ttb-actor-block__title img {
     width: 18px;
     height: 18px;
     object-fit: cover;
@@ -54,11 +66,11 @@
     border-radius: 3px;
 }
 
-#ttb-card-dock .ttb-stack {
+#players #ttb-card-dock .ttb-stack {
     margin-bottom: 6px;
 }
 
-#ttb-card-dock .ttb-stack__title {
+#players #ttb-card-dock .ttb-stack__title {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -67,7 +79,7 @@
     line-height: 1.2;
 }
 
-#ttb-card-dock .ttb-badge {
+#players #ttb-card-dock .ttb-badge {
     min-width: 18px;
     padding: 1px 5px;
     border-radius: 999px;
@@ -77,7 +89,7 @@
     line-height: 1.2;
 }
 
-#ttb-card-dock .ttb-preview {
+#players #ttb-card-dock .ttb-preview {
     display: flex;
     flex-wrap: nowrap;
     gap: 3px;
@@ -85,7 +97,7 @@
     margin-bottom: 4px;
 }
 
-#ttb-card-dock .ttb-card {
+#players #ttb-card-dock .ttb-card {
     width: 30px;
     min-width: 30px;
     min-height: 42px;
@@ -95,32 +107,31 @@
     overflow: hidden;
 }
 
-#ttb-card-dock .ttb-card--back {
-    background:
-            linear-gradient(135deg, rgba(220, 190, 120, 0.20), rgba(120, 90, 20, 0.45));
+#players #ttb-card-dock .ttb-card--back {
+    background: linear-gradient(135deg, rgba(220, 190, 120, 0.20), rgba(120, 90, 20, 0.45));
 }
 
-#ttb-card-dock .ttb-card--face {
+#players #ttb-card-dock .ttb-card--face {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     background: rgba(255, 255, 255, 0.08);
 }
 
-#ttb-card-dock .ttb-card__value {
+#players #ttb-card-dock .ttb-card__value {
     font-size: 11px;
     font-weight: 700;
     line-height: 1;
 }
 
-#ttb-card-dock .ttb-card__suit {
+#players #ttb-card-dock .ttb-card__suit {
     margin-top: 2px;
     font-size: 8px;
     line-height: 1.05;
     opacity: 0.9;
 }
 
-#ttb-card-dock .ttb-card__action {
+#players #ttb-card-dock .ttb-card__action {
     margin-top: 3px;
     padding: 2px 3px;
     min-height: 18px;
@@ -128,12 +139,12 @@
     line-height: 1;
 }
 
-#ttb-card-dock .ttb-stack__actions {
+#players #ttb-card-dock .ttb-stack__actions {
     display: flex;
     gap: 3px;
 }
 
-#ttb-card-dock .ttb-stack__actions button {
+#players #ttb-card-dock .ttb-stack__actions button {
     flex: 1;
     min-height: 22px;
     padding: 2px 4px;

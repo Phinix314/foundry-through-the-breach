@@ -83,6 +83,7 @@ export async function syncActorCardSummary(actorOrIdOrNameOrUuid) {
     await actor.setFlag(SYSTEM_ID, "cardSummary", summary);
 
     ui.players?.render?.(true);
+    await game.throughTheBreach?.rerenderTtbCardDockPopout?.();
 
     return summary;
 }
@@ -95,6 +96,7 @@ export async function syncAllActorCardSummaries() {
     }
 
     ui.players?.render?.(true);
+    await game.throughTheBreach?.rerenderTtbCardDockPopout?.();
 
     return true;
 }
@@ -145,6 +147,16 @@ export function getGlobalDockPresentation() {
     const fateDiscardCount = fateDiscard?.cards.size ?? 0;
     const conflictCount = conflict?.cards.size ?? 0;
 
+    const conflictCards = conflict
+        ? [...conflict.cards]
+            .sort((a, b) => {
+                const aSeq = Number(a.getFlag(SYSTEM_ID, "conflictSeq") ?? 0);
+                const bSeq = Number(b.getFlag(SYSTEM_ID, "conflictSeq") ?? 0);
+                return aSeq - bSeq;
+            })
+            .map(formatFaceCard)
+        : [];
+
     return {
         fateDeck: {
             count: fateDeckCount,
@@ -158,7 +170,7 @@ export function getGlobalDockPresentation() {
 
         conflict: {
             count: conflictCount,
-            cards: getTopCardsByFlag(conflict, "conflictSeq", 4)
+            cards: conflictCards
         }
     };
 }

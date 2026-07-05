@@ -78,6 +78,11 @@ import {
     setupGmDeckToolsMacroForCurrentUser,
     openAssignTwistDeckDialogFromApi
 } from "./module/macros/gm-deck-tools.mjs";
+import {
+    openTtbCardDockPopout,
+    rerenderTtbCardDockPopout,
+    isTtbCardDockPopoutOpen
+} from "./module/ui/card-dock-popout.mjs";
 
 const SYSTEM_ID = "through-the-breach";
 
@@ -161,6 +166,10 @@ Hooks.once("ready", async () => {
         syncActorCardSummary,
         syncAllActorCardSummaries,
         rerenderTtbCardDock,
+
+        openTtbCardDockPopout,
+        rerenderTtbCardDockPopout,
+        isTtbCardDockPopoutOpen,
 
         flipTopCardToConflict,
         drawTwistCardsForActor,

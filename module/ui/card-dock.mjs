@@ -20,6 +20,7 @@ async function getDockData() {
 
 async function onAction(event) {
     event.preventDefault();
+    event.stopPropagation();
 
     const button = event.currentTarget;
     const action = button.dataset.action;
@@ -27,6 +28,10 @@ async function onAction(event) {
 
     try {
         switch (action) {
+            case "open-popout":
+                await game.throughTheBreach.openTtbCardDockPopout();
+                break;
+
             case "flip-fate":
                 await game.throughTheBreach.flipTopCardToConflict({});
                 break;
@@ -62,6 +67,7 @@ async function onAction(event) {
     }
 
     ui.players?.render?.(true);
+    await game.throughTheBreach?.rerenderTtbCardDockPopout?.();
 }
 
 function activateDockListeners(root) {
@@ -71,10 +77,19 @@ function activateDockListeners(root) {
     });
 }
 
+function resolvePlayersElement(html) {
+    const root = html instanceof HTMLElement ? html : html?.[0];
+    if (!root) return null;
+
+    if (root.id === "players") return root;
+
+    return root.querySelector("#players") ?? root;
+}
+
 export async function renderTtbCardDock(app, html) {
     try {
-        const root = html instanceof HTMLElement ? html : html?.[0];
-        if (!root) {
+        const playersRoot = resolvePlayersElement(html);
+        if (!playersRoot) {
             console.warn(`${SYSTEM_ID} | Could not resolve Players root element.`);
             return;
         }
@@ -87,10 +102,10 @@ export async function renderTtbCardDock(app, html) {
             data
         );
 
-        root.querySelector("#ttb-card-dock")?.remove();
-        root.insertAdjacentHTML("afterbegin", dockHtml);
+        playersRoot.querySelector("#ttb-card-dock")?.remove();
+        playersRoot.insertAdjacentHTML("afterbegin", dockHtml);
 
-        const dock = root.querySelector("#ttb-card-dock");
+        const dock = playersRoot.querySelector("#ttb-card-dock");
         if (dock) activateDockListeners(dock);
     } catch (error) {
         console.error(`${SYSTEM_ID} | Failed to render card dock`, error);

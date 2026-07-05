@@ -1,0 +1,133 @@
+<section id="ttb-card-dock-popout" class="ttb-card-dock-popout">
+    <header class="ttb-card-dock-popout__header">
+        <nav class="ttb-card-dock-popout__tabs">
+            {{#each tabs as |tab|}}
+                <button
+                        type="button"
+                        class="ttb-popout-tab {{#if tab.active}}active{{/if}}"
+                        data-action="select-dock"
+                        data-dock-key="{{tab.key}}"
+                >
+                    {{tab.label}}
+                </button>
+            {{/each}}
+        </nav>
+
+        <div class="ttb-card-dock-popout__controls">
+            {{#each dock.controls as |control|}}
+                <button
+                        type="button"
+                        data-action="{{control.action}}"
+                        data-actor-uuid="{{control.actorUuid}}"
+                >
+                    {{control.label}}
+                </button>
+            {{/each}}
+
+            <button type="button" data-action="close-popout">
+                Close
+            </button>
+        </div>
+    </header>
+
+    <section class="ttb-card-dock-popout__layout">
+        <section class="ttb-dock-column ttb-dock-column--source">
+            <div class="ttb-dock-panel">
+                <div class="ttb-dock-panel__title">
+                    <span>{{dock.source.title}}</span>
+                    <span class="ttb-pop-badge">{{dock.source.count}}</span>
+                </div>
+
+                <div class="ttb-pop-preview ttb-pop-preview--single">
+                    {{#if dock.source.hasCards}}
+                        <div class="ttb-pop-card ttb-pop-card--back"></div>
+                    {{else}}
+                        <div class="ttb-pop-card ttb-pop-card--empty"></div>
+                    {{/if}}
+                </div>
+            </div>
+        </section>
+
+        <section class="ttb-dock-column ttb-dock-column--active">
+            <div class="ttb-dock-panel">
+                <div class="ttb-dock-panel__title">
+                    <span>{{dock.active.title}}</span>
+                    <span class="ttb-pop-badge">{{dock.active.totalCount}}</span>
+                </div>
+
+                <div class="ttb-pop-preview ttb-pop-preview--active">
+                    {{#each dock.active.visibleCards as |card|}}
+                        <div class="ttb-pop-card ttb-pop-card--face" title="{{card.name}}">
+                            <div class="ttb-pop-card__value">{{card.value}}</div>
+                            <div class="ttb-pop-card__suit">{{card.suitLabel}}</div>
+
+                            {{#if ../dock.active.actorUuid}}
+                                <button
+                                        type="button"
+                                        class="ttb-pop-card__action"
+                                        data-action="cheat-card"
+                                        data-actor-uuid="{{../dock.active.actorUuid}}"
+                                        data-card-id="{{card.id}}"
+                                >
+                                    Cheat
+                                </button>
+                            {{/if}}
+                        </div>
+                    {{/each}}
+
+                    {{#if dock.active.overflowCount}}
+                        <button
+                                type="button"
+                                class="ttb-pop-card ttb-pop-card--overflow"
+                                data-action="open-active-overflow"
+                                title="Show all active cards"
+                        >
+                            <div class="ttb-pop-card__value">
+                                {{dock.active.overflowTopCard.value}}
+                            </div>
+                            <div class="ttb-pop-card__suit">
+                                {{dock.active.overflowTopCard.suitLabel}}
+                            </div>
+
+                            {{#if dock.active.showOverflowBadge}}
+                                <div class="ttb-pop-card__overflow-badge">
+                                    +{{dock.active.hiddenUnderTopCount}}
+                                </div>
+                            {{/if}}
+                        </button>
+                    {{/if}}
+                </div>
+            </div>
+        </section>
+
+        <section class="ttb-dock-column ttb-dock-column--discard">
+            <div class="ttb-dock-panel">
+                <div class="ttb-dock-panel__title">
+                    <span>{{dock.discard.title}}</span>
+                    <span class="ttb-pop-badge">{{dock.discard.count}}</span>
+                </div>
+
+                <div class="ttb-pop-preview ttb-pop-preview--single">
+                    {{#if dock.discard.topCard}}
+                        <div class="ttb-pop-card ttb-pop-card--face" title="{{dock.discard.topCard.name}}">
+                            <div class="ttb-pop-card__value">{{dock.discard.topCard.value}}</div>
+                            <div class="ttb-pop-card__suit">{{dock.discard.topCard.suitLabel}}</div>
+                        </div>
+                    {{else}}
+                        <div class="ttb-pop-card ttb-pop-card--empty"></div>
+                    {{/if}}
+                </div>
+
+                <div class="ttb-pop-actions">
+                    <button
+                            type="button"
+                            data-action="{{dock.discard.action}}"
+                            data-actor-uuid="{{dock.discard.actorUuid}}"
+                    >
+                        {{dock.discard.actionLabel}}
+                    </button>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
