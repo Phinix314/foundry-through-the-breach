@@ -1,7 +1,6 @@
 import { buildFateDeckCards } from "./fate-deck.mjs";
 import {
-    getCharacterActors,
-    getActorCardStackOwnership
+    getCharacterActors
 } from "./actor-card-permissions.mjs";
 
 const SYSTEM_ID = "through-the-breach";
@@ -9,6 +8,20 @@ const SYSTEM_ID = "through-the-breach";
 export const ACTOR_DECK_PREFIX = "Twist Deck";
 
 const CARD_IMAGE = "icons/svg/card-joker.svg";
+
+function getHiddenDeckOwnership() {
+    const ownership = {
+        default: CONST.DOCUMENT_OWNERSHIP_LEVELS.NONE
+    };
+
+    for (const user of game.users) {
+        if (user.isGM) continue;
+
+        ownership[user.id] = CONST.DOCUMENT_OWNERSHIP_LEVELS.NONE;
+    }
+
+    return ownership;
+}
 
 async function resolveActor(actorOrIdOrNameOrUuid) {
     if (!actorOrIdOrNameOrUuid) return null;
@@ -112,7 +125,7 @@ export async function ensureActorTwistDeck(actorOrIdOrNameOrUuid, { notify = fal
         img: CARD_IMAGE,
         description: `Personal Through the Breach Twist Deck for ${actor.name}.`,
         displayCount: true,
-        ownership: getActorCardStackOwnership(actor),
+        ownership: getHiddenDeckOwnership(),
         flags: {
             [SYSTEM_ID]: {
                 deck: "twist",
@@ -283,7 +296,7 @@ export async function syncActorTwistDeckOwnership(actorOrIdOrNameOrUuid) {
     if (!deck) return null;
 
     await deck.update({
-        ownership: getActorCardStackOwnership(actor)
+        ownership: getHiddenDeckOwnership()
     });
 
     return deck;

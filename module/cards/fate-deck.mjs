@@ -9,7 +9,8 @@ export const CONFLICT_PILE_NAME = "Current Conflict";
 const CARD_IMAGE = "icons/svg/card-joker.svg";
 const CARD_BACK_IMAGE = "icons/svg/card-joker.svg";
 
-const PLAYER_OWNERSHIP = CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER;
+const HIDDEN_OWNERSHIP = CONST.DOCUMENT_OWNERSHIP_LEVELS.NONE;
+const PUBLIC_OWNERSHIP = CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER;
 
 const SUITS = [
     { key: "rams", label: "Rams" },
@@ -130,14 +131,14 @@ function getCardFateId(card) {
     return card.getFlag(SYSTEM_ID, "fateId");
 }
 
-async function setPublicOwnership(cardsDocument) {
+async function setDefaultOwnership(cardsDocument, ownershipLevel) {
     if (!game.user.isGM) return cardsDocument;
 
     const currentDefault = cardsDocument.ownership?.default;
 
-    if (currentDefault !== PLAYER_OWNERSHIP) {
+    if (currentDefault !== ownershipLevel) {
         await cardsDocument.update({
-            "ownership.default": PLAYER_OWNERSHIP
+            "ownership.default": ownershipLevel
         });
     }
 
@@ -161,7 +162,7 @@ export async function ensureFateDeck({ notify = false } = {}) {
             description: "Shared Through the Breach Fate Deck.",
             displayCount: true,
             ownership: {
-                default: PLAYER_OWNERSHIP
+                default: HIDDEN_OWNERSHIP
             },
             flags: {
                 [SYSTEM_ID]: {
@@ -173,8 +174,7 @@ export async function ensureFateDeck({ notify = false } = {}) {
 
         createdDeck = true;
     }
-
-    await setPublicOwnership(deck);
+    await setDefaultOwnership(deck, HIDDEN_OWNERSHIP);
 
     const expectedCards = buildFateDeckCards();
 
@@ -229,7 +229,7 @@ export async function ensureConflictPile({ notify = false } = {}) {
             description: "Public pile for currently flipped Fate cards.",
             displayCount: true,
             ownership: {
-                default: PLAYER_OWNERSHIP
+                default:  PUBLIC_OWNERSHIP
             },
             flags: {
                 [SYSTEM_ID]: {
@@ -242,7 +242,7 @@ export async function ensureConflictPile({ notify = false } = {}) {
         createdPile = true;
     }
 
-    await setPublicOwnership(pile);
+    await setDefaultOwnership(pile, PUBLIC_OWNERSHIP);
 
     console.log(`${SYSTEM_ID} | Conflict pile ready`, {
         createdPile,

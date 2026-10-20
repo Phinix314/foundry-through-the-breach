@@ -10,6 +10,7 @@
   - 0.0.6.2 GM Assignment Macro
   - 0.0.6.3 card dock pop out
   - 0.0.6.4 Improved Card Dock and have unique for fate/players.
+  - 0.0.6.5 Improve Privacy of Decks / Unflipped Cards.
 - 0.0.9  Add Fatecards instead of Prototypes
 - 0.1.0  first usable table prototype
 
@@ -30,3 +31,8 @@
 # Known Issues: 
 - delete player decks of deleted charackters
 - Pop Out migth not close
+- Decks can still be viewd over deck tab. 
+- Consider naming convention of Popout in regards to same named Module. Possibly integrate it in core.
+
+# Recomendations:
+Using the PopOut! Modules to enable having the Popout be a seperate window. 
