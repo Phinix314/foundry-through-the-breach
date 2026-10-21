@@ -12,6 +12,7 @@
   - 0.0.6.4 Improved Card Dock and have unique for fate/players.
   - 0.0.6.5 Improve Privacy of Decks / Unflipped Cards.
   - 0.0.6.6 Improved Card behaivior: Player can Discard Cards and Reshuffle Deck even if its not empty. (Resolved over GM Socket)
+- 0.0.8 Improved Charackter Sheet 
 - 0.0.9  Add Fatecards instead of Prototypes
 - 0.1.0  first usable table prototype
 
@@ -28,6 +29,7 @@
   - Link Aspect and Skills
   - Ability to pop out/Improve Talents.
 - Improved Display of current conflict. 
+  - Select which card was used whne resolving the conflict. 
 - Undo Button
 
 # Quality of Life
@@ -35,9 +37,6 @@
 
 # Known Issues: 
 - delete player decks of deleted charackters
-- Pop Out migth not close
-- Decks can still be viewd over deck tab. 
 - Consider naming convention of Popout in regards to same named Module. Possibly integrate it in core.
 
 # Recomendations:
-Using the PopOut! Modules to enable having the Popout be a seperate window. 

@@ -369,10 +369,17 @@ export class TTBCardDockPopout extends HandlebarsApplicationMixin(ApplicationV2)
     _onRender(_context, _options) {
         super._onRender?.(_context, _options);
 
-        const root = this.element;
-        if (!root) return;
+        const appRoot = this.element;
+        if (!appRoot) return;
 
-        root.querySelectorAll("[data-action]").forEach((el) => {
+        const contentRoot =
+            appRoot.matches?.("#ttb-card-dock-popout")
+                ? appRoot
+                : appRoot.querySelector("#ttb-card-dock-popout");
+
+        if (!contentRoot) return;
+
+        contentRoot.querySelectorAll("[data-action]").forEach((el) => {
             el.removeEventListener("click", handleAction);
             el.addEventListener("click", handleAction);
         });
