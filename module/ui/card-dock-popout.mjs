@@ -1,7 +1,7 @@
-import { getActorDockPresentation, getGlobalDockPresentation } from "../cards/summary-state.mjs";
+import {getActorDockPresentation, getGlobalDockPresentation} from "../cards/summary-state.mjs";
 
 const SYSTEM_ID = "through-the-breach";
-const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
+const {ApplicationV2, HandlebarsApplicationMixin} = foundry.applications.api;
 
 const dockPopoutInstances = new Map();
 const dockPopoutClosing = new Set();
@@ -47,11 +47,11 @@ function buildDockDefinition(dockKey = "fate") {
             type: "fate",
             label: "Fate Dock",
             controls: [
-                { action: "flip-fate-one", label: "Flip 1" },
-                { action: "flip-fate-two", label: "Flip 2" },
-                { action: "resolve-conflict", label: "Resolve" },
-                { action: "reshuffle-fate", label: "Reshuffle" },
-                { action: "close-popout", label: "Close", dockKey: "fate" }
+                {action: "flip-fate-one", label: "Flip 1"},
+                {action: "flip-fate-two", label: "Flip 2"},
+                {action: "resolve-conflict", label: "Resolve"},
+                {action: "reshuffle-fate", label: "Reshuffle"},
+                {action: "close-popout", label: "Close", dockKey: "fate"}
             ],
             source: {
                 title: "Fate Deck",
@@ -76,11 +76,11 @@ function buildDockDefinition(dockKey = "fate") {
             type: "fate",
             label: "Fate Dock",
             controls: [
-                { action: "flip-fate-one", label: "Flip 1" },
-                { action: "flip-fate-two", label: "Flip 2" },
-                { action: "resolve-conflict", label: "Resolve" },
-                { action: "reshuffle-fate", label: "Reshuffle" },
-                { action: "close-popout", label: "Close", dockKey: "fate" }
+                {action: "flip-fate-one", label: "Flip 1"},
+                {action: "flip-fate-two", label: "Flip 2"},
+                {action: "resolve-conflict", label: "Resolve"},
+                {action: "reshuffle-fate", label: "Reshuffle"},
+                {action: "close-popout", label: "Close", dockKey: "fate"}
             ],
             source: {
                 title: "Fate Deck",
@@ -104,10 +104,10 @@ function buildDockDefinition(dockKey = "fate") {
         label: `${actor.actorName} Dock`,
         actorUuid: actor.actorUuid,
         controls: [
-            { action: "draw-twist-one", label: "Draw 1", actorUuid: actor.actorUuid },
-            { action: "draw-twist-two", label: "Draw 2", actorUuid: actor.actorUuid },
-            { action: "reshuffle-actor", label: "Reshuffle", actorUuid: actor.actorUuid },
-            { action: "close-popout", label: "Close", dockKey: `actor:${actor.actorUuid}` }
+            {action: "draw-twist-one", label: "Draw 1", actorUuid: actor.actorUuid},
+            {action: "draw-twist-two", label: "Draw 2", actorUuid: actor.actorUuid},
+            {action: "reshuffle-actor", label: "Reshuffle", actorUuid: actor.actorUuid},
+            {action: "close-popout", label: "Close", dockKey: `actor:${actor.actorUuid}`}
         ],
         source: {
             title: "Twist Deck",
@@ -149,6 +149,14 @@ function renderActiveCardListHtml(cards, actorUuid = null) {
                         >
                             Cheat
                         </button>
+                        <button
+                            type="button"
+                            class="ttb-active-popup-discard"
+                            data-card-id="${card.id}"
+                            data-actor-uuid="${actorUuid}"
+                        >
+                            Discard
+                        </button>
                     ` : ""}
                 </div>
             `).join("")}
@@ -186,6 +194,25 @@ async function openActiveOverflowDialog(dock) {
                 } catch (error) {
                     console.error(`${SYSTEM_ID} | Active popup cheat failed`, error);
                     ui.notifications.error("TTB active popup cheat failed. Check console.");
+                }
+            });
+            html.find(".ttb-active-popup-discard").on("click", async (event) => {
+                const cardId = event.currentTarget.dataset.cardId;
+                const targetActorUuid = event.currentTarget.dataset.actorUuid;
+
+                try {
+                    await game.throughTheBreach.discardTwistCardFromActorHand(
+                        targetActorUuid,
+                        cardId
+                    );
+
+                    dialog.close();
+                    await rerenderTtbCardDockPopout();
+                } catch (error) {
+                    console.error(`${SYSTEM_ID} | Active popup discard failed`, error);
+                    ui.notifications.error(
+                        "TTB active popup discard failed. Check console."
+                    );
                 }
             });
         });
@@ -231,24 +258,21 @@ async function handleAction(event) {
                 break;
 
             case "resolve-conflict":
-                await game.throughTheBreach.resolveCurrentConflict({ chat: true });
+                await game.throughTheBreach.resolveCurrentConflict({chat: true});
                 break;
 
-            case "reshuffle-fate": {
-                const didRecycle = await game.throughTheBreach.recycleFateDeckIfEmpty({ notify: true });
-                if (!didRecycle) {
-                    ui.notifications.warn("Fate Deck can only be reshuffled from discard when the deck is empty.");
-                }
+            case "reshuffle-fate":
+                await game.throughTheBreach.reshuffleFateDeck({
+                    notify: true
+                });
                 break;
-            }
 
-            case "reshuffle-actor": {
-                const didRecycle = await game.throughTheBreach.recycleActorTwistDeckIfEmpty(actorUuid, { notify: true });
-                if (!didRecycle) {
-                    ui.notifications.warn("Twist Deck can only be reshuffled from discard when the deck is empty.");
-                }
+            case "reshuffle-actor":
+                await game.throughTheBreach.reshuffleActorTwistDeck(
+                    actorUuid,
+                    {notify: true}
+                );
                 break;
-            }
 
             case "peek-fate-discard":
                 await game.throughTheBreach.showPeekFateDiscard(3);
@@ -261,6 +285,12 @@ async function handleAction(event) {
             case "cheat-card": {
                 const cardId = button.dataset.cardId;
                 await game.throughTheBreach.cheatFateCardFromActorHand(actorUuid, cardId);
+                break;
+            }
+
+            case "discard-card": {
+                const cardId = button.dataset.cardId;
+                await game.throughTheBreach.discardTwistCardFromActorHand(actorUuid, cardId);
                 break;
             }
 
@@ -307,7 +337,7 @@ export class TTBCardDockPopout extends HandlebarsApplicationMixin(ApplicationV2)
                 }
             },
             options,
-            { inplace: false }
+            {inplace: false}
         );
 
         super(mergedOptions);

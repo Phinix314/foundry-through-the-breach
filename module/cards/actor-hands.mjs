@@ -8,7 +8,11 @@ import {
     getCharacterActors,
     getActorCardStackOwnership
 } from "./actor-card-permissions.mjs";
-import { markCardEnteredConflict } from "./conflict-resolution.mjs";
+import {
+    markCardEnteredConflict,
+    appendCardToDiscard
+} from "./conflict-resolution.mjs";
+import { getActorTwistDiscard } from "./discard-piles.mjs";
 
 const SYSTEM_ID = "through-the-breach";
 export const ACTOR_HAND_PREFIX = "Hand";
@@ -248,6 +252,51 @@ export async function drawTwistCardsForActor(actorOrIdOrNameOrUuid, number = 1) 
     await game.throughTheBreach?.syncActorCardSummary?.(actor);
 
     return drawnCards;
+}
+
+export async function discardTwistCardFromActorHand(
+    actorOrIdOrNameOrUuid,
+    cardId
+) {
+    const actor = await resolveActor(actorOrIdOrNameOrUuid);
+
+    if (!actor) {
+        ui.notifications.warn("Select a token or assign a character first.");
+        return null;
+    }
+
+    const hand = getActorTwistHand(actor);
+    const discardPile = getActorTwistDiscard(actor);
+
+    if (!hand) {
+        ui.notifications.error(`No hand found for ${actor.name}.`);
+        return null;
+    }
+
+    if (!discardPile) {
+        ui.notifications.error(`No Twist Discard found for ${actor.name}.`);
+        return null;
+    }
+
+    const card = hand.cards.get(cardId);
+
+    if (!card) {
+        ui.notifications.error("That card is not in this actor's hand.");
+        return null;
+    }
+
+    const movedCard = await appendCardToDiscard(
+        discardPile,
+        hand,
+        card,
+        { action: "discard" }
+    );
+
+    if (!movedCard) return null;
+
+    await game.throughTheBreach?.syncActorCardSummary?.(actor);
+
+    return movedCard;
 }
 
 export async function cheatFateCardFromActorHand(actorOrIdOrNameOrUuid, cardId) {

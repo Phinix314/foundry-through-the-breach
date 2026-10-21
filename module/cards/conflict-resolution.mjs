@@ -42,13 +42,18 @@ function getConflictCardsInOrder(conflictPile) {
     });
 }
 
-async function appendCardToDiscard(discardPile, originPile, card) {
+export async function appendCardToDiscard(
+    discardPile,
+    originPile,
+    card,
+    { action = "resolve-conflict" } = {}
+) {
     const movedCards = await originPile.pass(
         discardPile,
         [card.id],
         {
             chatNotification: false,
-            action: "resolve-conflict",
+            action,
             updateData: {}
         }
     );

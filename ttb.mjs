@@ -36,6 +36,7 @@ import {
     ensureActorTwistHand,
     syncActorTwistHandOwnership,
     drawTwistCardsForActor,
+    discardTwistCardFromActorHand,
     cheatFateCardFromActorHand,
     openCheatFateDialogForActor
 } from "./module/cards/actor-hands.mjs";
@@ -67,6 +68,8 @@ import {
     setupResolveConflictMacroForCurrentUser
 } from "./module/macros/conflict-macros.mjs";
 import {
+    reshuffleFateDeck,
+    reshuffleActorTwistDeck,
     recycleFateDeckIfEmpty,
     recycleActorTwistDeckIfEmpty,
     prepareFateDeckForDraw,
@@ -83,6 +86,9 @@ import {
     rerenderTtbCardDockPopout,
     isTtbCardDockPopoutOpen
 } from "./module/ui/card-dock-popout.mjs";
+import {
+    initializeReshuffleSocket
+} from "./module/cards/reshuffle-socket.mjs";
 
 const SYSTEM_ID = "through-the-breach";
 
@@ -145,8 +151,11 @@ Hooks.once("ready", async () => {
         showPeekFateDiscard,
         showPeekActorTwistDiscard,
 
+        reshuffleFateDeck,
+        reshuffleActorTwistDeck,
         recycleFateDeckIfEmpty,
         recycleActorTwistDeckIfEmpty,
+
         prepareFateDeckForDraw,
         prepareActorTwistDeckForDraw,
         announceActorTwistDraw,
@@ -173,6 +182,7 @@ Hooks.once("ready", async () => {
 
         flipTopCardToConflict,
         drawTwistCardsForActor,
+        discardTwistCardFromActorHand,
         cheatFateCardFromActorHand,
         openCheatFateDialogForActor,
 
@@ -183,6 +193,7 @@ Hooks.once("ready", async () => {
         syncActorTwistDeckOwnership,
         listFateCardIds
     };
+    initializeReshuffleSocket();
 
     if (game.user.isGM) {
         try {

@@ -11,6 +11,7 @@
   - 0.0.6.3 card dock pop out
   - 0.0.6.4 Improved Card Dock and have unique for fate/players.
   - 0.0.6.5 Improve Privacy of Decks / Unflipped Cards.
+  - 0.0.6.6 Improved Card behaivior: Player can Discard Cards and Reshuffle Deck even if its not empty. (Resolved over GM Socket)
 - 0.0.9  Add Fatecards instead of Prototypes
 - 0.1.0  first usable table prototype
 
@@ -27,6 +28,10 @@
   - Link Aspect and Skills
   - Ability to pop out/Improve Talents.
 - Improved Display of current conflict. 
+- Undo Button
+
+# Quality of Life
+- If not enough cards to draw/flip automatically shuffle deck. 
 
 # Known Issues: 
 - delete player decks of deleted charackters

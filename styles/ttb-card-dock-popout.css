@@ -191,7 +191,8 @@
     font-size: 13px;
 }
 
-.ttb-active-popup-cheat {
+.ttb-active-popup-cheat,
+.ttb-active-popup-discard {
     min-height: 28px;
     padding: 4px 8px;
     font-size: 12px;
