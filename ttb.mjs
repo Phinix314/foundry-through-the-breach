@@ -13,7 +13,8 @@ import {TTBCharacterSheet} from "./module/sheets/character-sheet.mjs";
 import {
     ensureFateDeck,
     ensureConflictPile,
-    flipTopCardToConflict
+    flipTopCardToConflict,
+    syncAllFateCardImages
 } from "./module/cards/fate-deck.mjs";
 import {
     ensureFlipFateMacro,
@@ -129,6 +130,7 @@ Hooks.once("ready", async () => {
         ensureFateDeck,
         ensureFateDiscard,
         ensureConflictPile,
+        syncAllFateCardImages,
 
         ensureActorTwistDeck,
         ensureActorTwistHand,
@@ -204,6 +206,14 @@ Hooks.once("ready", async () => {
             for (const actor of game.actors.filter((a) => a.type === "character")) {
                 await ensureActorCardStacks(actor, { notify: true });
             }
+
+            for (const actor of game.actors.filter((a) => a.type === "character")) {
+                await ensureActorCardStacks(actor, { notify: true });
+            }
+
+            await syncAllFateCardImages({ notify: true });
+
+            await syncAllActorCardSummaries();
 
             await syncAllActorCardSummaries();
             await rerenderTtbCardDock();

@@ -85,7 +85,7 @@ red-joker"
                 }
             },
             add: {
-                label: "Add Cards",
+                label: "Add cards",
                 callback: async (html) => {
                     const actorUuid = html.find('[name="actorUuid"]').val();
                     const raw = html.find('[name="cardIds"]').val();

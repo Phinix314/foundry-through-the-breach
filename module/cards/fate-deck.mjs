@@ -1,22 +1,33 @@
 const SYSTEM_ID = "through-the-breach";
 
-import { markCardEnteredConflict } from "./conflict-resolution.mjs";
-import { prepareFateDeckForDraw } from "./deck-recycling.mjs";
+import {markCardEnteredConflict} from "./conflict-resolution.mjs";
+import {prepareFateDeckForDraw} from "./deck-recycling.mjs";
 
 export const FATE_DECK_NAME = "Fate Deck";
 export const CONFLICT_PILE_NAME = "Current Conflict";
 
-const CARD_IMAGE = "icons/svg/card-joker.svg";
-const CARD_BACK_IMAGE = "icons/svg/card-joker.svg";
+const CARD_ASSET_ROOT = `systems/${SYSTEM_ID}/assets/cards`;
+
+const CARD_IMAGE = `${CARD_ASSET_ROOT}/back.webp`;
+const CARD_BACK_IMAGE = `${CARD_ASSET_ROOT}/back.webp`;
+
+function getNumberCardImage(suitKey, value) {
+    const paddedValue = String(value).padStart(2, "0");
+    return `${CARD_ASSET_ROOT}/${suitKey}-${paddedValue}.webp`;
+}
+
+function getJokerImage(color) {
+    return `${CARD_ASSET_ROOT}/${String(color).toLowerCase()}-joker.webp`;
+}
 
 const HIDDEN_OWNERSHIP = CONST.DOCUMENT_OWNERSHIP_LEVELS.NONE;
 const PUBLIC_OWNERSHIP = CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER;
 
 const SUITS = [
-    { key: "rams", label: "Rams" },
-    { key: "crows", label: "Crows" },
-    { key: "tomes", label: "Tomes" },
-    { key: "masks", label: "Masks" }
+    {key: "rams", label: "Rams"},
+    {key: "crows", label: "Crows"},
+    {key: "tomes", label: "Tomes"},
+    {key: "masks", label: "Masks"}
 ];
 
 function makeFateCardId(suitKey, value) {
@@ -43,7 +54,7 @@ function makeNumberCard(suit, value, sort) {
         faces: [
             {
                 name,
-                img: CARD_IMAGE,
+                img: getNumberCardImage(suit.key, value),
                 text: name
             }
         ],
@@ -83,7 +94,7 @@ function makeJoker(color, value, sort) {
         faces: [
             {
                 name,
-                img: CARD_IMAGE,
+                img: getJokerImage(color),
                 text: name
             }
         ],
@@ -127,6 +138,83 @@ export function buildFateDeckCards() {
     return cards;
 }
 
+function getExpectedCardImage(card) {
+    const isJoker = card.getFlag(SYSTEM_ID, "joker") === true;
+
+    if (isJoker) {
+        const color = card.getFlag(SYSTEM_ID, "color");
+
+        if (color !== "red" && color !== "black") {
+            return null;
+        }
+
+        return getJokerImage(color);
+    }
+
+    const suit = card.getFlag(SYSTEM_ID, "suit");
+    const value = Number(card.getFlag(SYSTEM_ID, "value"));
+
+    const validSuit = SUITS.some((entry) => entry.key === suit);
+    const validValue =
+        Number.isInteger(value) &&
+        value >= 1 &&
+        value <= 13;
+
+    if (!validSuit || !validValue) {
+        return null;
+    }
+
+    return getNumberCardImage(suit, value);
+}
+
+export async function syncAllFateCardImages({notify = false} = {}) {
+    if (!game.user.isGM) return 0;
+
+    let updatedCount = 0;
+
+    for (const stack of game.cards) {
+        const updates = [];
+
+        for (const card of stack.cards) {
+            const expectedFaceImage = getExpectedCardImage(card);
+            if (!expectedFaceImage) continue;
+
+            const update = {
+                _id: card.id
+            };
+
+            let changed = false;
+
+            if (card.faces?.[0]?.img !== expectedFaceImage) {
+                update["faces.0.img"] = expectedFaceImage;
+                changed = true;
+            }
+
+            if (card.back?.img !== CARD_BACK_IMAGE) {
+                update["back.img"] = CARD_BACK_IMAGE;
+                changed = true;
+            }
+
+            if (changed) {
+                updates.push(update);
+            }
+        }
+
+        if (updates.length > 0) {
+            await stack.updateEmbeddedDocuments("Card", updates);
+            updatedCount += updates.length;
+        }
+    }
+
+    if (notify && updatedCount > 0) {
+        ui.notifications.info(
+            `Updated images for ${updatedCount} card(s).`
+        );
+    }
+
+    return updatedCount;
+}
+
 function getCardFateId(card) {
     return card.getFlag(SYSTEM_ID, "fateId");
 }
@@ -145,7 +233,7 @@ async function setDefaultOwnership(cardsDocument, ownershipLevel) {
     return cardsDocument;
 }
 
-export async function ensureFateDeck({ notify = false } = {}) {
+export async function ensureFateDeck({notify = false} = {}) {
     if (!game.user.isGM) {
         console.warn(`${SYSTEM_ID} | Only a GM may create or repair the Fate Deck.`);
         return game.cards.getName(FATE_DECK_NAME) ?? null;
@@ -194,7 +282,7 @@ export async function ensureFateDeck({ notify = false } = {}) {
     }
 
     if (createdDeck) {
-        await deck.shuffle({ chatNotification: false });
+        await deck.shuffle({chatNotification: false});
     }
 
     console.log(`${SYSTEM_ID} | Fate Deck ready`, {
@@ -212,7 +300,7 @@ export async function ensureFateDeck({ notify = false } = {}) {
     return deck;
 }
 
-export async function ensureConflictPile({ notify = false } = {}) {
+export async function ensureConflictPile({notify = false} = {}) {
     if (!game.user.isGM) {
         console.warn(`${SYSTEM_ID} | Only a GM may create or repair the Conflict pile.`);
         return game.cards.getName(CONFLICT_PILE_NAME) ?? null;
@@ -229,7 +317,7 @@ export async function ensureConflictPile({ notify = false } = {}) {
             description: "Public pile for currently flipped Fate cards.",
             displayCount: true,
             ownership: {
-                default:  PUBLIC_OWNERSHIP
+                default: PUBLIC_OWNERSHIP
             },
             flags: {
                 [SYSTEM_ID]: {
@@ -284,9 +372,13 @@ function renderFlipChatContent(cardData, actor = null) {
     <div class="ttb-chat-card ttb-fate-flip">
       <h2>Fate Flip</h2>
       ${actorName}
-      <div style="display:flex; gap:10px; align-items:center;">
-        <img src="${cardData.img}" width="64" height="64" style="border:0;" />
-        <div>
+      <div class="ttb-chat-card__content">
+          <img
+            class="ttb-chat-card__image"
+            src="${cardData.img}"
+            alt="${cardData.name}"
+          />
+            <div>
           <p><strong>Card:</strong> ${cardData.name}</p>
           <p><strong>Value:</strong> ${cardData.value}</p>
           <p><strong>Suit:</strong> ${cardData.suitLabel}</p>
@@ -297,7 +389,7 @@ function renderFlipChatContent(cardData, actor = null) {
   `;
 }
 
-export async function flipTopCardToConflict({ actor = null } = {}) {
+export async function flipTopCardToConflict({actor = null} = {}) {
     const deck = game.cards.getName(FATE_DECK_NAME);
     const conflictPile = game.cards.getName(CONFLICT_PILE_NAME);
 
@@ -324,7 +416,7 @@ export async function flipTopCardToConflict({ actor = null } = {}) {
     const drawnCards = await conflictPile.draw(
         deck,
         1,
-        { chatNotification: false },
+        {chatNotification: false},
         drawMode,
         {}
     );
@@ -344,7 +436,7 @@ export async function flipTopCardToConflict({ actor = null } = {}) {
     const cardData = getFlippedCardData(card);
 
     await ChatMessage.create({
-        speaker: ChatMessage.getSpeaker({ actor }),
+        speaker: ChatMessage.getSpeaker({actor}),
         content: renderFlipChatContent(cardData, actor),
         flags: {
             [SYSTEM_ID]: {

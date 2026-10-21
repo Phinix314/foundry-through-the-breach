@@ -28,7 +28,13 @@
 
                 <div class="ttb-pop-preview ttb-pop-preview--single">
                     {{#if dock.source.hasCards}}
-                        <div class="ttb-pop-card ttb-pop-card--back"></div>
+                        <div class="ttb-pop-card ttb-pop-card--back{{#if dock.source.hasStack}} ttb-pop-card--stacked{{/if}}">
+                            <img
+                                    class="ttb-pop-card__image"
+                                    src="systems/through-the-breach/assets/cards/back.webp"
+                                    alt="Card back"
+                            />
+                        </div>
                     {{else}}
                         <div class="ttb-pop-card ttb-pop-card--empty"></div>
                     {{/if}}
@@ -46,8 +52,11 @@
                 <div class="ttb-pop-preview ttb-pop-preview--active">
                     {{#each dock.active.visibleCards as |card|}}
                         <div class="ttb-pop-card ttb-pop-card--face" title="{{card.name}}">
-                            <div class="ttb-pop-card__value">{{card.value}}</div>
-                            <div class="ttb-pop-card__suit">{{card.suitLabel}}</div>
+                            <img
+                                    class="ttb-pop-card__image"
+                                    src="{{card.img}}"
+                                    alt="{{card.name}}"
+                            />
 
                             {{#if ../dock.active.actorUuid}}
                                 <button
@@ -75,17 +84,16 @@
                     {{#if dock.active.overflowCount}}
                         <button
                                 type="button"
-                                class="ttb-pop-card ttb-pop-card--overflow"
+                                class="ttb-pop-card ttb-pop-card--overflow{{#if dock.active.showOverflowBadge}} ttb-pop-card--stacked{{/if}}"
                                 data-action="open-active-overflow"
                                 data-dock-key="{{dock.key}}"
                                 title="Show all active cards"
                         >
-                            <div class="ttb-pop-card__value">
-                                {{dock.active.overflowTopCard.value}}
-                            </div>
-                            <div class="ttb-pop-card__suit">
-                                {{dock.active.overflowTopCard.suitLabel}}
-                            </div>
+                            <img
+                                    class="ttb-pop-card__image"
+                                    src="{{dock.active.overflowTopCard.img}}"
+                                    alt="{{dock.active.overflowTopCard.name}}"
+                            />
 
                             {{#if dock.active.showOverflowBadge}}
                                 <div class="ttb-pop-card__overflow-badge">
@@ -107,9 +115,12 @@
 
                 <div class="ttb-pop-preview ttb-pop-preview--single">
                     {{#if dock.discard.topCard}}
-                        <div class="ttb-pop-card ttb-pop-card--face" title="{{dock.discard.topCard.name}}">
-                            <div class="ttb-pop-card__value">{{dock.discard.topCard.value}}</div>
-                            <div class="ttb-pop-card__suit">{{dock.discard.topCard.suitLabel}}</div>
+                        <div class="ttb-pop-card ttb-pop-card--face{{#if dock.discard.hasStack}} ttb-pop-card--stacked{{/if}}" title="{{dock.discard.topCard.name}}">
+                            <img
+                                    class="ttb-pop-card__image"
+                                    src="{{dock.discard.topCard.img}}"
+                                    alt="{{dock.discard.topCard.name}}"
+                            />
                         </div>
                     {{else}}
                         <div class="ttb-pop-card ttb-pop-card--empty"></div>

@@ -197,8 +197,12 @@ function renderCheatChatContent(cardData, actor) {
       <h2>Cheat Fate</h2>
       <p><strong>Actor:</strong> ${esc(actor.name)}</p>
 
-      <div style="display:flex; gap:10px; align-items:center;">
-        <img src="${esc(cardData.img)}" width="64" height="64" style="border:0;" />
+      <div class="ttb-chat-card__content">
+          <img
+            class="ttb-chat-card__image"
+            src="${esc(cardData.img)}"
+            alt="${esc(cardData.name)}"
+          />
 
         <div>
           <p><strong>Card:</strong> ${esc(cardData.name)}</p>

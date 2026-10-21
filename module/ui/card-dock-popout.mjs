@@ -19,8 +19,22 @@ function visibleActorPresentations() {
 function buildActivePresentation(cards, actorUuid = null) {
     const chronologicalCards = cards ?? [];
 
-    const visibleCards = chronologicalCards.slice(-4).reverse();
-    const overflowCards = chronologicalCards.slice(0, -4);
+    /*
+     * Show at most four card tiles:
+     * - Up to four cards: show every card normally.
+     * - More than four: show three normal cards and one overflow card.
+     */
+    const hasOverflow = chronologicalCards.length > 4;
+    const visibleCount = hasOverflow ? 3 : 4;
+
+    const visibleCards = chronologicalCards
+        .slice(-visibleCount)
+        .reverse();
+
+    const overflowCards = hasOverflow
+        ? chronologicalCards.slice(0, -visibleCount)
+        : [];
+
     const overflowTopCard = overflowCards.length ? overflowCards[overflowCards.length - 1] : null;
     const hiddenUnderTopCount = Math.max(overflowCards.length - 1, 0);
 
@@ -56,12 +70,14 @@ function buildDockDefinition(dockKey = "fate") {
             source: {
                 title: "Fate Deck",
                 count: global.fateDeck.count,
+                hasStack: global.fateDeck.count > 1,
                 hasCards: global.fateDeck.count > 0
             },
             active: buildActivePresentation(global.conflict.cards ?? [], null),
             discard: {
                 title: "Fate Discard",
                 count: global.fateDiscard.count,
+                hasStack: global.fateDiscard.count > 1,
                 topCard: global.fateDiscard.cards?.[0] ?? null,
                 action: "peek-fate-discard",
                 actionLabel: "Peek"
@@ -85,12 +101,14 @@ function buildDockDefinition(dockKey = "fate") {
             source: {
                 title: "Fate Deck",
                 count: global.fateDeck.count,
-                hasCards: global.fateDeck.count > 0
+                hasCards: global.fateDeck.count > 0,
+                hasStack: global.fateDeck.count > 1,
             },
             active: buildActivePresentation(global.conflict.cards ?? [], null),
             discard: {
                 title: "Fate Discard",
                 count: global.fateDiscard.count,
+                hasStack: global.fateDiscard.count > 1,
                 topCard: global.fateDiscard.cards?.[0] ?? null,
                 action: "peek-fate-discard",
                 actionLabel: "Peek"
@@ -113,12 +131,14 @@ function buildDockDefinition(dockKey = "fate") {
             title: "Twist Deck",
             count: actor.twistDeck.count,
             hasCards: actor.twistDeck.count > 0,
+            hasStack: actor.twistDeck.count > 1,
             actorUuid: actor.actorUuid
         },
         active: buildActivePresentation(actor.hand.cards ?? [], actor.actorUuid),
         discard: {
             title: "Twist Discard",
             count: actor.twistDiscard.count,
+            hasStack: actor.twistDiscard.count > 1,
             topCard: actor.twistDiscard.cards?.[0] ?? null,
             action: "peek-twist-discard",
             actionLabel: "Peek",
@@ -312,7 +332,7 @@ export class TTBCardDockPopout extends HandlebarsApplicationMixin(ApplicationV2)
         classes: ["through-the-breach", "ttb-card-dock-popout-app"],
         position: {
             width: 980,
-            height: 760
+            height: 520
         },
         window: {
             resizable: true

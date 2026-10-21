@@ -158,3 +158,17 @@
     margin: 0 0 6px;
     border-bottom: 1px solid #3a2618;
 }
+
+.ttb-chat-card__content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ttb-chat-card__image {
+    width: 90px;
+    height: 126px;
+    flex: 0 0 auto;
+    object-fit: contain;
+    border: 0;
+}

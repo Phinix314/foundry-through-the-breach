@@ -12,6 +12,7 @@
   - 0.0.6.4 Improved Card Dock and have unique for fate/players.
   - 0.0.6.5 Improve Privacy of Decks / Unflipped Cards.
   - 0.0.6.6 Improved Card behaivior: Player can Discard Cards and Reshuffle Deck even if its not empty. (Resolved over GM Socket)
+  - 0.0.6.7 Added Card Images for both chat and card docks. Also sligthly improved visiual display in the card-dock. 
 - 0.0.8 Improved Charackter Sheet 
 - 0.0.9  Add Fatecards instead of Prototypes
 - 0.1.0  first usable table prototype
@@ -31,6 +32,7 @@
 - Improved Display of current conflict. 
   - Select which card was used whne resolving the conflict. 
 - Undo Button
+- Card Display in Chat / Multiple Cards.
 
 # Quality of Life
 - If not enough cards to draw/flip automatically shuffle deck. 

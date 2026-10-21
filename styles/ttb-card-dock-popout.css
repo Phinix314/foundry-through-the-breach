@@ -86,37 +86,63 @@
     margin-bottom: 8px;
 }
 
+button.ttb-pop-card--overflow {
+    width: 120px;
+    min-width: 120px;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    padding: 5px;
+    align-self: flex-start;
+    appearance: none;
+}
+
 .ttb-pop-preview--active {
     min-height: 200px;
     align-items: flex-start;
+    align-content: flex-start;
+    overflow: visible;
 }
 
 .ttb-pop-card {
-    width: 78px;
-    min-width: 78px;
-    min-height: 112px;
-    padding: 6px;
+    width: 120px;
+    min-width: 120px;
+    min-height: 0;
+    padding: 5px;
+    box-sizing: border-box;
     border: 1px solid var(--color-border-dark-3);
     border-radius: 6px;
     overflow: hidden;
     position: relative;
 }
 
-.ttb-pop-card--back {
-    background:
-            linear-gradient(135deg, rgba(220, 190, 120, 0.22), rgba(120, 90, 20, 0.48));
+.ttb-pop-card__image {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 5 / 7;
+    object-fit: contain;
+    border: 0;
+    border-radius: 4px;
 }
 
 .ttb-pop-card--face {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    gap: 6px;
     background: rgba(255, 255, 255, 0.08);
 }
 
+.ttb-pop-card--back {
+    padding: 0;
+    background: none;
+}
+
 .ttb-pop-card--empty {
+    min-height: 168px;
     background: rgba(255, 255, 255, 0.03);
 }
+
 
 .ttb-pop-card--overflow {
     display: flex;
@@ -202,4 +228,33 @@
     .ttb-card-dock-popout__layout {
         grid-template-columns: 1fr;
     }
+}
+
+.ttb-pop-card--stacked {
+    overflow: visible;
+    isolation: isolate;
+    margin-right: 14px;
+    margin-bottom: 12px;
+}
+
+.ttb-pop-card--stacked::before,
+.ttb-pop-card--stacked::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(220, 200, 175, 0.55);
+    border-radius: 6px;
+    background: #4a4038;
+    box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.55);
+    pointer-events: none;
+}
+
+.ttb-pop-card--stacked::before {
+    z-index: -1;
+    transform: translate(6px, 4px) rotate(1deg);
+}
+
+.ttb-pop-card--stacked::after {
+    z-index: -2;
+    transform: translate(12px, 8px) rotate(2deg);
 }
