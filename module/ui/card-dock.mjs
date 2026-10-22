@@ -2,6 +2,9 @@ import {
     getActorDockPresentation,
     getGlobalDockPresentation
 } from "../cards/summary-state.mjs";
+import {
+    CONFLICT_PILE_NAME
+} from "../cards/fate-deck.mjs";
 
 const SYSTEM_ID = "through-the-breach";
 let hooksRegistered = false;
@@ -127,6 +130,12 @@ export function initializeTtbCardDock() {
     hooksRegistered = true;
 
     Hooks.on("renderPlayers", renderTtbCardDock);
+
+    Hooks.on("updateCards", (cards) => {
+        if (cards.name !== CONFLICT_PILE_NAME) return;
+
+        rerenderTtbCardDock();
+    });
 
     Hooks.on("ready", () => {
         console.log(`${SYSTEM_ID} | Initializing card dock rerender`);

@@ -91,6 +91,15 @@ import {
     initializeReshuffleSocket
 } from "./module/cards/reshuffle-socket.mjs";
 
+import {
+    buildSelectionPolicy,
+    getActiveConflict,
+    createActiveConflict,
+    startActiveConflict,
+    clearActiveConflictState,
+    getActiveConflictSelectionPresentation
+} from "./module/cards/active-conflict.mjs";
+
 const SYSTEM_ID = "through-the-breach";
 
 async function ensureActorCardStacks(actor, { notify = false } = {}) {
@@ -193,7 +202,13 @@ Hooks.once("ready", async () => {
         addFateCardsToActorDeck,
         setActorDeckComposition,
         syncActorTwistDeckOwnership,
-        listFateCardIds
+
+        buildSelectionPolicy,
+        getActiveConflict,
+        createActiveConflict,
+        clearActiveConflictState,
+        startActiveConflict,
+        getActiveConflictSelectionPresentation,
     };
     initializeReshuffleSocket();
 

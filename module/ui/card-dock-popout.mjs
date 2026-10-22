@@ -1,4 +1,11 @@
-import {getActorDockPresentation, getGlobalDockPresentation} from "../cards/summary-state.mjs";
+import {
+    getActorDockPresentation,
+    getGlobalDockPresentation
+} from "../cards/summary-state.mjs";
+
+import {
+    CONFLICT_PILE_NAME
+} from "../cards/fate-deck.mjs";
 
 const SYSTEM_ID = "through-the-breach";
 const {ApplicationV2, HandlebarsApplicationMixin} = foundry.applications.api;
@@ -450,3 +457,9 @@ export function isTtbCardDockPopoutOpen(dockKey = "fate") {
     const instance = dockPopoutInstances.get(dockKey);
     return !!instance?.rendered;
 }
+
+Hooks.on("updateCards", (cards) => {
+    if (cards.name !== CONFLICT_PILE_NAME) return;
+
+    void rerenderTtbCardDockPopout();
+});

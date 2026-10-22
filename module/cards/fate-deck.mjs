@@ -389,7 +389,11 @@ function renderFlipChatContent(cardData, actor = null) {
   `;
 }
 
-export async function flipTopCardToConflict({actor = null} = {}) {
+export async function flipTopCardToConflict({
+                                                actor = null,
+                                                chat = true,
+                                                conflictId = null
+                                            } = {}) {
     const deck = game.cards.getName(FATE_DECK_NAME);
     const conflictPile = game.cards.getName(CONFLICT_PILE_NAME);
 
@@ -430,22 +434,26 @@ export async function flipTopCardToConflict({actor = null} = {}) {
 
     await markCardEnteredConflict(card, {
         sourceStack: "fate",
-        sourceActorUuid: null
+        sourceActorUuid: null,
+        conflictId: conflictId ?? null
     });
 
     const cardData = getFlippedCardData(card);
 
-    await ChatMessage.create({
-        speaker: ChatMessage.getSpeaker({actor}),
-        content: renderFlipChatContent(cardData, actor),
-        flags: {
-            [SYSTEM_ID]: {
-                type: "fateFlip",
-                card: cardData,
-                actorUuid: actor?.uuid ?? null
+    if (chat) {
+        await ChatMessage.create({
+            speaker: ChatMessage.getSpeaker({ actor }),
+            content: renderFlipChatContent(cardData, actor),
+            flags: {
+                [SYSTEM_ID]: {
+                    type: "fateFlip",
+                    card: cardData,
+                    actorUuid: actor?.uuid ?? null,
+                    conflictId
+                }
             }
-        }
-    });
+        });
+    }
 
     return card;
 }

@@ -13,8 +13,9 @@
   - 0.0.6.5 Improve Privacy of Decks / Unflipped Cards.
   - 0.0.6.6 Improved Card behaivior: Player can Discard Cards and Reshuffle Deck even if its not empty. (Resolved over GM Socket)
   - 0.0.6.7 Added Card Images for both chat and card docks. Also sligthly improved visiual display in the card-dock. 
-- 0.0.8 Improved Charackter Sheet 
-- 0.0.9  Add Fatecards instead of Prototypes
+- 0.0.7 Conflict.
+  - 0.0.7.0 Basic Conflict logic in the backend.
+- 0.0.8 Improved Charackter Sheet
 - 0.1.0  first usable table prototype
 
 
