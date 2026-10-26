@@ -42,9 +42,12 @@
 # Quality of Life
 - If not enough cards to draw/flip automatically shuffle deck. 
 - When adding cards to player have example of each of the 4 suits. 
+- Currently there are two Conflict Types which seem similar but are diffrent and should probably be entangled
+  - Conflict via the Card Docks
+  - Conflict via Commands esp. through the charackter sheet.
+- Indicate that a card has been cheated rather then selected more clearly in the chat window
 
-# Known Issues: 
-- Docks dont sync from actions of other people 
+# Known Issues:
 - delete player decks of deleted charackters
 - Consider naming convention of Popout in regards to same named Module. Possibly integrate it in core.
 

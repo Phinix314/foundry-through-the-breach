@@ -35,7 +35,7 @@ export async function ensureResolveConflictMacro({ notify = false } = {}) {
         flags: {
             [SYSTEM_ID]: {
                 macro: "resolve-conflict",
-                version: 1
+                version: 2
             }
         }
     };

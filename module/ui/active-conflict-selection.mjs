@@ -1,8 +1,8 @@
-import{
+import {
     getActiveConflictSelectionPresentation,
-    selectActiveConflictCard
+    selectActiveConflictCard,
+    resolveActiveConflict
 } from "../cards/active-conflict.mjs";
-
 const {
     ApplicationV2,
     HandlebarsApplicationMixin,
@@ -227,12 +227,15 @@ export class TTBActiveConflictSelection
                     await selectActiveConflictCard({
                         conflictId: this.conflictId,
                         source: this.selectedSelection.source,
-                        cardId: this.selectedSelection.cardId,
-                        selectedSuit
+                        cardId: this.selectedSelection.cardId
+                    });
+
+                    await resolveActiveConflict({
+                        chat: true
                     });
 
                     ui.notifications.info(
-                        "Fate card selection confirmed."
+                        "Conflict resolved."
                     );
 
                     await this.close();

@@ -9,6 +9,40 @@ import {
 const SYSTEM_ID = "through-the-breach";
 let hooksRegistered = false;
 
+let dockRerenderTimer = null;
+
+function scheduleCardDockRerender() {
+    window.clearTimeout(dockRerenderTimer);
+
+    dockRerenderTimer = window.setTimeout(async () => {
+        dockRerenderTimer = null;
+
+        try {
+            rerenderTtbCardDock();
+
+            await game.throughTheBreach
+                ?.rerenderTtbCardDockPopout?.();
+        } catch (error) {
+            console.error(
+                `${SYSTEM_ID} | Shared dock rerender failed`,
+                error
+            );
+        }
+    }, 100);
+}
+
+function actorCardSummaryChanged(changes) {
+    const flat = foundry.utils.flattenObject(
+        changes ?? {}
+    );
+
+    return Object.keys(flat).some((key) =>
+        key.startsWith(
+            `flags.${SYSTEM_ID}.cardSummary`
+        )
+    );
+}
+
 async function getDockData() {
     const actors = game.actors
         .filter((actor) => actor.type === "character")
@@ -130,6 +164,19 @@ export function initializeTtbCardDock() {
     hooksRegistered = true;
 
     Hooks.on("renderPlayers", renderTtbCardDock);
+
+    Hooks.on("createCard", scheduleCardDockRerender);
+    Hooks.on("updateCard", scheduleCardDockRerender);
+    Hooks.on("deleteCard", scheduleCardDockRerender);
+
+    Hooks.on("createCards", scheduleCardDockRerender);
+    Hooks.on("updateCards", scheduleCardDockRerender);
+    Hooks.on("deleteCards", scheduleCardDockRerender);
+
+    Hooks.on("updateActor", (_actor, changes) => {
+        if (!actorCardSummaryChanged(changes)) return;
+        scheduleCardDockRerender();
+    });
 
     Hooks.on("updateCards", (cards) => {
         if (cards.name !== CONFLICT_PILE_NAME) return;
