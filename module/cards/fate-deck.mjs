@@ -407,6 +407,54 @@ export async function flipTopCardToConflict({
         return null;
     }
 
+    const activeConflict =
+        conflictPile.getFlag(
+            SYSTEM_ID,
+            "activeConflict"
+        );
+
+    /*
+     * Manual flips do not provide a conflictId. Block them while
+     * a structured conflict has reserved the shared Fate Deck.
+     */
+    if (
+        activeConflict &&
+        !conflictId
+    ) {
+        const conflictLabel =
+            activeConflict.source?.label ??
+            "another conflict";
+
+        const requestingUser =
+            game.users.get(
+                activeConflict.requestedBy
+            );
+
+        const userName =
+            requestingUser?.name ??
+            "another player";
+
+        ui.notifications.warn(
+            `The Fate Deck is currently reserved for ${conflictLabel} ` +
+            `by ${userName}. Finish that conflict before making a manual flip.`
+        );
+
+        return null;
+    }
+
+    /*
+     * A structured flip must belong to the conflict currently
+     * holding the lock. Reject stale or mismatched operations.
+     */
+    if (
+        conflictId &&
+        activeConflict?.id !== conflictId
+    ) {
+        throw new Error(
+            "The structured conflict no longer owns the Fate Deck."
+        );
+    }
+
     if (deck.cards.size < 1) {
         ui.notifications.warn("The Fate Deck is empty. Recall or reshuffle the deck before flipping.");
         return null;

@@ -1,8 +1,12 @@
 import {
-    getActiveConflictSelectionPresentation,
-    selectActiveConflictCard,
-    resolveActiveConflict
+    getActiveConflictSelectionPresentation
 } from "../cards/active-conflict.mjs";
+
+import {
+    requestActiveConflict,
+    confirmActiveConflictSelection
+} from "../cards/conflict-socket.mjs";
+
 const {
     ApplicationV2,
     HandlebarsApplicationMixin,
@@ -58,6 +62,74 @@ async function chooseRedJokerSuit() {
     ].includes(suit)
         ? suit
         : null;
+}
+
+async function showConflictRequestError(
+    error
+) {
+    const titles = {
+        NO_ACTIVE_GM:
+            "No GM Available",
+
+        GM_TIMEOUT:
+            "GM Not Responding",
+
+        CONFLICT_BUSY:
+            "Fate Deck In Use",
+
+        MANUAL_CONFLICT_PENDING:
+            "Manual Flip Pending",
+
+        ACTOR_NOT_OWNED:
+            "Character Not Available"
+    };
+
+    const title =
+        titles[error.code] ??
+        "Conflict Could Not Start";
+
+    const escapedMessage =
+        foundry.utils.escapeHTML(
+            error.message
+        );
+
+    const busyExplanation =
+        error.code === "CONFLICT_BUSY"
+            ? `
+                <p>
+                    <small>
+                        This request was not queued.
+                        Try again after the current result
+                        appears in chat.
+                    </small>
+                </p>
+            `
+            : "";
+
+    await DialogV2.wait({
+        window: {
+            title
+        },
+
+        position: {
+            width: 480
+        },
+
+        content: `
+            <p>${escapedMessage}</p>
+            ${busyExplanation}
+        `,
+
+        buttons: [
+            {
+                action: "close",
+                label: "Close"
+            }
+        ],
+
+        rejectClose: false,
+        modal: true
+    });
 }
 
 export class TTBActiveConflictSelection
@@ -224,14 +296,16 @@ export class TTBActiveConflictSelection
                         }
                     }
 
-                    await selectActiveConflictCard({
+                    await confirmActiveConflictSelection({
                         conflictId: this.conflictId,
-                        source: this.selectedSelection.source,
-                        cardId: this.selectedSelection.cardId
-                    });
 
-                    await resolveActiveConflict({
-                        chat: true
+                        source:
+                        this.selectedSelection.source,
+
+                        cardId:
+                        this.selectedSelection.cardId,
+
+                        selectedSuit
                     });
 
                     ui.notifications.info(
@@ -283,4 +357,31 @@ export async function openActiveConflictSelectionWindow() {
     await selectionWindow.render(true);
 
     return selectionWindow;
+}
+
+export async function requestAndOpenActiveConflict(
+    options = {}
+) {
+    try {
+        await requestActiveConflict(
+            options
+        );
+
+        /*
+         * The GM has now created the conflict and completed
+         * all required Fate card flips.
+         */
+        return openActiveConflictSelectionWindow();
+    } catch (error) {
+        console.error(
+            "through-the-breach | Could not start active conflict",
+            error
+        );
+
+        await showConflictRequestError(
+            error
+        );
+
+        return null;
+    }
 }

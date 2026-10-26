@@ -33,6 +33,7 @@ import {
     syncActorTwistDeckOwnership,
     listFateCardIds
 } from "./module/cards/actor-decks.mjs";
+
 import {
     ensureActorTwistHand,
     syncActorTwistHandOwnership,
@@ -77,19 +78,27 @@ import {
     prepareActorTwistDeckForDraw,
     announceActorTwistDraw,
 } from "./module/cards/deck-recycling.mjs";
+
 import {
     ensureGmDeckToolsMacro,
     setupGmDeckToolsMacroForCurrentUser,
     openAssignTwistDeckDialogFromApi
 } from "./module/macros/gm-deck-tools.mjs";
+
 import {
     openTtbCardDockPopout,
     rerenderTtbCardDockPopout,
     isTtbCardDockPopoutOpen
 } from "./module/ui/card-dock-popout.mjs";
+
 import {
     initializeReshuffleSocket
 } from "./module/cards/reshuffle-socket.mjs";
+
+import {
+    initializeActiveConflictSocket,
+    requestActiveConflict
+} from "./module/cards/conflict-socket.mjs";
 
 import {
     buildSelectionPolicy,
@@ -104,8 +113,10 @@ import {
 } from "./module/cards/active-conflict.mjs";
 
 import {
-    openActiveConflictSelectionWindow
+    openActiveConflictSelectionWindow,
+    requestAndOpenActiveConflict
 } from "./module/ui/active-conflict-selection.mjs";
+
 const SYSTEM_ID = "through-the-breach";
 
 async function ensureActorCardStacks(actor, { notify = false } = {}) {
@@ -220,9 +231,12 @@ Hooks.once("ready", async () => {
         resolveActiveConflict,
 
         openActiveConflictSelectionWindow,
+        requestAndOpenActiveConflict,
+        requestActiveConflict,
 
     };
     initializeReshuffleSocket();
+    initializeActiveConflictSocket();
 
     if (game.user.isGM) {
         try {
