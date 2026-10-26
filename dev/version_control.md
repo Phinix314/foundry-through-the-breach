@@ -15,6 +15,7 @@
   - 0.0.6.7 Added Card Images for both chat and card docks. Also sligthly improved visiual display in the card-dock. 
 - 0.0.7 Conflict.
   - 0.0.7.0 Basic Conflict logic in the backend.
+  - 0.0.7.1 Created visual selection for conflict resolution.
 - 0.0.8 Improved Charackter Sheet
 - 0.1.0  first usable table prototype
 

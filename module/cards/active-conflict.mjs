@@ -35,6 +35,18 @@ function integer(value, fallback = 0) {
         : fallback;
 }
 
+function formatFlipModifier(value) {
+    const modifier = integer(value);
+
+    if (modifier === 0) {
+        return "";
+    }
+
+    const symbol = modifier > 0 ? "+" : "−";
+
+    return symbol.repeat(Math.abs(modifier));
+}
+
 export function buildSelectionPolicy(flipModifier, overrides = {}) {
     const modifier = integer(flipModifier);
     const negative = modifier < 0;
@@ -375,44 +387,71 @@ export async function getActiveConflictSelectionPresentation() {
     const sortedFateCards = sortCardsHighestFirst(fateCards);
     const policy = conflict.selectionPolicy;
 
+    const blackJoker = sortedFateCards.find(
+        (card) =>
+            card.joker === true &&
+            card.color === "black"
+    );
+
+    const redJoker = sortedFateCards.find(
+        (card) =>
+            card.joker === true &&
+            card.color === "red"
+    );
+
     let defaultFateCard = null;
 
-    if (policy.defaultFateSelection === "lowest") {
-        defaultFateCard =
-            sortedFateCards[sortedFateCards.length - 1];
+    if (blackJoker) {
+        /*
+         * A flipped Black Joker must be used, regardless of
+         * positive or negative Fate modifiers.
+         */
+        defaultFateCard = blackJoker;
+
+        for (const card of sortedFateCards) {
+            card.selectable = card.id === blackJoker.id;
+            card.defaultSelected = card.id === blackJoker.id;
+        }
     } else {
-        defaultFateCard = sortedFateCards[0];
-    }
-
-    for (const card of sortedFateCards) {
-        switch (policy.fateSelection) {
-            case "lowest-only":
-                card.selectable =
-                    card.id === sortedFateCards.at(-1)?.id;
-                break;
-
-            case "highest-only":
-                card.selectable =
-                    card.id === sortedFateCards[0]?.id;
-                break;
-
-            case "choose":
-                card.selectable = true;
-                break;
-
-            default:
-                throw new Error(
-                    `Unknown Fate selection rule: ${policy.fateSelection}`
-                );
+        if (policy.defaultFateSelection === "lowest") {
+            defaultFateCard =
+                sortedFateCards[sortedFateCards.length - 1];
+        } else {
+            defaultFateCard = sortedFateCards[0];
         }
 
-        card.defaultSelected =
-            card.id === defaultFateCard?.id;
+        for (const card of sortedFateCards) {
+            switch (policy.fateSelection) {
+                case "lowest-only":
+                    card.selectable =
+                        card.id === sortedFateCards.at(-1)?.id ||
+                        card.id === redJoker?.id;
+                    break;
+
+                case "highest-only":
+                    card.selectable =
+                        card.id === sortedFateCards[0]?.id;
+                    break;
+
+                case "choose":
+                    card.selectable = true;
+                    break;
+
+                default:
+                    throw new Error(
+                        `Unknown Fate selection rule: ${policy.fateSelection}`
+                    );
+            }
+
+            card.defaultSelected =
+                card.id === defaultFateCard?.id;
+        }
     }
 
     const handCards = [];
 
     if (
+        !blackJoker &&
         policy.cheat?.allowed === true &&
         policy.cheat?.source === "actor-hand"
     ) {
@@ -455,5 +494,173 @@ export async function getActiveConflictSelectionPresentation() {
                 cardId: defaultFateCard.id
             }
             : null
+    };
+}
+
+export async function selectActiveConflictCard({
+                                                   conflictId,
+                                                   source,
+                                                   cardId,
+                                                   selectedBy = game.user.id
+                                               } = {}) {
+    requireGm();
+
+    const conflict = getActiveConflict();
+
+    if (!conflict) {
+        throw new Error("No active conflict exists.");
+    }
+
+    if (conflict.id !== conflictId) {
+        throw new Error(
+            "The active conflict changed before the card was selected."
+        );
+    }
+
+    if (conflict.phase !== "selecting") {
+        throw new Error(
+            `Conflict cannot accept a selection during phase "${conflict.phase}".`
+        );
+    }
+
+    const presentation =
+        await getActiveConflictSelectionPresentation();
+
+    let candidates;
+
+    switch (source) {
+        case "fate":
+            candidates = presentation.fateCards;
+            break;
+
+        case "hand":
+            candidates = presentation.handCards;
+            break;
+
+        default:
+            throw new Error(
+                `Unknown selection source: ${source}`
+            );
+    }
+
+    const selectedCard = candidates.find(
+        (card) => card.id === cardId
+    );
+
+    if (!selectedCard) {
+        throw new Error(
+            "The selected card is not part of the legal selection."
+        );
+    }
+
+    if (!selectedCard.selectable) {
+        throw new Error(
+            `${selectedCard.name} cannot be selected for this conflict.`
+        );
+    }
+
+    conflict.phase = "selected";
+    conflict.selectedCardId = selectedCard.id;
+    conflict.selectedCardSource = selectedCard.source;
+    conflict.selectedBy = selectedBy;
+    conflict.selectedAt = Date.now();
+
+    /*
+     * Snapshot the relevant card information. The final resolver
+     * should not depend on mutable presentation data.
+     */
+    conflict.selectedCard = {
+        id: selectedCard.id,
+        source: selectedCard.source,
+        name: selectedCard.name,
+        value: selectedCard.value,
+        suit: selectedCard.suit,
+        suitLabel: selectedCard.suitLabel,
+        joker: selectedCard.joker,
+        color: selectedCard.color,
+        isCheat: selectedCard.isCheat
+    };
+
+    const pile = getConflictPile();
+
+    await pile.setFlag(
+        SYSTEM_ID,
+        ACTIVE_CONFLICT_FLAG,
+        conflict
+    );
+
+    return foundry.utils.deepClone(conflict);
+}
+
+export function getActiveConflictResult() {
+    const conflict = getActiveConflict();
+
+    if (!conflict) {
+        throw new Error("No active conflict exists.");
+    }
+
+    if (conflict.phase !== "selected") {
+        throw new Error(
+            `Conflict has no confirmed result during phase "${conflict.phase}".`
+        );
+    }
+
+    const selectedCard = conflict.selectedCard;
+
+    if (
+        !selectedCard ||
+        selectedCard.id !== conflict.selectedCardId
+    ) {
+        throw new Error(
+            "The active conflict has no valid selected-card snapshot."
+        );
+    }
+
+    const baseValue = integer(conflict.baseValue);
+    const cardValue = integer(selectedCard.value);
+    const total = baseValue + cardValue;
+
+    const tn = conflict.tn === null
+        ? null
+        : integer(conflict.tn);
+
+    const difference = tn === null
+        ? null
+        : total - tn;
+
+    const success = difference === null
+        ? null
+        : difference >= 0;
+
+    const marginCount = difference === null
+        ? null
+        : Math.floor(Math.abs(difference) / 5);
+
+    return {
+        conflictId: conflict.id,
+        actorUuid: conflict.actorUuid,
+        source: foundry.utils.deepClone(conflict.source),
+
+        baseValue,
+        cardValue,
+        total,
+        tn,
+
+        difference,
+        success,
+        marginType:
+            difference === null
+                ? null
+                : success
+                    ? "success"
+                    : "failure",
+        marginCount,
+
+        selectedCard:
+            foundry.utils.deepClone(selectedCard),
+
+        requiresSuitChoice:
+            selectedCard.joker === true &&
+            selectedCard.color === "red"
     };
 }

@@ -1,0 +1,91 @@
+<div class="ttb-conflict-select">
+    <div class="ttb-conflict-select__body">
+        <header class="ttb-conflict-select__header">
+            <div>
+                <h2>{{selection.source.label}}</h2>
+                <p>{{selection.actorName}}</p>
+            </div>
+
+            <div class="ttb-conflict-select__summary">
+                <span>Base: {{selection.baseValue}}</span>
+                <span>Flip: {{selection.flipModifier}}</span>
+
+                {{#if selection.tn}}
+                    <span>TN: {{selection.tn}}</span>
+                {{/if}}
+            </div>
+        </header>
+
+        <section>
+            <h3>Fate Flip</h3>
+
+            <div class="ttb-conflict-select__cards">
+                {{#each selection.fateCards}}
+                    <button
+                            type="button"
+                            class="ttb-conflict-choice{{#if selected}} ttb-conflict-choice--selected{{/if}}"
+                            data-selection-source="{{source}}"
+                            data-card-id="{{id}}"
+                            {{#unless selectable}}disabled{{/unless}}
+                    >
+                        <img src="{{img}}" alt="{{name}}"/>
+
+                        <span class="ttb-conflict-choice__name">
+                            {{name}}
+                        </span>
+
+                        <span>
+                        {{value}} · {{suitLabel}}
+                    </span>
+                    </button>
+                {{/each}}
+            </div>
+        </section>
+
+        {{#if hasHandCards}}
+            <section>
+                <h3>Cheat Fate</h3>
+
+                <p class="ttb-conflict-select__notice">
+                    Choosing one of these cards cheats Fate.
+                </p>
+
+                <div class="ttb-conflict-select__cards">
+                    {{#each selection.handCards}}
+                        <button
+                                type="button"
+                                class="ttb-conflict-choice ttb-conflict-choice--cheat{{#if
+                                        selected}} ttb-conflict-choice--selected{{/if}}"
+                                data-selection-source="{{source}}"
+                                data-card-id="{{id}}"
+                        >
+                            <img src="{{img}}" alt="{{name}}"/>
+
+                            <span class="ttb-conflict-choice__badge">
+                            Cheat
+                        </span>
+
+                            <span class="ttb-conflict-choice__name">
+                                {{name}}
+                            </span>
+
+                            <span>
+                            {{value}} · {{suitLabel}}
+                        </span>
+                        </button>
+                    {{/each}}
+                </div>
+            </section>
+        {{/if}}
+    </div>
+
+    <footer class="ttb-conflict-select__footer">
+        <footer class="ttb-conflict-select__footer">
+            <button
+                    type="button"
+                    data-action="confirm-selection"
+            >
+                Confirm Selection
+            </button>
+        </footer>
+</div>

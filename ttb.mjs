@@ -97,9 +97,14 @@ import {
     createActiveConflict,
     startActiveConflict,
     clearActiveConflictState,
-    getActiveConflictSelectionPresentation
+    getActiveConflictSelectionPresentation,
+    selectActiveConflictCard,
+    getActiveConflictResult
 } from "./module/cards/active-conflict.mjs";
 
+import {
+    openActiveConflictSelectionWindow
+} from "./module/ui/active-conflict-selection.mjs";
 const SYSTEM_ID = "through-the-breach";
 
 async function ensureActorCardStacks(actor, { notify = false } = {}) {
@@ -209,6 +214,11 @@ Hooks.once("ready", async () => {
         clearActiveConflictState,
         startActiveConflict,
         getActiveConflictSelectionPresentation,
+        selectActiveConflictCard,
+        getActiveConflictResult,
+
+        openActiveConflictSelectionWindow,
+
     };
     initializeReshuffleSocket();
 
@@ -222,14 +232,7 @@ Hooks.once("ready", async () => {
                 await ensureActorCardStacks(actor, { notify: true });
             }
 
-            for (const actor of game.actors.filter((a) => a.type === "character")) {
-                await ensureActorCardStacks(actor, { notify: true });
-            }
-
             await syncAllFateCardImages({ notify: true });
-
-            await syncAllActorCardSummaries();
-
             await syncAllActorCardSummaries();
             await rerenderTtbCardDock();
 
