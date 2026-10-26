@@ -8,6 +8,10 @@ import {
     cheatFateCardFromActorHand
 } from "./actor-hands.mjs";
 
+import {
+    resolveCurrentConflict
+} from "./conflict-resolution.mjs";
+
 const SYSTEM_ID = "through-the-breach";
 const ACTIVE_CONFLICT_FLAG = "activeConflict";
 
@@ -17,6 +21,53 @@ const RED_JOKER_SUITS = Object.freeze({
     tomes: "Tomes",
     masks: "Masks"
 });
+
+function normalizeSuitList(suits = []) {
+    const list = Array.isArray(suits)
+        ? suits
+        : [suits];
+
+    return list
+        .map((suit) =>
+            String(suit ?? "").toLowerCase()
+        )
+        .filter((suit) =>
+            Object.hasOwn(
+                RED_JOKER_SUITS,
+                suit
+            )
+        );
+}
+
+function hasRequiredSuits(
+    resultSuits,
+    requiredSuits
+) {
+    const available = new Map();
+
+    for (const suit of resultSuits) {
+        available.set(
+            suit,
+            (available.get(suit) ?? 0) + 1
+        );
+    }
+
+    for (const requiredSuit of requiredSuits) {
+        const remaining =
+            available.get(requiredSuit) ?? 0;
+
+        if (remaining < 1) {
+            return false;
+        }
+
+        available.set(
+            requiredSuit,
+            remaining - 1
+        );
+    }
+
+    return true;
+}
 
 let conflictCreationPending = false;
 
@@ -100,6 +151,8 @@ export async function createActiveConflict({
                                                source,
                                                baseValue = 0,
                                                tn = null,
+                                               inherentSuits = [],
+                                               tnSuits = [],
                                                inherentModifier = 0,
                                                situationalModifier = 0,
                                                selectionOverrides = {}
@@ -167,6 +220,12 @@ export async function createActiveConflict({
 
             baseValue: integer(baseValue),
             tn: parsedTn,
+
+            inherentSuits:
+                normalizeSuitList(inherentSuits),
+
+            tnSuits:
+                normalizeSuitList(tnSuits),
 
             inherentModifier: inherent,
             situationalModifier: situational,
@@ -631,7 +690,8 @@ export async function selectActiveConflictCard({
         suitLabel: resolvedSuitLabel,
         joker: selectedCard.joker,
         color: selectedCard.color,
-        isCheat: selectedCard.isCheat
+        img: selectedCard.img,
+        isCheat: selectedCard.isCheat,
     };
 
     const pile = getConflictPile();
@@ -681,13 +741,63 @@ export function getActiveConflictResult() {
         ? null
         : total - tn;
 
-    const success = difference === null
+    const inherentSuits =
+        normalizeSuitList(
+            conflict.inherentSuits
+        );
+
+    const cardSuit =
+        Object.hasOwn(
+            RED_JOKER_SUITS,
+            selectedCard.suit
+        )
+            ? selectedCard.suit
+            : null;
+
+    const resultSuits = [
+        ...inherentSuits,
+        ...(cardSuit ? [cardSuit] : [])
+    ];
+
+    const tnSuits =
+        normalizeSuitList(
+            conflict.tnSuits
+        );
+
+    const numberMet = difference === null
         ? null
         : difference >= 0;
 
+    const suitsMet =
+        hasRequiredSuits(
+            resultSuits,
+            tnSuits
+        );
+
+    const success = numberMet === null
+        ? null
+        : numberMet && suitsMet;
+
     const marginCount = difference === null
         ? null
-        : Math.floor(Math.abs(difference) / 5);
+        : !success && numberMet && !suitsMet
+            ? 0
+            : Math.floor(
+                Math.abs(difference) / 5
+            );
+
+    const pile = getConflictPile();
+
+    const unselectedFateCards =
+        (conflict.flippedCardIds ?? [])
+            .map((id) => pile.cards.get(id))
+            .filter((card) =>
+                card &&
+                card.id !== conflict.selectedCardId
+            )
+            .map((card) =>
+                formatSelectionCard(card, "fate")
+            );
 
     return {
         conflictId: conflict.id,
@@ -701,6 +811,14 @@ export function getActiveConflictResult() {
 
         difference,
         success,
+        numberMet,
+        suitsMet,
+
+        inherentSuits,
+        resultSuits,
+        tnSuits,
+
+
         marginType:
             difference === null
                 ? null
@@ -712,9 +830,336 @@ export function getActiveConflictResult() {
         selectedCard:
             foundry.utils.deepClone(selectedCard),
 
+        unselectedFateCards,
+
         requiresSuitChoice:
             selectedCard.joker === true &&
             selectedCard.color === "red" &&
             !RED_JOKER_SUITS[selectedCard.suit]
+    };
+}
+
+function escapeChat(value) {
+    return foundry.utils.escapeHTML(
+        String(value ?? "")
+    );
+}
+
+function renderSuitSymbols(
+    suits = [],
+    {
+        sourceLabel = null,
+        requiredByTn = false
+    } = {}
+) {
+    return normalizeSuitList(suits)
+        .map((suit) => {
+            const suitLabel =
+                RED_JOKER_SUITS[suit];
+
+            const origin = requiredByTn
+                ? "Required by TN"
+                : sourceLabel
+                    ? `From ${sourceLabel}`
+                    : "";
+
+            const tooltip = origin
+                ? `${suitLabel} — ${origin}`
+                : suitLabel;
+
+            return `
+                <span
+                    class="
+                        ttb-conflict-suit
+                        ttb-conflict-suit--${suit}
+                    "
+                    data-tooltip="${escapeChat(tooltip)}"
+                    aria-label="${escapeChat(suitLabel)}"
+                ></span>
+            `;
+        })
+        .join("");
+}
+
+function renderActiveConflictResult(result) {
+    const card = result.selectedCard;
+    const hasTn = result.tn !== null;
+
+    const outcome = !hasTn
+        ? "Result"
+        : result.success
+            ? "Success"
+            : "Failure";
+
+    const outcomeClass = !hasTn
+        ? "neutral"
+        : result.success
+            ? "success"
+            : "failure";
+
+    const degreeType =
+        result.success
+            ? "Success"
+            : "Failure";
+
+    const degreeWord =
+        result.marginCount === 1
+            ? "Degree"
+            : "Degrees";
+
+    const degreeText = hasTn
+        ? `${result.marginCount} ${degreeWord} of ${degreeType}`
+        : "";
+
+    const calculationTooltip =
+        `Base ${result.baseValue} + ` +
+        `Card ${result.cardValue} = ` +
+        `${result.total}`;
+
+    const outcomeTooltip = !hasTn
+        ? calculationTooltip
+        : [
+            calculationTooltip,
+            result.numberMet
+                ? "TN number met"
+                : "TN number not met",
+            result.suitsMet
+                ? "Required suits met"
+                : "Required suits missing"
+        ].join(" · ");
+
+    const cardSuit =
+        Object.hasOwn(
+            RED_JOKER_SUITS,
+            card.suit
+        )
+            ? [card.suit]
+            : [];
+
+    const resultSuitsHtml = [
+        renderSuitSymbols(
+            result.inherentSuits,
+            {
+                sourceLabel:
+                result.source.label
+            }
+        ),
+
+        renderSuitSymbols(
+            cardSuit,
+            {
+                sourceLabel:
+                card.name
+            }
+        )
+    ].join("");
+
+    const tnSuitsHtml =
+        renderSuitSymbols(
+            result.tnSuits,
+            {
+                requiredByTn: true
+            }
+        );
+
+    const otherCards =
+        result.unselectedFateCards ?? [];
+
+    const otherCardNames =
+        otherCards
+            .map((otherCard) =>
+                otherCard.name
+            )
+            .join(", ");
+
+    const stackTooltip =
+        otherCards.length > 0
+            ? `Selected: ${card.name}. Other flipped cards: ${otherCardNames}`
+            : `Selected: ${card.name}`;
+
+    const stackClass =
+        otherCards.length === 0
+            ? ""
+            : otherCards.length === 1
+                ? "ttb-conflict-card-stack--one"
+                : "ttb-conflict-card-stack--many";
+
+    const tnHtml = hasTn
+        ? `
+            <div class="ttb-conflict-number-row">
+                <span class="ttb-conflict-number-label">
+                    TN
+                </span>
+
+                <span class="ttb-conflict-number">
+                    <span class="ttb-conflict-number__value">
+                        ${result.tn}
+                    </span>
+                
+                    <span class="ttb-conflict-suits">
+                        ${tnSuitsHtml}
+                    </span>
+                </span>
+            </div>
+        `
+        : "";
+
+    return `
+        <div class="ttb-chat-card ttb-conflict-result">
+            <h3 class="ttb-conflict-title">
+                ${escapeChat(result.source.label)}
+            </h3>
+
+            <div class="ttb-conflict-main">
+                <div class="ttb-conflict-selected">
+                    <span class="ttb-conflict-selected__label">
+                        Selected
+                    </span>
+
+                    <div
+                        class="ttb-conflict-card-stack ${stackClass}"
+                        data-tooltip="${escapeChat(stackTooltip)}"
+                    >
+                        <img
+                            class="ttb-conflict-selected__card"
+                            src="${escapeChat(card.img)}"
+                            alt="${escapeChat(card.name)}"
+                        >
+
+                        ${otherCards.length > 0
+        ? `
+                                <span class="ttb-conflict-stack-count">
+                                    +${otherCards.length}
+                                </span>
+                            `
+        : ""
+    }
+
+                        ${card.isCheat
+        ? `
+                                <span class="ttb-conflict-cheat">
+                                    Cheated
+                                </span>
+                            `
+        : ""
+    }
+                    </div>
+                </div>
+
+                <div class="ttb-conflict-summary">
+                    <div class="ttb-conflict-number-row">
+                        <span class="ttb-conflict-number-label">
+                            Result
+                        </span>
+
+                        <strong
+                            class="ttb-conflict-number ttb-conflict-number--result"
+                            data-tooltip="${escapeChat(
+                                calculationTooltip
+                            )}"
+                        >
+                            <span class="ttb-conflict-number__value">
+                                ${result.total}
+                            </span>
+                        
+                            <span class="ttb-conflict-suits">
+                                ${resultSuitsHtml}
+                            </span>
+                        </strong>
+                    </div>
+
+                    ${tnHtml}
+
+                    <div
+                        class="ttb-conflict-outcome ttb-conflict-outcome--${outcomeClass}"
+                        data-tooltip="${escapeChat(outcomeTooltip)}"
+                    >
+                        <strong>${outcome}</strong>
+
+                        ${hasTn
+        ? `
+                                <small>
+                                    ${degreeText}
+                                </small>
+                            `
+        : ""
+    }
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+export async function resolveActiveConflict({
+                                                chat = true
+                                            } = {}) {
+    requireGm();
+
+    const conflict = getActiveConflict();
+
+    if (!conflict) {
+        throw new Error("No active conflict exists.");
+    }
+
+    const result = getActiveConflictResult();
+    const actor = await fromUuid(conflict.actorUuid);
+
+    if (!actor) {
+        throw new Error(
+            `Conflict actor could not be found: ${conflict.actorUuid}`
+        );
+    }
+
+    let chatMessage = game.messages.find((message) => {
+        return (
+            message.getFlag(SYSTEM_ID, "type") ===
+            "activeConflictResult" &&
+            message.getFlag(SYSTEM_ID, "conflictId") ===
+            conflict.id
+        );
+    }) ?? null;
+
+    /*
+     * Create the result before moving cards. If card movement later
+     * fails, retrying will reuse this message instead of duplicating it.
+     */
+    if (chat && !chatMessage) {
+        chatMessage = await ChatMessage.create({
+            speaker: ChatMessage.getSpeaker({ actor }),
+            content: renderActiveConflictResult(
+                result,
+                actor
+            ),
+            flags: {
+                [SYSTEM_ID]: {
+                    type: "activeConflictResult",
+                    conflictId: conflict.id,
+                    result
+                }
+            }
+        });
+    }
+
+    const moved = await resolveCurrentConflict({
+        chat: false
+    });
+
+    const pile = getConflictPile();
+
+    if (pile.cards.size > 0) {
+        throw new Error(
+            "Not all conflict cards could be moved to their discard piles."
+        );
+    }
+
+    await clearActiveConflictState({
+        expectedId: conflict.id
+    });
+
+    return {
+        result,
+        moved,
+        chatMessageId: chatMessage?.id ?? null
     };
 }

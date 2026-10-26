@@ -172,3 +172,249 @@
     object-fit: contain;
     border: 0;
 }
+
+.ttb-chat-card.ttb-conflict-result {
+    padding: 7px;
+    border: 1px solid #4b3423;
+    border-radius: 4px;
+    background: #d8c39b;
+    color: #21160f;
+}
+
+.ttb-conflict-title {
+    margin: 0 0 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(58, 38, 24, 0.55);
+    font-size: 17px;
+    line-height: 1.1;
+    text-align: center;
+}
+
+.ttb-conflict-main {
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: 8px;
+    align-items: center;
+}
+
+.ttb-conflict-selected {
+    position: relative;
+    text-align: center;
+}
+
+.ttb-conflict-selected__label {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    opacity: 0.75;
+}
+
+.ttb-conflict-selected__card {
+    display: block;
+    width: 72px;
+    height: 100px;
+    max-width: none;
+    margin: 0 auto;
+    border: 1px solid #3a2618;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.ttb-conflict-cheat {
+    position: absolute;
+    right: 1px;
+    bottom: 2px;
+    padding: 1px 4px;
+    border-radius: 3px;
+    background: #5c1f1f;
+    color: #fff4dd;
+    font-size: 9px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.ttb-conflict-summary {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 5px;
+}
+.ttb-conflict-number-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 6px;
+    min-height: 22px;
+}
+
+.ttb-conflict-number-label {
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+
+.ttb-conflict-number {
+    display: grid;
+    grid-template-columns: 32px 56px;
+    align-items: center;
+    column-gap: 4px;
+
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.ttb-conflict-number__value {
+    justify-self: end;
+    font-variant-numeric: tabular-nums;
+}
+
+.ttb-conflict-number--result {
+    cursor: help;
+}
+
+.ttb-conflict-suits {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 4px;
+    min-width: 56px;
+}
+
+.ttb-conflict-suit {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-left: 0;
+
+    vertical-align: -2px;
+
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+
+    cursor: help;
+}
+
+.ttb-conflict-suit--rams {
+    background-image: url("../assets/suits/rams.png");
+}
+
+.ttb-conflict-suit--crows {
+    background-image: url("../assets/suits/crows.png");
+}
+
+.ttb-conflict-suit--tomes {
+    background-image: url("../assets/suits/tomes.png");
+}
+
+.ttb-conflict-suit--masks {
+    background-image: url("../assets/suits/masks.png");
+}
+
+.ttb-conflict-outcome {
+    padding: 4px 6px;
+    border: 1px solid currentColor;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    cursor: help;
+}
+
+.ttb-conflict-outcome--success {
+    color: #245b2a;
+    background: rgba(60, 125, 66, 0.13);
+}
+
+.ttb-conflict-outcome--failure {
+    color: #7a2020;
+    background: rgba(150, 40, 40, 0.12);
+}
+
+.ttb-conflict-outcome--neutral {
+    color: #3a3028;
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.ttb-conflict-card-stack {
+    position: relative;
+    width: 78px;
+    min-height: 100px;
+    margin: 0 auto;
+    cursor: help;
+}
+
+.ttb-conflict-card-stack::before,
+.ttb-conflict-card-stack::after {
+    content: "";
+    position: absolute;
+    width: 72px;
+    height: 100px;
+    border: 1px solid #59412f;
+    border-radius: 4px;
+    background: #b99d70;
+}
+
+.ttb-conflict-card-stack::before {
+    display: none;
+    top: 3px;
+    left: 3px;
+    z-index: 0;
+}
+
+.ttb-conflict-card-stack::after {
+    display: none;
+    top: 6px;
+    left: 6px;
+    z-index: 1;
+}
+
+.ttb-conflict-card-stack--one::before,
+.ttb-conflict-card-stack--many::before {
+    display: block;
+}
+
+.ttb-conflict-card-stack--many::after {
+    display: block;
+}
+
+.ttb-conflict-selected__card {
+    position: relative;
+    z-index: 2;
+}
+
+.ttb-conflict-stack-count {
+    position: absolute;
+    right: 0;
+    bottom: -5px;
+    z-index: 4;
+
+    min-width: 18px;
+    padding: 1px 4px;
+
+    border: 1px solid #3a2618;
+    border-radius: 9px;
+
+    background: #3a2618;
+    color: #fff4dd;
+
+    font-size: 10px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.ttb-conflict-outcome {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.ttb-conflict-outcome small {
+    font-size: 9px;
+    font-weight: normal;
+}

@@ -99,7 +99,8 @@ import {
     clearActiveConflictState,
     getActiveConflictSelectionPresentation,
     selectActiveConflictCard,
-    getActiveConflictResult
+    getActiveConflictResult,
+    resolveActiveConflict
 } from "./module/cards/active-conflict.mjs";
 
 import {
@@ -216,6 +217,7 @@ Hooks.once("ready", async () => {
         getActiveConflictSelectionPresentation,
         selectActiveConflictCard,
         getActiveConflictResult,
+        resolveActiveConflict,
 
         openActiveConflictSelectionWindow,
 
