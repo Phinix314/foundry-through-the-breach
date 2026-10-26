@@ -303,7 +303,11 @@ export async function discardTwistCardFromActorHand(
     return movedCard;
 }
 
-export async function cheatFateCardFromActorHand(actorOrIdOrNameOrUuid, cardId) {
+export async function cheatFateCardFromActorHand(
+    actorOrIdOrNameOrUuid,
+    cardId,
+    { chat = true } = {}
+) {
     const actor = await resolveActor(actorOrIdOrNameOrUuid);
 
     if (!actor) {
@@ -351,17 +355,19 @@ export async function cheatFateCardFromActorHand(actorOrIdOrNameOrUuid, cardId) 
 
     const cardData = getCardData(movedCard);
 
-    await ChatMessage.create({
-        speaker: ChatMessage.getSpeaker({ actor }),
-        content: renderCheatChatContent(cardData, actor),
-        flags: {
-            [SYSTEM_ID]: {
-                type: "cheatFate",
-                card: cardData,
-                actorUuid: actor.uuid
+    if (chat) {
+        await ChatMessage.create({
+            speaker: ChatMessage.getSpeaker({ actor }),
+            content: renderCheatChatContent(cardData, actor),
+            flags: {
+                [SYSTEM_ID]: {
+                    type: "cheatFate",
+                    card: cardData,
+                    actorUuid: actor.uuid
+                }
             }
-        }
-    });
+        });
+    }
 
     await game.throughTheBreach?.syncActorCardSummary?.(actor);
 

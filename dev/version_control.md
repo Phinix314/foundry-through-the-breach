@@ -12,11 +12,12 @@
   - 0.0.6.4 Improved Card Dock and have unique for fate/players.
   - 0.0.6.5 Improve Privacy of Decks / Unflipped Cards.
   - 0.0.6.6 Improved Card behaivior: Player can Discard Cards and Reshuffle Deck even if its not empty. (Resolved over GM Socket)
-  - 0.0.6.7 Added Card Images for both chat and card docks. Also sligthly improved visiual display in the card-dock. 
+  - 0.0.6.7 Added Card Images for both chat and card docks. Also sligthly improved visiual display in the card-dock.
 - 0.0.7 Conflict.
   - 0.0.7.0 Basic Conflict logic in the backend.
   - 0.0.7.1 Created visual selection for conflict resolution. Added Black Joker Logic
   - 0.0.7.2 Improved UI regarding pos/neg flips. Included Red Joker Logic & suit selection.
+  - 0.0.7.3 Integrated cheating cards into a conflict and resolving them afterwards. 
 - 0.0.8 Improved Charackter Sheet
 - 0.1.0  first usable table prototype
 
@@ -39,8 +40,10 @@
 
 # Quality of Life
 - If not enough cards to draw/flip automatically shuffle deck. 
+- When adding cards to player have example of each of the 4 suits. 
 
 # Known Issues: 
+- Docks dont sync from actions of other people 
 - delete player decks of deleted charackters
 - Consider naming convention of Popout in regards to same named Module. Possibly integrate it in core.
 

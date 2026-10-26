@@ -4,7 +4,8 @@ import {
 } from "./fate-deck.mjs";
 
 import {
-    getActorTwistHand
+    getActorTwistHand,
+    cheatFateCardFromActorHand
 } from "./actor-hands.mjs";
 
 const SYSTEM_ID = "through-the-breach";
@@ -591,9 +592,27 @@ export async function selectActiveConflictCard({
             );
         }
     }
+    let confirmedCardId = selectedCard.id;
+
+    if (source === "hand") {
+        const movedCard = await cheatFateCardFromActorHand(
+            conflict.actorUuid,
+            selectedCard.id,
+            {chat: false}
+        );
+
+        if (!movedCard) {
+            throw new Error(
+                "The selected hand card could not be moved into the conflict."
+            );
+        }
+
+        confirmedCardId = movedCard.id;
+    }
+
 
     conflict.phase = "selected";
-    conflict.selectedCardId = selectedCard.id;
+    conflict.selectedCardId = confirmedCardId;
     conflict.selectedCardSource = selectedCard.source;
     conflict.selectedSuit = isRedJoker ? resolvedSuit : null;
     conflict.selectedBy = selectedBy;
@@ -604,7 +623,7 @@ export async function selectActiveConflictCard({
      * should not depend on mutable presentation data.
      */
     conflict.selectedCard = {
-        id: selectedCard.id,
+        id: confirmedCardId,
         source: selectedCard.source,
         name: selectedCard.name,
         value: selectedCard.value,
