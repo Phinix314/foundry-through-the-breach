@@ -10,6 +10,13 @@ import {
 const SYSTEM_ID = "through-the-breach";
 const ACTIVE_CONFLICT_FLAG = "activeConflict";
 
+const RED_JOKER_SUITS = Object.freeze({
+    rams: "Rams",
+    crows: "Crows",
+    tomes: "Tomes",
+    masks: "Masks"
+});
+
 let conflictCreationPending = false;
 
 function requireGm() {
@@ -413,7 +420,9 @@ export async function getActiveConflictSelectionPresentation() {
             card.defaultSelected = card.id === blackJoker.id;
         }
     } else {
-        if (policy.defaultFateSelection === "lowest") {
+        if (redJoker) {
+            defaultFateCard = redJoker;
+        } else if (policy.defaultFateSelection === "lowest") {
             defaultFateCard =
                 sortedFateCards[sortedFateCards.length - 1];
         } else {
@@ -483,6 +492,7 @@ export async function getActiveConflictSelectionPresentation() {
         baseValue: conflict.baseValue,
         tn: conflict.tn,
         flipModifier: conflict.flipModifier,
+        flipLabel: formatFlipModifier(conflict.flipModifier),
         selectionPolicy: foundry.utils.deepClone(policy),
 
         fateCards: sortedFateCards,
@@ -501,6 +511,7 @@ export async function selectActiveConflictCard({
                                                    conflictId,
                                                    source,
                                                    cardId,
+                                                   selectedSuit = null,
                                                    selectedBy = game.user.id
                                                } = {}) {
     requireGm();
@@ -559,9 +570,32 @@ export async function selectActiveConflictCard({
         );
     }
 
+    const isRedJoker =
+        selectedCard.joker === true &&
+        selectedCard.color === "red";
+
+    let resolvedSuit = selectedCard.suit;
+    let resolvedSuitLabel = selectedCard.suitLabel;
+
+    if (isRedJoker) {
+        resolvedSuit = String(
+            selectedSuit ?? ""
+        ).toLowerCase();
+
+        resolvedSuitLabel =
+            RED_JOKER_SUITS[resolvedSuit];
+
+        if (!resolvedSuitLabel) {
+            throw new Error(
+                "A valid suit must be chosen for the Red Joker."
+            );
+        }
+    }
+
     conflict.phase = "selected";
     conflict.selectedCardId = selectedCard.id;
     conflict.selectedCardSource = selectedCard.source;
+    conflict.selectedSuit = isRedJoker ? resolvedSuit : null;
     conflict.selectedBy = selectedBy;
     conflict.selectedAt = Date.now();
 
@@ -574,8 +608,8 @@ export async function selectActiveConflictCard({
         source: selectedCard.source,
         name: selectedCard.name,
         value: selectedCard.value,
-        suit: selectedCard.suit,
-        suitLabel: selectedCard.suitLabel,
+        suit: resolvedSuit,
+        suitLabel: resolvedSuitLabel,
         joker: selectedCard.joker,
         color: selectedCard.color,
         isCheat: selectedCard.isCheat
@@ -661,6 +695,7 @@ export function getActiveConflictResult() {
 
         requiresSuitChoice:
             selectedCard.joker === true &&
-            selectedCard.color === "red"
+            selectedCard.color === "red" &&
+            !RED_JOKER_SUITS[selectedCard.suit]
     };
 }

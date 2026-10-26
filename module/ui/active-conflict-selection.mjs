@@ -5,10 +5,60 @@ import{
 
 const {
     ApplicationV2,
-    HandlebarsApplicationMixin
+    HandlebarsApplicationMixin,
+    DialogV2
 } = foundry.applications.api;
 
 let selectionWindow = null;
+
+async function chooseRedJokerSuit() {
+    const suit = await DialogV2.wait({
+        window: {
+            title: "Choose Red Joker Suit"
+        },
+        position: {
+            width: 560
+        },
+        content: `
+            <p>
+                Choose the suit contributed by the Red Joker.
+            </p>
+        `,
+        buttons: [
+            {
+                action: "rams",
+                label: "♥ Rams"
+            },
+            {
+                action: "crows",
+                label: "♠ Crows"
+            },
+            {
+                action: "tomes",
+                label: "♣ Tomes"
+            },
+            {
+                action: "masks",
+                label: "♦ Masks"
+            },
+            {
+                action: "cancel",
+                label: "Cancel"
+            }
+        ],
+        rejectClose: false,
+        modal: true
+    });
+
+    return [
+        "rams",
+        "crows",
+        "tomes",
+        "masks"
+    ].includes(suit)
+        ? suit
+        : null;
+}
 
 export class TTBActiveConflictSelection
     extends HandlebarsApplicationMixin(ApplicationV2) {
@@ -47,6 +97,8 @@ export class TTBActiveConflictSelection
     async _prepareContext() {
         const presentation =
             await getActiveConflictSelectionPresentation();
+
+        this.presentation = presentation;
 
         if (presentation.conflictId !== this.conflictId) {
             throw new Error(
@@ -141,12 +193,42 @@ export class TTBActiveConflictSelection
                 confirmButton.disabled = true;
 
                 try {
+                    const cards = [
+                        ...(this.presentation?.fateCards ?? []),
+                        ...(this.presentation?.handCards ?? [])
+                    ];
+
+                    const selectedCard = cards.find(
+                        (card) =>
+                            card.source === this.selectedSelection.source &&
+                            card.id === this.selectedSelection.cardId
+                    );
+
+                    if (!selectedCard) {
+                        throw new Error(
+                            "The highlighted card is no longer available."
+                        );
+                    }
+
+                    let selectedSuit = null;
+
+                    if (
+                        selectedCard.joker === true &&
+                        selectedCard.color === "red"
+                    ) {
+                        selectedSuit = await chooseRedJokerSuit();
+
+                        if (!selectedSuit) {
+                            confirmButton.disabled = false;
+                            return;
+                        }
+                    }
+
                     await selectActiveConflictCard({
                         conflictId: this.conflictId,
-                        source:
-                        this.selectedSelection.source,
-                        cardId:
-                        this.selectedSelection.cardId
+                        source: this.selectedSelection.source,
+                        cardId: this.selectedSelection.cardId,
+                        selectedSuit
                     });
 
                     ui.notifications.info(

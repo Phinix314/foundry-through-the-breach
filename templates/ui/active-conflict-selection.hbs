@@ -8,7 +8,9 @@
 
             <div class="ttb-conflict-select__summary">
                 <span>Base: {{selection.baseValue}}</span>
-                <span>Flip: {{selection.flipModifier}}</span>
+                {{#if selection.flipLabel}}
+                    <span>Flip: {{selection.flipLabel}}</span>
+                {{/if}}
 
                 {{#if selection.tn}}
                     <span>TN: {{selection.tn}}</span>
