@@ -5,6 +5,9 @@ First attempt at implementing a foundry game system for wyrds through the breach
 ## Fate Deck
 I am using the Fatedeck created by Christopher Reid. You can see them [here](https://therivetcounter.blogspot.com/2015/12/choose-your-fate.html?lr=1792578374455). 
 
+## Charackter-Sheet 
+The Charackter sheet has been custom made for this module. However i used both the official and especially u/sfw_pants [custom charackter sheet](https://www.reddit.com/r/Malifaux/comments/1jzb696/through_the_breach_character_sheet_version_3/). 
+
 ## AI Usage Disclaimer.
 This Project is primarily created by a Human. AI tools were however utilized to implement specific functions,particularly regarding to style and css.
 It has also been used to help learn and understand Java Script for this Project.
