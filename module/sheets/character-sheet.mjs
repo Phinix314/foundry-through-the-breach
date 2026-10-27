@@ -2,6 +2,10 @@ import {
     TTB_SKILL_CATEGORIES
 } from "../data/skill-catalog.mjs";
 
+import {
+    openSkillTestDialog
+} from "../ui/skill-test-dialog.mjs";
+
 const SYSTEM_ID = "through-the-breach";
 
 const ActorSheetV1 =
@@ -164,10 +168,83 @@ export class TTBCharacterSheet extends ActorSheetV1 {
         return context;
     }
 
+    async _onSkillTest(event) {
+        event.preventDefault();
+
+        const skillId =
+            event.currentTarget.dataset.skillId;
+
+        const skill =
+            this.actor.system.skills.find(
+                candidate =>
+                    candidate.id === skillId
+            );
+
+        if (!skill) {
+            ui.notifications.error(
+                `Skill could not be found: ${skillId}`
+            );
+            return;
+        }
+
+        const aspectValue =
+            Number(
+                this.actor.system.aspects?.[
+                    skill.aspect
+                    ] ?? 0
+            );
+
+        const actingValue =
+            Number(skill.rating ?? 0) +
+            aspectValue;
+
+        const testOptions =
+            await openSkillTestDialog({
+                skill,
+                actingValue,
+
+                aspectLabel:
+                    ASPECT_LABELS[skill.aspect] ??
+                    skill.aspect,
+
+                aspectValue
+            });
+
+        if (!testOptions) {
+            return;
+        }
+
+        console.log(
+            "through-the-breach | Skill test configured",
+            {
+                actor: this.actor,
+                skill,
+                actingValue,
+                ...testOptions
+            }
+        );
+
+        ui.notifications.info(
+            `${skill.name} test configured.`
+        );
+    }
+
     activateListeners(html) {
         super.activateListeners(html);
 
         const root = html[0] ?? html;
+
+        root
+            .querySelectorAll(
+                '[data-action="test-skill"]'
+            )
+            .forEach((button) => {
+                button.addEventListener(
+                    "click",
+                    (event) =>
+                        this._onSkillTest(event)
+                );
+            });
 
         this.collapsedSkillCategories ??=
             new Set();

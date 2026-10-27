@@ -201,7 +201,20 @@
                                                     />
                                                 {{/each}}
 
-                                                {{skill.data.name}}
+                                                <button
+                                                        type="button"
+                                                        class="ttb-skill-test-button"
+                                                        data-action="test-skill"
+                                                        data-skill-id="{{skill.data.id}}"
+                                                        title="Test {{skill.data.name}}"
+                                                >
+                                                    <span
+                                                            class="ttb-skill-test-icon"
+                                                            aria-hidden="true"
+                                                    ></span>
+
+                                                    <span>{{skill.data.name}}</span>
+                                                </button>
                                             </td>
 
                                             <td class="ttb-skill-rating">

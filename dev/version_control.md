@@ -22,6 +22,7 @@
   - 0.0.7.5 Created GM Socket to handle/queue multiple conflicts at once. Multi client testing required. 
 - 0.0.8 Improved Charackter Sheet
   - 0.0.8.1 Started reworking Characktersheet. Updated Skill Tab with all non magic skills as well as calculating AV.
+    - 0.0.8.1.1 Implemented Skill Test Action with dialog, allowing selectoin of TN and situational modfiierers.
   - 
 - 0.1.0  first usable table prototype
 
@@ -41,6 +42,7 @@
   - Select which card was used whne resolving the conflict. 
 - Undo Button
 - Card Display in Chat / Multiple Cards.
+- Tokens and Conditions
 
 # Quality of Life
 - If not enough cards to draw/flip automatically shuffle deck. 

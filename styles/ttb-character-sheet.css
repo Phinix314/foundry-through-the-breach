@@ -18,9 +18,9 @@
 }
 
 .ttb-character-sheet .ttb-skill-group {
+    min-width: 0;
     margin: 0;
     padding: 8px 10px 10px;
-    min-width: 0;
 }
 
 .ttb-character-sheet .ttb-skill-group-heading {
@@ -40,7 +40,7 @@
 
 .ttb-character-sheet
 .ttb-skill-group-heading::before {
-    content: "▶";
+    content: "▸";
     flex: 0 0 auto;
     font-size: 0.7rem;
     transition: transform 120ms ease;
@@ -74,54 +74,262 @@
     table-layout: fixed;
 }
 
-.ttb-character-sheet
-.ttb-skill-name-column {
+.ttb-character-sheet .ttb-skill-name-column {
     width: 46%;
 }
 
-.ttb-character-sheet
-.ttb-skill-rank-column {
+.ttb-character-sheet .ttb-skill-rank-column {
     width: 14%;
 }
 
-.ttb-character-sheet
-.ttb-skill-aspect-column {
+.ttb-character-sheet .ttb-skill-aspect-column {
     width: 28%;
 }
 
-.ttb-character-sheet
-.ttb-skill-av-column {
+.ttb-character-sheet .ttb-skill-av-column {
     width: 12%;
 }
 
-.ttb-character-sheet
-.ttb-skill-table th,
-.ttb-character-sheet
-.ttb-skill-table td {
+.ttb-character-sheet .ttb-skill-table th,
+.ttb-character-sheet .ttb-skill-table td {
     padding: 3px 5px;
     vertical-align: middle;
 }
 
-.ttb-character-sheet
-.ttb-skill-rating input {
+.ttb-character-sheet .ttb-skill-rating input {
+    box-sizing: border-box;
     width: 100%;
     min-width: 0;
-    box-sizing: border-box;
     text-align: center;
 }
 
-.ttb-character-sheet
-.ttb-skill-rating,
-.ttb-character-sheet
-.ttb-skill-av {
+.ttb-character-sheet .ttb-skill-rating,
+.ttb-character-sheet .ttb-skill-av {
     text-align: center;
 }
 
-.ttb-character-sheet
-.ttb-skill-name,
-.ttb-character-sheet
-.ttb-skill-aspect {
+.ttb-character-sheet .ttb-skill-name,
+.ttb-character-sheet .ttb-skill-aspect {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+
+/* ----------------------------------------- */
+/* Character Sheet: Skill Test Button        */
+/* ----------------------------------------- */
+
+.ttb-character-sheet .ttb-skill-test-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    width: 100%;
+    min-height: 0;
+    margin: 0;
+    padding: 2px 3px;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+}
+
+.ttb-character-sheet .ttb-skill-test-button:hover,
+.ttb-character-sheet .ttb-skill-test-button:focus-visible {
+    color: var(--color-text-hyperlink);
+    text-shadow: none;
+}
+
+.ttb-character-sheet .ttb-skill-test-icon {
+    position: relative;
+    display: inline-block;
+    flex: 0 0 auto;
+    width: 12px;
+    height: 16px;
+    margin: 0 2px;
+    border: 2px solid currentColor;
+    border-radius: 2px;
+    transform: rotate(-4deg);
+}
+
+.ttb-character-sheet .ttb-skill-test-icon::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 4px;
+    height: 4px;
+    margin: auto;
+    border: 1px solid currentColor;
+    transform: rotate(45deg);
+}
+
+
+/* ----------------------------------------- */
+/* Skill Test Dialog                         */
+/* ----------------------------------------- */
+
+.ttb-skill-test-dialog {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    text-align: left;
+}
+
+
+/* Skill and Acting Value */
+
+.ttb-skill-test-summary {
+    display: block;
+    margin-bottom: 18px;
+    text-align: left;
+}
+
+.ttb-skill-test-title-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+.ttb-skill-test-name {
+    font-size: 20px;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+.ttb-skill-test-av {
+    font-size: 13px;
+    line-height: 1;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0.8;
+    cursor: help;
+}
+
+
+/* Target and Situational Sections */
+
+.ttb-skill-test-section {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 18px;
+    padding-top: 10px;
+    border-top:
+            1px solid var(--color-border-light-primary);
+    text-align: left;
+}
+
+.ttb-skill-test-section h3 {
+    margin: 0 0 5px;
+    font-size: 16px;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+.ttb-skill-test-target-fields {
+    display: grid;
+    grid-template-columns:
+        100px
+        minmax(180px, 260px);
+    align-items: start;
+    justify-content: start;
+    gap: 12px;
+}
+
+.ttb-skill-test-modifier-grid {
+    display: grid;
+    grid-template-columns:
+        minmax(90px, 0.75fr)
+        minmax(170px, 1.35fr)
+        minmax(130px, 1fr);
+    align-items: start;
+    gap: 12px;
+}
+
+
+/* Dialog Fields */
+
+.ttb-skill-test-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.ttb-skill-test-field > span {
+    font-size: 13px;
+    line-height: 1.2;
+    font-weight: 600;
+}
+
+.ttb-skill-test-field > input {
+    box-sizing: border-box;
+    width: 100%;
+    text-align: center;
+}
+
+
+/* Flip Controls */
+
+.ttb-skill-test-flip-control {
+    display: grid;
+    grid-template-columns:
+        32px
+        minmax(76px, 1fr)
+        32px;
+    align-items: stretch;
+    gap: 4px;
+    width: 100%;
+}
+
+.ttb-skill-test-flip-control > button {
+    width: auto;
+    min-width: 0;
+    min-height: 32px;
+    margin: 0;
+    padding: 4px 6px;
+}
+
+
+/* Suit Controls */
+
+.ttb-skill-test-suit-builder {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+}
+
+.ttb-skill-test-suit-builder > select {
+    flex: 1 1 130px;
+    width: auto;
+    min-width: 0;
+}
+
+.ttb-skill-test-suit-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+}
+
+.ttb-skill-test-suit-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    width: auto;
+    min-width: 0;
+    min-height: 24px;
+    margin: 0;
+    padding: 2px 7px;
+    border:
+            1px solid var(--color-border-light-primary);
+    border-radius: 999px;
+    font-size: 0.8rem;
+    line-height: 1;
 }
