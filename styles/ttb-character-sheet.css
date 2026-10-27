@@ -1,0 +1,127 @@
+/* ----------------------------------------- */
+/* Character Sheet: Skills                   */
+/* ----------------------------------------- */
+
+.ttb-character-sheet .ttb-skill-columns {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(390px, 1fr));
+    gap: 12px;
+    align-items: start;
+}
+
+.ttb-character-sheet .ttb-skill-column {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+}
+
+.ttb-character-sheet .ttb-skill-group {
+    margin: 0;
+    padding: 8px 10px 10px;
+    min-width: 0;
+}
+
+.ttb-character-sheet .ttb-skill-group-heading {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 28px;
+    cursor: pointer;
+    list-style: none;
+    font-weight: 700;
+}
+
+.ttb-character-sheet
+.ttb-skill-group-heading::-webkit-details-marker {
+    display: none;
+}
+
+.ttb-character-sheet
+.ttb-skill-group-heading::before {
+    content: "▶";
+    flex: 0 0 auto;
+    font-size: 0.7rem;
+    transition: transform 120ms ease;
+}
+
+.ttb-character-sheet
+.ttb-skill-group[open]
+> .ttb-skill-group-heading::before {
+    transform: rotate(90deg);
+}
+
+.ttb-character-sheet .ttb-skill-group-title {
+    min-width: 0;
+}
+
+.ttb-character-sheet .ttb-ranked-only-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    width: auto;
+    min-height: 22px;
+    margin-left: auto;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    line-height: 1;
+}
+
+.ttb-character-sheet .ttb-skill-table {
+    width: 100%;
+    margin-top: 7px;
+    table-layout: fixed;
+}
+
+.ttb-character-sheet
+.ttb-skill-name-column {
+    width: 46%;
+}
+
+.ttb-character-sheet
+.ttb-skill-rank-column {
+    width: 14%;
+}
+
+.ttb-character-sheet
+.ttb-skill-aspect-column {
+    width: 28%;
+}
+
+.ttb-character-sheet
+.ttb-skill-av-column {
+    width: 12%;
+}
+
+.ttb-character-sheet
+.ttb-skill-table th,
+.ttb-character-sheet
+.ttb-skill-table td {
+    padding: 3px 5px;
+    vertical-align: middle;
+}
+
+.ttb-character-sheet
+.ttb-skill-rating input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.ttb-character-sheet
+.ttb-skill-rating,
+.ttb-character-sheet
+.ttb-skill-av {
+    text-align: center;
+}
+
+.ttb-character-sheet
+.ttb-skill-name,
+.ttb-character-sheet
+.ttb-skill-aspect {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

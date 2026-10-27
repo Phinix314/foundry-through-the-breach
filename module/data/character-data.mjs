@@ -1,3 +1,7 @@
+import {
+    TTB_SKILL_DEFINITIONS
+} from "./skill-catalog.mjs";
+
 const {
     SchemaField,
     ArrayField,
@@ -26,12 +30,15 @@ function makeRows(count, factory) {
     return Array.from({ length: count }, () => factory());
 }
 
-function skillRow() {
+function skillRow(definition) {
     return {
-        name: "",
-        av: "",
-        rating: "",
-        aspect: ""
+        id: definition.id,
+        name: definition.name,
+        category: definition.category,
+        rating: 0,
+        aspect: definition.aspect,
+        inherentSuits: [],
+        triggers: ""
     };
 }
 
@@ -124,13 +131,35 @@ export class TTBCharacterData extends foundry.abstract.TypeDataModel {
 
             skills: new ArrayField(
                 new SchemaField({
+                    id: textField(),
                     name: textField(),
-                    av: textField(),
-                    rating: textField(),
-                    aspect: textField()
+                    category: textField(),
+
+                    rating: new NumberField({
+                        required: true,
+                        nullable: false,
+                        integer: true,
+                        min: 0,
+                        max: 5,
+                        initial: 0
+                    }),
+
+                    aspect: textField(),
+
+                    inherentSuits: new ArrayField(
+                        textField(),
+                        {
+                            initial: () => []
+                        }
+                    ),
+
+                    triggers: textField()
                 }),
                 {
-                    initial: () => makeRows(24, skillRow)
+                    initial: () =>
+                        TTB_SKILL_DEFINITIONS.map(
+                            (definition) => skillRow(definition)
+                        )
                 }
             ),
 

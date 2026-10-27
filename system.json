@@ -2,7 +2,7 @@
   "id": "through-the-breach",
   "title": "Through the Breach",
   "description": "Unofficial Through the Breach system for Foundry VTT",
-  "version": "0.0.7.5",
+  "version": "0.0.8.1",
   "socket": true,
   "compatibility": {
     "minimum": "14",
@@ -22,7 +22,8 @@
     "styles/ttb.css",
     "styles/ttb-card-dock.css",
     "styles/ttb-card-dock-popout.css",
-    "styles/ttb-active-conflict-selection.css"
+    "styles/ttb-active-conflict-selection.css",
+    "styles/ttb-character-sheet.css"
   ],
   "media": [
     {

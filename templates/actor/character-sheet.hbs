@@ -1,4 +1,4 @@
-<form class="{{cssClass}}" autocomplete="off">
+<form class="{{cssClass}} ttb-character-sheet" autocomplete="off">
     <header class="ttb-header">
         <img
                 class="profile-img"
@@ -98,30 +98,146 @@
             </section>
         </div>
 
-        <div class="tab" data-group="primary" data-tab="skills">
-            <div class="ttb-box">
-                <h2>Skills</h2>
+        <div
+                class="tab ttb-skills-tab"
+                data-group="primary"
+                data-tab="skills"
+        >
+            <div class="ttb-skill-columns">
+                {{#each skillColumns as |column|}}
+                    <div
+                            class="ttb-skill-column"
+                            data-skill-column="{{column.id}}"
+                    >
+                        {{#each column.groups as |group|}}
+                            <details
+                                    class="ttb-box ttb-skill-group"
+                                    data-skill-category="{{group.id}}"
+                                    open
+                            >
+                                <summary class="ttb-skill-group-heading">
+                            <span class="ttb-skill-group-title">
+                                {{group.label}} Skills
+                            </span>
 
-                <table class="ttb-table">
-                    <thead>
-                    <tr>
-                        <th>Skill</th>
-                        <th>AV</th>
-                        <th>Rating</th>
-                        <th>Aspect</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {{#each rows.skills as |row|}}
-                        <tr>
-                            <td><input type="text" name="system.skills.{{row.index}}.name" value="{{row.data.name}}" /></td>
-                            <td><input type="text" name="system.skills.{{row.index}}.av" value="{{row.data.av}}" /></td>
-                            <td><input type="text" name="system.skills.{{row.index}}.rating" value="{{row.data.rating}}" /></td>
-                            <td><input type="text" name="system.skills.{{row.index}}.aspect" value="{{row.data.aspect}}" /></td>
-                        </tr>
-                    {{/each}}
-                    </tbody>
-                </table>
+                                    <button
+                                            type="button"
+                                            class="ttb-ranked-only-toggle"
+                                            data-action="toggle-ranked-only"
+                                            data-skill-category-filter="{{group.id}}"
+                                            role="checkbox"
+                                            aria-checked="false"
+                                            title="Hide Rank 0 Skills in {{group.label}}"
+                                    >
+                                        <i
+                                                class="fa-regular fa-square"
+                                                aria-hidden="true"
+                                        ></i>
+
+                                        <span>Ranked only</span>
+                                    </button>
+                                </summary>
+
+                                <table class="ttb-table ttb-skill-table">
+                                    <colgroup>
+                                        <col class="ttb-skill-name-column" />
+                                        <col class="ttb-skill-rank-column" />
+                                        <col class="ttb-skill-aspect-column" />
+                                        <col class="ttb-skill-av-column" />
+                                    </colgroup>
+
+                                    <thead>
+                                    <tr>
+                                        <th>Skill</th>
+                                        <th>Rank</th>
+                                        <th>Aspect</th>
+                                        <th>AV</th>
+                                    </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    {{#each group.skills as |skill|}}
+                                        <tr
+                                                data-skill-id="{{skill.data.id}}"
+                                                data-skill-category-row="{{group.id}}"
+                                                data-skill-rating="{{skill.data.rating}}"
+                                        >
+                                            <td class="ttb-skill-name">
+                                                <input
+                                                        type="hidden"
+                                                        name="system.skills.{{skill.index}}.id"
+                                                        value="{{skill.data.id}}"
+                                                />
+
+                                                <input
+                                                        type="hidden"
+                                                        name="system.skills.{{skill.index}}.name"
+                                                        value="{{skill.data.name}}"
+                                                />
+
+                                                <input
+                                                        type="hidden"
+                                                        name="system.skills.{{skill.index}}.category"
+                                                        value="{{skill.data.category}}"
+                                                />
+
+                                                <input
+                                                        type="hidden"
+                                                        name="system.skills.{{skill.index}}.aspect"
+                                                        value="{{skill.data.aspect}}"
+                                                />
+
+                                                <input
+                                                        type="hidden"
+                                                        name="system.skills.{{skill.index}}.triggers"
+                                                        value="{{skill.data.triggers}}"
+                                                />
+
+                                                {{#each skill.data.inherentSuits as |suit suitIndex|}}
+                                                    <input
+                                                            type="hidden"
+                                                            name="system.skills.{{skill.index}}.inherentSuits.{{suitIndex}}"
+                                                            value="{{suit}}"
+                                                    />
+                                                {{/each}}
+
+                                                {{skill.data.name}}
+                                            </td>
+
+                                            <td class="ttb-skill-rating">
+                                                <input
+                                                        type="number"
+                                                        name="system.skills.{{skill.index}}.rating"
+                                                        value="{{skill.data.rating}}"
+                                                        min="0"
+                                                        max="5"
+                                                        step="1"
+                                                        aria-label="{{skill.data.name}} Rank"
+                                                />
+                                            </td>
+
+                                            <td
+                                                    class="ttb-skill-aspect"
+                                                    title="Aspect value: {{skill.data.aspectValue}}"
+                                            >
+                                                {{skill.data.aspectLabel}}
+                                            </td>
+
+                                            <td class="ttb-skill-av">
+                                                <strong
+                                                        title="{{skill.data.rating}} Rank + {{skill.data.aspectValue}} {{skill.data.aspectLabel}}"
+                                                >
+                                                    {{skill.data.av}}
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                    {{/each}}
+                                    </tbody>
+                                </table>
+                            </details>
+                        {{/each}}
+                    </div>
+                {{/each}}
             </div>
         </div>
 
