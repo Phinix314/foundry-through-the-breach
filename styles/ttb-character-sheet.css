@@ -3,6 +3,8 @@
 /* ----------------------------------------- */
 
 .ttb-character-sheet .ttb-skill-columns {
+    --ttb-open-skill-group-height: 390px;
+
     display: grid;
     grid-template-columns:
         repeat(auto-fit, minmax(390px, 1fr));
@@ -18,9 +20,16 @@
 }
 
 .ttb-character-sheet .ttb-skill-group {
+    box-sizing: border-box;
     min-width: 0;
     margin: 0;
     padding: 8px 10px 10px;
+}
+
+.ttb-character-sheet .ttb-skill-group[open] {
+    height: var(--ttb-open-skill-group-height);
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .ttb-character-sheet .ttb-skill-group-heading {
