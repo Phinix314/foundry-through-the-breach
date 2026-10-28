@@ -198,15 +198,45 @@ export class TTBCharacterSheet extends ActorSheetV1 {
             Number(skill.rating ?? 0) +
             aspectValue;
 
+        /*
+         * Permanent flip modifiers will later be stored
+         * on the skill. Until then this normally resolves to 0.
+         */
+        const inherentFlipModifier =
+            Number(
+                skill.inherentFlipModifier ?? 0
+            );
+
         const testOptions =
             await openSkillTestDialog({
                 skill,
-                actingValue
+                actingValue,
+                inherentFlipModifier
             });
 
         if (!testOptions) {
             return;
         }
+
+        const situationalFlipModifier =
+            testOptions.situationalFlipModifier;
+
+        const finalFlipModifier =
+            inherentFlipModifier +
+            situationalFlipModifier;
+
+        /*
+         * A negative flip normally prevents cheating.
+         * The dialog may explicitly override this only
+         * when the negative modifier is situational.
+         */
+        const cheatingAllowed =
+            finalFlipModifier >= 0 ||
+            (
+                situationalFlipModifier < 0 &&
+                testOptions
+                    .allowCheatingOnNegativeFlip === true
+            );
 
         await game.throughTheBreach
             .requestAndOpenActiveConflict({
@@ -235,17 +265,14 @@ export class TTBCharacterSheet extends ActorSheetV1 {
                 tnSuits:
                 testOptions.tnSuits,
 
-                inherentFlipModifier:
-                    Number(
-                        skill.inherentFlipModifier ?? 0
-                    ),
+                inherentFlipModifier,
 
-                situationalFlipModifier:
-                testOptions.situationalFlipModifier,
+                situationalFlipModifier,
 
                 selectionOverrides: {
                     cheat: {
-                        allowed: true
+                        allowed:
+                        cheatingAllowed
                     }
                 }
             });

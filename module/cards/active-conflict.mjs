@@ -782,10 +782,6 @@ export function getActiveConflictResult() {
         ? null
         : integer(conflict.tn);
 
-    const difference = tn === null
-        ? null
-        : total - tn;
-
     const inherentSuits =
         normalizeSuitList(
             conflict.inherentSuits
@@ -815,9 +811,22 @@ export function getActiveConflictResult() {
             conflict.tnSuits
         );
 
-    const numberMet = difference === null
-        ? null
-        : difference >= 0;
+    const hasNumericTn =
+        tn !== null;
+
+    const hasSuitTn =
+        tnSuits.length > 0;
+
+    const hasTarget =
+        hasNumericTn || hasSuitTn;
+
+    const difference = hasNumericTn
+        ? total - tn
+        : null;
+
+    const numberMet = hasNumericTn
+        ? difference >= 0
+        : true;
 
     const suitsMet =
         hasRequiredSuits(
@@ -825,17 +834,19 @@ export function getActiveConflictResult() {
             tnSuits
         );
 
-    const success = numberMet === null
-        ? null
-        : numberMet && suitsMet;
+    const success = hasTarget
+        ? numberMet && suitsMet
+        : null;
 
-    const marginCount = difference === null
+    const marginCount = !hasTarget
         ? null
-        : !success && numberMet && !suitsMet
+        : !hasNumericTn
             ? 0
-            : Math.floor(
-                Math.abs(difference) / 5
-            );
+            : !success && numberMet && !suitsMet
+                ? 0
+                : Math.floor(
+                    Math.abs(difference) / 5
+                );
 
     const pile = getConflictPile();
 
@@ -863,6 +874,10 @@ export function getActiveConflictResult() {
 
         tn,
 
+        hasTarget,
+        hasNumericTn,
+        hasSuitTn,
+
         difference,
         success,
         numberMet,
@@ -875,11 +890,12 @@ export function getActiveConflictResult() {
 
 
         marginType:
-            difference === null
+            !hasTarget
                 ? null
                 : success
                     ? "success"
                     : "failure",
+
         marginCount,
 
         selectedCard:
@@ -938,15 +954,15 @@ function renderSuitSymbols(
 
 function renderActiveConflictResult(result) {
     const card = result.selectedCard;
-    const hasTn = result.tn !== null;
+    const hasTarget = result.hasTarget;
 
-    const outcome = !hasTn
+    const outcome = !hasTarget
         ? "Result"
         : result.success
             ? "Success"
             : "Failure";
 
-    const outcomeClass = !hasTn
+    const outcomeClass = !hasTarget
         ? "neutral"
         : result.success
             ? "success"
@@ -962,7 +978,7 @@ function renderActiveConflictResult(result) {
             ? "Degree"
             : "Degrees";
 
-    const degreeText = hasTn
+    const degreeText = hasTarget
         ? `${result.marginCount} ${degreeWord} of ${degreeType}`
         : "";
 
@@ -981,17 +997,28 @@ function renderActiveConflictResult(result) {
         ` + Card ${result.cardValue} = ` +
         `${result.total}`;
 
-    const outcomeTooltip = !hasTn
-        ? calculationTooltip
-        : [
-            calculationTooltip,
+    const targetTooltipParts = [
+        calculationTooltip
+    ];
+
+    if (result.hasNumericTn) {
+        targetTooltipParts.push(
             result.numberMet
                 ? "TN number met"
-                : "TN number not met",
+                : "TN number not met"
+        );
+    }
+
+    if (result.hasSuitTn) {
+        targetTooltipParts.push(
             result.suitsMet
                 ? "Required suits met"
                 : "Required suits missing"
-        ].join(" · ");
+        );
+    }
+
+    const outcomeTooltip =
+        targetTooltipParts.join(" · ");
 
     const cardSuit =
         Object.hasOwn(
@@ -1057,7 +1084,15 @@ function renderActiveConflictResult(result) {
                 ? "ttb-conflict-card-stack--one"
                 : "ttb-conflict-card-stack--many";
 
-    const tnHtml = hasTn
+    const tnValueHtml = result.hasNumericTn
+        ? `
+        <span class="ttb-conflict-number__value">
+            ${result.tn}
+        </span>
+    `
+        : "";
+
+    const tnHtml = hasTarget
         ? `
             <div class="ttb-conflict-number-row">
                 <span class="ttb-conflict-number-label">
@@ -1065,9 +1100,7 @@ function renderActiveConflictResult(result) {
                 </span>
 
                 <span class="ttb-conflict-number">
-                    <span class="ttb-conflict-number__value">
-                        ${result.tn}
-                    </span>
+                    ${tnValueHtml}
                 
                     <span class="ttb-conflict-suits">
                         ${tnSuitsHtml}
@@ -1149,7 +1182,7 @@ function renderActiveConflictResult(result) {
                     >
                         <strong>${outcome}</strong>
 
-                        ${hasTn
+                        ${hasTarget
         ? `
                                 <small>
                                     ${degreeText}

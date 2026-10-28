@@ -24,6 +24,7 @@
   - 0.0.8.1 Started reworking Characktersheet. Updated Skill Tab with all non magic skills as well as calculating AV.
     - 0.0.8.1.1 Implemented Skill Test Action with dialog, allowing selectoin of TN and situational modfiierers.
     - 0.0.8.1.2 Connected Skill Test dialog with structured conflicts. Small visual updates. Fixed inconsistent naming of values/suits. 
+    - 0.0.8.1.3 Applied negative flip cheat policy, fixed couple bugs and added structured conflict requireing just suits without tn.
 - 0.1.0  first usable table prototype
 
 

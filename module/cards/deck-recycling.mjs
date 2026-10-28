@@ -363,7 +363,6 @@ export async function recycleFateDeckIfEmpty({notify = true} = {}) {
     if (discard.cards.size < 1) return false;
 
     await shuffleDeckWithDiscard(deck, discard);
-    f
 
     if (notify) {
         await announce("<p><strong>Fate Deck</strong> has been shuffled from its discard pile.</p>");

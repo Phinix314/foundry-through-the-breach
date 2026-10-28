@@ -38,7 +38,8 @@ function parseInteger(value, fallback = 0) {
 
 export async function openSkillTestDialog({
                                               skill,
-                                              actingValue
+                                              actingValue,
+                                              inherentFlipModifier = 0
                                           }) {
     const rank = Number(skill.rating ?? 0);
 
@@ -66,6 +67,9 @@ export async function openSkillTestDialog({
      */
     const aspectValue =
         resolvedActingValue - rank;
+
+    const normalizedInherentFlipModifier =
+        parseInteger(inherentFlipModifier, 0);
 
     const selectedSuits = {
         tn: [],
@@ -157,6 +161,7 @@ export async function openSkillTestDialog({
                             >
                                 −
                             </button>
+                           
 
                             <button
                                 type="button"
@@ -182,6 +187,19 @@ export async function openSkillTestDialog({
                                 value="0"
                             >
                         </div>
+                        
+                           <label
+                                class="ttb-skill-test-negative-cheat"
+                                data-negative-cheat-option
+                                hidden
+                            >
+                                <input
+                                    type="checkbox"
+                                    name="allowCheatingOnNegativeFlip"
+                                >
+                            
+                                <span>Cheating allowed</span>
+                            </label>
                     </div>
 
                     <div class="ttb-skill-test-field">
@@ -237,6 +255,16 @@ export async function openSkillTestDialog({
                 "[data-flip-display]"
             );
 
+            const negativeCheatOption =
+                root.querySelector(
+                    "[data-negative-cheat-option]"
+                );
+
+            const negativeCheatInput =
+                root.querySelector(
+                    'input[name="allowCheatingOnNegativeFlip"]'
+                );
+
             const updateFlipDisplay = () => {
                 const value = parseInteger(
                     flipInput?.value,
@@ -246,6 +274,26 @@ export async function openSkillTestDialog({
                 if (flipDisplay) {
                     flipDisplay.textContent =
                         formatFlipModifier(value);
+                }
+
+                const finalFlipModifier =
+                    normalizedInherentFlipModifier +
+                    value;
+
+                const canOverrideNegativeFlip =
+                    value < 0 &&
+                    finalFlipModifier < 0;
+
+                if (negativeCheatOption) {
+                    negativeCheatOption.hidden =
+                        !canOverrideNegativeFlip;
+                }
+
+                if (
+                    negativeCheatInput &&
+                    !canOverrideNegativeFlip
+                ) {
+                    negativeCheatInput.checked = false;
                 }
             };
 
@@ -417,7 +465,14 @@ export async function openSkillTestDialog({
 
                     situationalSuits: [
                         ...selectedSuits.situational
-                    ]
+                    ],
+
+                    allowCheatingOnNegativeFlip:
+                    form.elements
+                        .allowCheatingOnNegativeFlip
+                        .checked,
+
+
                 };
             }
         }

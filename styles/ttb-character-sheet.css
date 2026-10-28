@@ -345,3 +345,21 @@
     font-size: 0.8rem;
     line-height: 1;
 }
+
+.ttb-skill-test-negative-cheat {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 3px;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.ttb-skill-test-negative-cheat[hidden] {
+    display: none;
+}
+
+.ttb-skill-test-negative-cheat > input {
+    width: auto;
+    margin: 0;
+}
