@@ -12,8 +12,22 @@
                     <span>Flip: {{selection.flipLabel}}</span>
                 {{/if}}
 
-                {{#if selection.tn}}
-                    <span>TN: {{selection.tn}}</span>
+                {{#if selection.hasTarget}}
+                    <span class="ttb-conflict-select__target">
+        <span>TN:</span>
+
+                        {{#if selection.hasNumericTn}}
+                            <span>{{selection.tn}}</span>
+                        {{/if}}
+
+                        {{#each selection.targetSuits}}
+                            <span
+                                    class="ttb-conflict-suit ttb-conflict-suit--{{id}}"
+                                    data-tooltip="Required {{label}}"
+                                    aria-label="Required {{label}}"
+                            ></span>
+                        {{/each}}
+    </span>
                 {{/if}}
             </div>
         </header>
@@ -82,12 +96,12 @@
     </div>
 
     <footer class="ttb-conflict-select__footer">
-        <footer class="ttb-conflict-select__footer">
-            <button
-                    type="button"
-                    data-action="confirm-selection"
-            >
-                Confirm Selection
-            </button>
-        </footer>
+        <button
+                type="button"
+                data-action="confirm-selection"
+        >
+            Confirm Selection
+        </button>
+    </footer>
+</div>
 </div>

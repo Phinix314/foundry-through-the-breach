@@ -570,12 +570,30 @@ export async function getActiveConflictSelectionPresentation() {
         }
     }
 
+    const tnSuits =
+        normalizeSuitList(conflict.tnSuits);
+
+    const hasNumericTn =
+        conflict.tn !== null &&
+        conflict.tn !== undefined;
+
+    const hasSuitTn =
+        tnSuits.length > 0;
+
+    const targetSuits =
+        tnSuits.map((suit) => ({
+            id: suit,
+            label: RED_JOKER_SUITS[suit]
+        }));
+
     return {
         conflictId: conflict.id,
         actorUuid: actor.uuid,
         actorName: actor.name,
+
         source: foundry.utils.deepClone(conflict.source),
-        baseValue: conflict.baseValue,actingValue:
+
+        actingValue:
             integer(conflict.actingValue),
 
         actingValueModifier:
@@ -584,7 +602,16 @@ export async function getActiveConflictSelectionPresentation() {
         modifiedActingValue:
             integer(conflict.actingValue) +
             integer(conflict.actingValueModifier),
-        tn: conflict.tn,
+        tn: hasNumericTn
+            ? integer(conflict.tn)
+            : null,
+
+        tnSuits,
+        targetSuits,
+        hasNumericTn,
+        hasSuitTn,
+        hasTarget:
+            hasNumericTn || hasSuitTn,
         flipModifier: conflict.flipModifier,
         flipLabel: formatFlipModifier(conflict.flipModifier),
         selectionPolicy: foundry.utils.deepClone(policy),

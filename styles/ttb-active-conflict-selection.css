@@ -37,10 +37,27 @@
     gap: 8px;
 }
 
-.ttb-conflict-select__summary span {
+.ttb-conflict-select__summary > span {
     padding: 4px 8px;
     border: 1px solid var(--color-border-dark-3);
     border-radius: 4px;
+}
+
+.ttb-conflict-select__target {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ttb-conflict-select__target .ttb-conflict-suit {
+    width: 18px;
+    height: 18px;
+    margin-left: 0;
+    border: 1px solid #6b5a3d;
+    border-radius: 3px;
+    background-color: #e8dcc0;
+    background-size: 14px 14px;
+    vertical-align: middle;
 }
 
 .ttb-conflict-select__cards {
