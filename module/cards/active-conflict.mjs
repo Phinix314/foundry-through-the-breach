@@ -149,12 +149,14 @@ export async function createActiveConflict({
                                                actorUuid,
                                                requestedBy = game.user.id,
                                                source,
-                                               baseValue = 0,
+                                               actingValue = 0,
+                                               actingValueModifier = 0,
                                                tn = null,
                                                inherentSuits = [],
+                                               situationalSuits = [],
                                                tnSuits = [],
-                                               inherentModifier = 0,
-                                               situationalModifier = 0,
+                                               inherentFlipModifier = 0,
+                                               situationalFlipModifier = 0,
                                                selectionOverrides = {}
                                            } = {}) {
     requireGm();
@@ -195,9 +197,20 @@ export async function createActiveConflict({
             throw new Error("The conflict source requires a label.");
         }
 
-        const inherent = integer(inherentModifier);
-        const situational = integer(situationalModifier);
-        const flipModifier = inherent + situational;
+        const normalizedActingValue =
+            integer(actingValue);
+
+        const normalizedActingValueModifier =
+            integer(actingValueModifier);
+
+        const inherentFlip =
+            integer(inherentFlipModifier);
+
+        const situationalFlip =
+            integer(situationalFlipModifier);
+
+        const flipModifier =
+            inherentFlip + situationalFlip;
 
         const parsedTn =
             tn === null || tn === ""
@@ -205,7 +218,7 @@ export async function createActiveConflict({
                 : integer(tn);
 
         const conflict = {
-            version: 1,
+            version: 2,
             id: foundry.utils.randomID(16),
             phase: "locked",
 
@@ -218,18 +231,31 @@ export async function createActiveConflict({
                 label: source.label
             },
 
-            baseValue: integer(baseValue),
+            actingValue:
+            normalizedActingValue,
+
+            actingValueModifier:
+            normalizedActingValueModifier,
+
             tn: parsedTn,
 
             inherentSuits:
                 normalizeSuitList(inherentSuits),
 
+            situationalSuits:
+                normalizeSuitList(situationalSuits),
+
             tnSuits:
                 normalizeSuitList(tnSuits),
 
-            inherentModifier: inherent,
-            situationalModifier: situational,
+            inherentFlipModifier:
+            inherentFlip,
+
+            situationalFlipModifier:
+            situationalFlip,
+
             flipModifier,
+
             cardCount: 1 + Math.abs(flipModifier),
 
             selectionPolicy: buildSelectionPolicy(
@@ -549,7 +575,15 @@ export async function getActiveConflictSelectionPresentation() {
         actorUuid: actor.uuid,
         actorName: actor.name,
         source: foundry.utils.deepClone(conflict.source),
-        baseValue: conflict.baseValue,
+        baseValue: conflict.baseValue,actingValue:
+            integer(conflict.actingValue),
+
+        actingValueModifier:
+            integer(conflict.actingValueModifier),
+
+        modifiedActingValue:
+            integer(conflict.actingValue) +
+            integer(conflict.actingValueModifier),
         tn: conflict.tn,
         flipModifier: conflict.flipModifier,
         flipLabel: formatFlipModifier(conflict.flipModifier),
@@ -729,9 +763,20 @@ export function getActiveConflictResult() {
         );
     }
 
-    const baseValue = integer(conflict.baseValue);
-    const cardValue = integer(selectedCard.value);
-    const total = baseValue + cardValue;
+    const actingValue =
+        integer(conflict.actingValue);
+
+    const actingValueModifier =
+        integer(conflict.actingValueModifier);
+
+    const modifiedActingValue =
+        actingValue + actingValueModifier;
+
+    const cardValue =
+        integer(selectedCard.value);
+
+    const total =
+        modifiedActingValue + cardValue;
 
     const tn = conflict.tn === null
         ? null
@@ -754,8 +799,14 @@ export function getActiveConflictResult() {
             ? selectedCard.suit
             : null;
 
+    const situationalSuits =
+        normalizeSuitList(
+            conflict.situationalSuits
+        );
+
     const resultSuits = [
         ...inherentSuits,
+        ...situationalSuits,
         ...(cardSuit ? [cardSuit] : [])
     ];
 
@@ -804,9 +855,12 @@ export function getActiveConflictResult() {
         actorUuid: conflict.actorUuid,
         source: foundry.utils.deepClone(conflict.source),
 
-        baseValue,
+        actingValue,
+        actingValueModifier,
+        modifiedActingValue,
         cardValue,
         total,
+
         tn,
 
         difference,
@@ -815,6 +869,7 @@ export function getActiveConflictResult() {
         suitsMet,
 
         inherentSuits,
+        situationalSuits,
         resultSuits,
         tnSuits,
 
@@ -911,9 +966,19 @@ function renderActiveConflictResult(result) {
         ? `${result.marginCount} ${degreeWord} of ${degreeType}`
         : "";
 
+    const actingValueModifierText =
+        result.actingValueModifier === 0
+            ? ""
+            : result.actingValueModifier > 0
+                ? ` + AV modifier ${result.actingValueModifier}`
+                : ` - AV modifier ${Math.abs(
+                    result.actingValueModifier
+                )}`;
+
     const calculationTooltip =
-        `Base ${result.baseValue} + ` +
-        `Card ${result.cardValue} = ` +
+        `Acting Value ${result.actingValue}` +
+        actingValueModifierText +
+        ` + Card ${result.cardValue} = ` +
         `${result.total}`;
 
     const outcomeTooltip = !hasTn
@@ -942,6 +1007,14 @@ function renderActiveConflictResult(result) {
             {
                 sourceLabel:
                 result.source.label
+            }
+        ),
+
+        renderSuitSymbols(
+            result.situationalSuits,
+            {
+                sourceLabel:
+                    "Situational modifier"
             }
         ),
 

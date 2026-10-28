@@ -201,32 +201,54 @@ export class TTBCharacterSheet extends ActorSheetV1 {
         const testOptions =
             await openSkillTestDialog({
                 skill,
-                actingValue,
-
-                aspectLabel:
-                    ASPECT_LABELS[skill.aspect] ??
-                    skill.aspect,
-
-                aspectValue
+                actingValue
             });
 
         if (!testOptions) {
             return;
         }
 
-        console.log(
-            "through-the-breach | Skill test configured",
-            {
-                actor: this.actor,
-                skill,
-                actingValue,
-                ...testOptions
-            }
-        );
+        await game.throughTheBreach
+            .requestAndOpenActiveConflict({
+                actorUuid: this.actor.uuid,
 
-        ui.notifications.info(
-            `${skill.name} test configured.`
-        );
+                source: {
+                    type: "skill",
+                    id: skill.id,
+                    label: skill.name
+                },
+
+                actingValue,
+
+                actingValueModifier:
+                testOptions.actingValueModifier,
+
+                tn:
+                testOptions.tn,
+
+                inherentSuits:
+                    skill.inherentSuits ?? [],
+
+                situationalSuits:
+                testOptions.situationalSuits,
+
+                tnSuits:
+                testOptions.tnSuits,
+
+                inherentFlipModifier:
+                    Number(
+                        skill.inherentFlipModifier ?? 0
+                    ),
+
+                situationalFlipModifier:
+                testOptions.situationalFlipModifier,
+
+                selectionOverrides: {
+                    cheat: {
+                        allowed: true
+                    }
+                }
+            });
     }
 
     activateListeners(html) {

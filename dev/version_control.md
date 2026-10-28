@@ -23,7 +23,7 @@
 - 0.0.8 Improved Charackter Sheet
   - 0.0.8.1 Started reworking Characktersheet. Updated Skill Tab with all non magic skills as well as calculating AV.
     - 0.0.8.1.1 Implemented Skill Test Action with dialog, allowing selectoin of TN and situational modfiierers.
-  - 
+    - 0.0.8.1.2 Connected Skill Test dialog with structured conflicts. Small visual updates. Fixed inconsistent naming of values/suits. 
 - 0.1.0  first usable table prototype
 
 
@@ -41,7 +41,6 @@
 - Improved Display of current conflict. 
   - Select which card was used whne resolving the conflict. 
 - Undo Button
-- Card Display in Chat / Multiple Cards.
 - Tokens and Conditions
 
 # Quality of Life
@@ -51,6 +50,13 @@
   - Conflict via the Card Docks
   - Conflict via Commands esp. through the charackter sheet.
 - Indicate that a card has been cheated rather then selected more clearly in the chat window
+
+# Refractoring 
+- Keep Consistent Naming in line with TTB Core Rules
+  -> Rename conflicts to challanges. 
+- Visual Design of Charackter Sheet
+  - Skill Tables!
+  - 
 
 # Known Issues:
 - delete player decks of deleted charackters

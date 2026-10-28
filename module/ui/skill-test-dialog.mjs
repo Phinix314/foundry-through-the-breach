@@ -140,7 +140,7 @@ export async function openSkillTestDialog({
 
                         <input
                             type="number"
-                            name="numericModifier"
+                            name="actingValueModifier"
                             value="0"
                             step="1"
                         >
@@ -178,7 +178,7 @@ export async function openSkillTestDialog({
 
                             <input
                                 type="hidden"
-                                name="flipModifier"
+                                name="situationalFlipModifier"
                                 value="0"
                             >
                         </div>
@@ -230,7 +230,7 @@ export async function openSkillTestDialog({
             if (!root) return;
 
             const flipInput = root.querySelector(
-                'input[name="flipModifier"]'
+                'input[name="situationalFlipModifier"]'
             );
 
             const flipDisplay = root.querySelector(
@@ -399,18 +399,18 @@ export async function openSkillTestDialog({
                         ...selectedSuits.tn
                     ],
 
-                    numericModifier:
+                    actingValueModifier:
                         parseInteger(
                             form.elements
-                                .numericModifier
+                                .actingValueModifier
                                 .value,
                             0
                         ),
 
-                    flipModifier:
+                    situationalFlipModifier:
                         parseInteger(
                             form.elements
-                                .flipModifier
+                                .situationalFlipModifier
                                 .value,
                             0
                         ),

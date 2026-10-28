@@ -326,6 +326,9 @@
     align-items: center;
     gap: 4px;
 }
+.ttb-skill-test-suit-list:empty {
+    display: none;
+}
 
 .ttb-skill-test-suit-chip {
     display: inline-flex;
