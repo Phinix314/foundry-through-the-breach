@@ -84,19 +84,28 @@
 }
 
 .ttb-character-sheet .ttb-skill-name-column {
-    width: 46%;
+    width: 42%;
 }
 
 .ttb-character-sheet .ttb-skill-rank-column {
-    width: 14%;
+    width: 13%;
 }
 
 .ttb-character-sheet .ttb-skill-aspect-column {
-    width: 28%;
+    width: 23%;
+}
+
+.ttb-character-sheet .ttb-skill-misc-column {
+    width: 12%;
 }
 
 .ttb-character-sheet .ttb-skill-av-column {
-    width: 12%;
+    width: 10%;
+}
+
+.ttb-character-sheet .ttb-skill-misc {
+    text-align: center;
+    cursor: help;
 }
 
 .ttb-character-sheet .ttb-skill-table th,
@@ -360,6 +369,79 @@
 }
 
 .ttb-skill-test-negative-cheat > input {
+    width: auto;
+    margin: 0;
+}
+
+.ttb-character-sheet .ttb-skill-name-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    min-width: 0;
+}
+
+.ttb-character-sheet
+.ttb-skill-name-actions
+.ttb-skill-test-button {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.ttb-character-sheet .ttb-skill-customize-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 22px;
+    width: 22px;
+    height: 22px;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    color: inherit;
+    font-size: 11px;
+    opacity: 0.25;
+}
+
+.ttb-character-sheet
+tr:hover
+.ttb-skill-customize-button {
+    opacity: 0.65;
+}
+
+.ttb-character-sheet
+.ttb-skill-customize-button:hover,
+.ttb-character-sheet
+.ttb-skill-customize-button:focus-visible {
+    color: var(--color-text-hyperlink);
+    opacity: 1;
+}
+
+.ttb-skill-customization-grid {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+}
+
+.ttb-skill-customization-suits {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 6px 10px;
+}
+
+.ttb-skill-customization-suits label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ttb-skill-customization-suits input {
     width: auto;
     margin: 0;
 }

@@ -143,6 +143,7 @@
                                         <col class="ttb-skill-name-column" />
                                         <col class="ttb-skill-rank-column" />
                                         <col class="ttb-skill-aspect-column" />
+                                        <col class="ttb-skill-misc-column" />
                                         <col class="ttb-skill-av-column" />
                                     </colgroup>
 
@@ -151,6 +152,9 @@
                                         <th>Skill</th>
                                         <th>Rank</th>
                                         <th>Aspect</th>
+                                        <th title="Miscellaneous modifiers">
+                                            Misc.
+                                        </th>
                                         <th>AV</th>
                                     </tr>
                                     </thead>
@@ -193,6 +197,18 @@
                                                         value="{{skill.data.triggers}}"
                                                 />
 
+                                                <input
+                                                        type="hidden"
+                                                        name="system.skills.{{skill.index}}.manualActingValueModifier"
+                                                        value="{{skill.data.manualActingValueModifier}}"
+                                                />
+
+                                                <input
+                                                        type="hidden"
+                                                        name="system.skills.{{skill.index}}.inherentFlipModifier"
+                                                        value="{{skill.data.inherentFlipModifier}}"
+                                                />
+
                                                 {{#each skill.data.inherentSuits as |suit suitIndex|}}
                                                     <input
                                                             type="hidden"
@@ -201,20 +217,36 @@
                                                     />
                                                 {{/each}}
 
-                                                <button
-                                                        type="button"
-                                                        class="ttb-skill-test-button"
-                                                        data-action="test-skill"
-                                                        data-skill-id="{{skill.data.id}}"
-                                                        title="Test {{skill.data.name}}"
-                                                >
+                                                <div class="ttb-skill-name-actions">
+                                                    <button
+                                                            type="button"
+                                                            class="ttb-skill-test-button"
+                                                            data-action="test-skill"
+                                                            data-skill-id="{{skill.data.id}}"
+                                                            title="Test {{skill.data.name}}"
+                                                    >
                                                     <span
                                                             class="ttb-skill-test-icon"
                                                             aria-hidden="true"
                                                     ></span>
 
-                                                    <span>{{skill.data.name}}</span>
-                                                </button>
+                                                        <span>{{skill.data.name}}</span>
+                                                    </button>
+
+                                                    {{#if @root.editable}}
+                                                        <button
+                                                                type="button"
+                                                                class="ttb-skill-customize-button"
+                                                                data-action="customize-skill"
+                                                                data-skill-id="{{skill.data.id}}"
+                                                                title="Customize {{skill.data.name}}"
+                                                                aria-label="Customize {{skill.data.name}}"
+                                                        >
+                                                            <i class="fa-solid fa-gear"></i>
+                                                        </button>
+                                                    {{/if}}
+                                                </div>
+
                                             </td>
 
                                             <td class="ttb-skill-rating">
@@ -229,6 +261,8 @@
                                                 />
                                             </td>
 
+
+
                                             <td
                                                     class="ttb-skill-aspect"
                                                     title="Aspect value: {{skill.data.aspectValue}}"
@@ -236,9 +270,18 @@
                                                 {{skill.data.aspectLabel}}
                                             </td>
 
+                                            <td
+                                                    class="ttb-skill-misc"
+                                                    data-tooltip="{{skill.data.miscModifierTooltip}}"
+                                            >
+                                                <strong>
+                                                    {{skill.data.miscModifierLabel}}
+                                                </strong>
+                                            </td>
+
                                             <td class="ttb-skill-av">
                                                 <strong
-                                                        title="{{skill.data.rating}} Rank + {{skill.data.aspectValue}} {{skill.data.aspectLabel}}"
+                                                        title="Rank {{skill.data.rating}} + {{skill.data.aspectLabel}} {{skill.data.aspectValue}} + Misc. {{skill.data.miscModifierLabel}} = AV {{skill.data.av}}"
                                                 >
                                                     {{skill.data.av}}
                                                 </strong>

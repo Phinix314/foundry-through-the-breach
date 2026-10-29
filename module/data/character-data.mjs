@@ -37,8 +37,12 @@ function skillRow(definition) {
         category: definition.category,
         rating: 0,
         aspect: definition.aspect,
+
+        manualActingValueModifier: 0,
+        inherentFlipModifier: 0,
+
         inherentSuits: [],
-        triggers: ""
+        triggers: []
     };
 }
 
@@ -146,6 +150,12 @@ export class TTBCharacterData extends foundry.abstract.TypeDataModel {
 
                     aspect: textField(),
 
+                    manualActingValueModifier:
+                        numberField(0),
+
+                    inherentFlipModifier:
+                        numberField(0),
+
                     inherentSuits: new ArrayField(
                         textField(),
                         {
@@ -153,7 +163,24 @@ export class TTBCharacterData extends foundry.abstract.TypeDataModel {
                         }
                     ),
 
-                    triggers: textField()
+                    triggers: new ArrayField(
+                        new SchemaField({
+                            id: textField(),
+                            name: textField(),
+
+                            requiredSuits: new ArrayField(
+                                textField(),
+                                {
+                                    initial: () => []
+                                }
+                            ),
+
+                            description: textField()
+                        }),
+                        {
+                            initial: () => []
+                        }
+                    )
                 }),
                 {
                     initial: () =>

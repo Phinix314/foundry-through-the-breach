@@ -6,6 +6,10 @@ import {
     openSkillTestDialog
 } from "../ui/skill-test-dialog.mjs";
 
+import {
+    openSkillCustomizationDialog
+} from "../ui/skill-customization-dialog.mjs";
+
 const SYSTEM_ID = "through-the-breach";
 
 const ActorSheetV1 =
@@ -49,6 +53,28 @@ function rowData(array, count, fallback = {}) {
     }));
 }
 
+function formatModifier(value) {
+    const number = Number(value ?? 0);
+
+    return number > 0
+        ? `+${number}`
+        : String(number);
+}
+
+function prepareSkillModifierBreakdown(skill) {
+    const manual =
+        Number(
+            skill.manualActingValueModifier ?? 0
+        );
+
+    return {
+        total: manual,
+        label: formatModifier(manual),
+        tooltip:
+            `Manual modifier: ${formatModifier(manual)}`
+    };
+}
+
 function prepareSkillRows(skills, aspects) {
     return Array.from(skills ?? []).map(
         (skill, index) => {
@@ -59,6 +85,8 @@ function prepareSkillRows(skills, aspects) {
                 Number(
                     aspects?.[skill.aspect] ?? 0
                 );
+            const modifierBreakdown =
+                prepareSkillModifierBreakdown(skill);
 
             return {
                 index,
@@ -70,7 +98,19 @@ function prepareSkillRows(skills, aspects) {
                     aspectLabel:
                         ASPECT_LABELS[skill.aspect] ??
                         skill.aspect,
-                    av: rating + aspectValue
+                    av:
+                        rating +
+                        aspectValue +
+                        modifierBreakdown.total,
+
+                    miscModifier:
+                    modifierBreakdown.total,
+
+                    miscModifierLabel:
+                    modifierBreakdown.label,
+
+                    miscModifierTooltip:
+                    modifierBreakdown.tooltip,
                 }
             };
         }
@@ -168,6 +208,57 @@ export class TTBCharacterSheet extends ActorSheetV1 {
         return context;
     }
 
+    async _onCustomizeSkill(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const skillId =
+            event.currentTarget.dataset.skillId;
+
+        const skillIndex =
+            this.actor.system.skills.findIndex(
+                candidate =>
+                    candidate.id === skillId
+            );
+
+        if (skillIndex < 0) {
+            ui.notifications.error(
+                `Skill could not be found: ${skillId}`
+            );
+            return;
+        }
+
+        const skill =
+            this.actor.system.skills[skillIndex];
+
+        const customization =
+            await openSkillCustomizationDialog({
+                skill
+            });
+
+        if (!customization) {
+            return;
+        }
+
+        const skills =
+            foundry.utils.deepClone(
+                this.actor.toObject().system.skills
+            );
+
+        skills[skillIndex] = {
+            ...skills[skillIndex],
+            ...customization
+        };
+
+        await this.actor.update({
+            "system.skills": skills
+        });
+
+        ui.notifications.info(
+            `${skill.name} updated.`
+        );
+    }
+
     async _onSkillTest(event) {
         event.preventDefault();
 
@@ -194,14 +285,19 @@ export class TTBCharacterSheet extends ActorSheetV1 {
                     ] ?? 0
             );
 
-        const actingValue =
+        const baseActingValue =
             Number(skill.rating ?? 0) +
             aspectValue;
 
-        /*
-         * Permanent flip modifiers will later be stored
-         * on the skill. Until then this normally resolves to 0.
-         */
+        const persistentModifier =
+            prepareSkillModifierBreakdown(
+                skill
+            ).total;
+
+        const displayedActingValue =
+            baseActingValue +
+            persistentModifier;
+
         const inherentFlipModifier =
             Number(
                 skill.inherentFlipModifier ?? 0
@@ -210,7 +306,8 @@ export class TTBCharacterSheet extends ActorSheetV1 {
         const testOptions =
             await openSkillTestDialog({
                 skill,
-                actingValue,
+                actingValue:
+                displayedActingValue,
                 inherentFlipModifier
             });
 
@@ -248,10 +345,14 @@ export class TTBCharacterSheet extends ActorSheetV1 {
                     label: skill.name
                 },
 
-                actingValue,
+                actingValue:
+                    baseActingValue,
 
                 actingValueModifier:
-                testOptions.actingValueModifier,
+                    persistentModifier +
+                    Number(
+                        testOptions.actingValueModifier ?? 0
+                    ),
 
                 tn:
                 testOptions.tn,
@@ -292,6 +393,18 @@ export class TTBCharacterSheet extends ActorSheetV1 {
                     "click",
                     (event) =>
                         this._onSkillTest(event)
+                );
+            });
+
+        root
+            .querySelectorAll(
+                '[data-action="customize-skill"]'
+            )
+            .forEach((button) => {
+                button.addEventListener(
+                    "click",
+                    (event) =>
+                        this._onCustomizeSkill(event)
                 );
             });
 

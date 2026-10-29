@@ -26,23 +26,23 @@
     - 0.0.8.1.2 Connected Skill Test dialog with structured conflicts. Small visual updates. Fixed inconsistent naming of values/suits. 
     - 0.0.8.1.3 Applied negative flip cheat policy, fixed couple bugs and added structured conflict requireing just suits without tn.
     - 0.0.8.1.4 Added Suit requirements for SKill tests as well as display in the card choice window
+    - 0.0.8.1.5 Added ability to customize skills in ragards to inherent flip/av/suit modifier as well as changing used aspect.
 - 0.1.0  first usable table prototype
+  
+
+# Untracked Tasks
+- improved charackter sheet.
+  - Ability to pop out/Improve Talents.
+  - Skill modifier aggregation: Calculate each skill’s Misc modifier from its manual bonus plus talents, items, and effects. Preserve labeled source contributions for the Misc-column tooltip and use the same calculated total when starting conflicts.
+  - Create/Update Fatedeck from Characktersheet.
 
 
-# Untracked:
-- Persuits
-- npc data model
-- Skills
+# Untracked Ideas
 - Items
 - Charackter Creation
-- improved charackter sheet.
-  - Autmatic Calculations of Derived Values. 
-  - Create/Update Fatedeck from Characktersheet.
-  - Link Aspect and Skills
-  - Ability to pop out/Improve Talents.
-- Improved Display of current conflict. 
-  - Select which card was used whne resolving the conflict. 
-- Undo Button
+- Persuits
+- npc data model
+- - Undo Button
 - Tokens and Conditions
 
 # Quality of Life
@@ -52,16 +52,16 @@
   - Conflict via the Card Docks
   - Conflict via Commands esp. through the charackter sheet.
 - Indicate that a card has been cheated rather then selected more clearly in the chat window
+- Indicate AV Suits same as TN suits in selecting card dialog as in 0.0.8.1.4
 
 # Refractoring 
 - Keep Consistent Naming in line with TTB Core Rules
   -> Rename conflicts to challanges. 
 - Visual Design of Charackter Sheet
   - Skill Tables!
-  - 
 
 # Known Issues:
 - delete player decks of deleted charackters
-- Consider naming convention of Popout in regards to same named Module. Possibly integrate it in core.
+- Set TN sometimes maintains into the next duel. 
 
 # Recomendations:
