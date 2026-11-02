@@ -670,8 +670,36 @@ export async function getActiveConflictSelectionPresentation() {
         }
     }
 
+    const inherentSuits =
+        normalizeSuitList(
+            conflict.inherentSuits
+        );
+
+    const situationalSuits =
+        normalizeSuitList(
+            conflict.situationalSuits
+        );
+
+    const actingSuits = [
+        ...inherentSuits.map((suit) => ({
+            id: suit,
+            label: RED_JOKER_SUITS[suit],
+            sourceLabel:
+                `From ${conflict.source?.label ?? "skill"}`
+        })),
+
+        ...situationalSuits.map((suit) => ({
+            id: suit,
+            label: RED_JOKER_SUITS[suit],
+            sourceLabel:
+                "From situational modifier"
+        }))
+    ];
+
     const tnSuits =
-        normalizeSuitList(conflict.tnSuits);
+        normalizeSuitList(
+            conflict.tnSuits
+        );
 
     const hasNumericTn =
         conflict.tn !== null &&
@@ -702,6 +730,7 @@ export async function getActiveConflictSelectionPresentation() {
         modifiedActingValue:
             integer(conflict.actingValue) +
             integer(conflict.actingValueModifier),
+        actingSuits,
         tn: hasNumericTn
             ? integer(conflict.tn)
             : null,

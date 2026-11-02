@@ -103,8 +103,10 @@ export async function openSkillTestDialog({
             <input
                 type="number"
                 name="tn"
+                value=""
                 placeholder="—"
                 step="1"
+                autocomplete="off"
                 aria-label="Target Number"
             >
         </label>
