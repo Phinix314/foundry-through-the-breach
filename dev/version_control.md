@@ -19,7 +19,7 @@
   - 0.0.7.2 Improved UI regarding pos/neg flips. Included Red Joker Logic & suit selection.
   - 0.0.7.3 Integrated cheating cards into a conflict and resolving them afterwards. 
   - 0.0.7.4 Resolving Conflict and posting in Chat. Added sprites for suits. 
-  - 0.0.7.5 Created GM Socket to handle/queue multiple conflicts at once. Multi client testing required. 
+  - 0.0.7.5Added GM socket arbitration to enforce one active structured Challenge Duel at a time.
 - 0.0.8 Improved Charackter Sheet
   - 0.0.8.1 Started reworking Characktersheet. Updated Skill Tab with all non magic skills as well as calculating AV.
     - 0.0.8.1.1 Implemented Skill Test Action with dialog, allowing selectoin of TN and situational modfiierers.
@@ -28,7 +28,8 @@
     - 0.0.8.1.4 Added Suit requirements for SKill tests as well as display in the card choice window
     - 0.0.8.1.5 Added ability to customize skills in ragards to inherent flip/av/suit modifier as well as changing used aspect.
     - 0.0.8.1.6 Added ability to add Triggers in the customize skill window.
-    - 0.0.8.1.7 Created Functionality and Visibility to created Triggers, now shwoing in chat window if avaliable.
+    - 0.0.8.1.7 Added Skill Trigger creation, suit-requirement detection, and available-trigger display in chat.
+    - 0.0.8.1.8 Creating initial Trigger Decleration/Resolve. Timing and autmatic effect are left out. 
 - 0.1.0  first usable table prototype
   
 
@@ -57,13 +58,14 @@
 - Indicate AV Suits same as TN suits in selecting card dialog as in 0.0.8.1.4
 
 # Refractoring 
-- Keep Consistent Naming in line with TTB Core Rules
-  -> Rename conflicts to challanges. 
+- Replace user-facing “Conflict” terminology with “Challenge Duel” or “Duel”.
+  - Internal activeConflict naming can remain temporarily to avoid a risky broad refactor.
 - Visual Design of Charackter Sheet
   - Skill Tables!
 
 # Known Issues:
 - delete player decks of deleted charackters
 - Set TN sometimes maintains into the next duel. 
+- Resolve Conflict macro of GM does not clear structured Conflicts.
 
 # Recomendations:

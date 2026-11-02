@@ -2,6 +2,10 @@ import {
     getActiveConflict,
     startActiveConflict,
     selectActiveConflictCard,
+
+    declareActiveConflictTrigger as
+        declareActiveConflictTriggerOnGm,
+
     resolveActiveConflict
 } from "./active-conflict.mjs";
 
@@ -139,7 +143,10 @@ async function handleStartRequest(message) {
      */
     if (
         existingConflict?.requestedBy === requester.id &&
-        existingConflict.phase === "selecting"
+        [
+            "selecting",
+            "triggering"
+        ].includes(existingConflict.phase)
     ) {
         return {
             conflict: existingConflict,
@@ -238,22 +245,61 @@ async function handleConfirmRequest(message) {
         );
     }
 
+    let confirmedConflict = conflict;
+
     if (conflict.phase === "selecting") {
-        await selectActiveConflictCard({
-            conflictId: selection.conflictId,
-            source: selection.source,
-            cardId: selection.cardId,
-            selectedSuit: selection.selectedSuit,
-            selectedBy: requester.id
-        });
+        confirmedConflict =
+            await selectActiveConflictCard({
+                conflictId:
+                selection.conflictId,
+
+                source:
+                selection.source,
+
+                cardId:
+                selection.cardId,
+
+                selectedSuit:
+                selection.selectedSuit,
+
+                selectedBy:
+                requester.id
+            });
     } else if (
-        conflict.phase !== "selected" ||
-        conflict.selectedBy !== requester.id
+        ["triggering", "selected"].includes(
+            conflict.phase
+        ) &&
+        conflict.selectedBy === requester.id
     ) {
+        /*
+         * Allow recovery if the card was stored but the
+         * following request or resolution failed.
+         */
+        confirmedConflict = conflict;
+    } else {
         throw new ConflictRequestError(
             "CONFLICT_NOT_SELECTING",
             `This conflict cannot accept a selection during phase "${conflict.phase}".`
         );
+    }
+
+    if (
+        confirmedConflict.phase ===
+        "triggering"
+    ) {
+        return {
+            conflictId:
+            confirmedConflict.id,
+
+            resolved: false,
+            requiresTrigger: true,
+
+            availableTriggers:
+                foundry.utils.deepClone(
+                    confirmedConflict.availableTriggers ??
+                    []
+                )
+        };
     }
 
     /*
@@ -277,6 +323,93 @@ async function handleConfirmRequest(message) {
     };
 }
 
+async function handleTriggerRequest(message) {
+    const requester =
+        game.users.get(message.requesterId);
+
+    const declaration =
+        message.payload ?? {};
+
+    const conflict =
+        getActiveConflict();
+
+    if (!requester?.active) {
+        throw new ConflictRequestError(
+            "REQUESTER_UNAVAILABLE",
+            "The requesting user is no longer connected."
+        );
+    }
+
+    if (
+        !conflict ||
+        conflict.id !== declaration.conflictId
+    ) {
+        throw new ConflictRequestError(
+            "CONFLICT_CHANGED",
+            "This conflict is no longer active. It may already have been resolved."
+        );
+    }
+
+    await requireActorPermission(
+        requester,
+        conflict.actorUuid
+    );
+
+    if (
+        conflict.requestedBy !== requester.id &&
+        !requester.isGM
+    ) {
+        throw new ConflictRequestError(
+            "NOT_REQUESTER",
+            "Only the player who started this conflict may declare its trigger."
+        );
+    }
+
+    if (conflict.phase === "triggering") {
+        await declareActiveConflictTriggerOnGm({
+            conflictId:
+            declaration.conflictId,
+
+            triggerId:
+                declaration.triggerId ?? null,
+
+            declaredBy:
+            requester.id
+        });
+    } else if (
+        conflict.phase !== "selected" ||
+        (
+            conflict.triggerDeclaredBy !==
+            requester.id &&
+            !requester.isGM
+        )
+    ) {
+        throw new ConflictRequestError(
+            "CONFLICT_NOT_TRIGGERING",
+            `This conflict cannot accept a trigger during phase "${conflict.phase}".`
+        );
+    }
+
+    /*
+     * The selected phase is accepted for recovery if
+     * declaration succeeded but resolution failed.
+     */
+    const resolution =
+        await resolveActiveConflict({
+            chat: true
+        });
+
+    return {
+        conflictId:
+        declaration.conflictId,
+
+        resolved: true,
+
+        chatMessageId:
+        resolution.chatMessageId
+    };
+}
+
 async function handleGmRequest(message) {
     switch (message.type) {
         case "active-conflict-start-request":
@@ -284,6 +417,9 @@ async function handleGmRequest(message) {
 
         case "active-conflict-confirm-request":
             return handleConfirmRequest(message);
+
+        case "active-conflict-trigger-request":
+            return handleTriggerRequest(message);
 
         default:
             throw new ConflictRequestError(
@@ -434,6 +570,19 @@ export function confirmActiveConflictSelection({
     );
 }
 
+export function confirmActiveConflictTrigger({
+                                                 conflictId,
+                                                 triggerId = null
+                                             } = {}) {
+    return submitRequest(
+        "active-conflict-trigger-request",
+        {
+            conflictId,
+            triggerId
+        }
+    );
+}
+
 export function initializeActiveConflictSocket() {
     game.socket.on(
         SOCKET_NAME,
@@ -496,9 +645,9 @@ export function initializeActiveConflictSocket() {
 
             if (![
                 "active-conflict-start-request",
-                "active-conflict-confirm-request"
+                "active-conflict-confirm-request",
+                "active-conflict-trigger-request"
             ].includes(message?.type)) {
-                return;
             }
 
             /*

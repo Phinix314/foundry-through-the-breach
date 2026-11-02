@@ -133,6 +133,28 @@ async function getSourceTriggers(
         );
 }
 
+function getAvailableConflictTriggers(
+    sourceTriggers = [],
+    resultSuits = []
+) {
+    const normalizedResultSuits =
+        normalizeSuitList(resultSuits);
+
+    return Array.from(sourceTriggers ?? [])
+        .map((trigger) =>
+            normalizeConflictTrigger(trigger)
+        )
+        .filter((trigger) =>
+            trigger.id &&
+            trigger.name &&
+            trigger.requiredSuits.length > 0 &&
+            hasRequiredSuits(
+                normalizedResultSuits,
+                trigger.requiredSuits
+            )
+        );
+}
+
 let conflictCreationPending = false;
 
 function requireGm() {
@@ -337,6 +359,12 @@ export async function createActiveConflict({
 
             flippedCardIds: [],
             selectedCardId: null,
+
+            availableTriggers: [],
+            declaredTriggerId: null,
+            declaredTrigger: null,
+            triggerDeclaredBy: null,
+            triggerDeclaredAt: null,
 
             createdAt: Date.now()
         };
@@ -802,8 +830,6 @@ export async function selectActiveConflictCard({
         confirmedCardId = movedCard.id;
     }
 
-
-    conflict.phase = "selected";
     conflict.selectedCardId = confirmedCardId;
     conflict.selectedCardSource = selectedCard.source;
     conflict.selectedSuit = isRedJoker ? resolvedSuit : null;
@@ -827,6 +853,34 @@ export async function selectActiveConflictCard({
         isCheat: selectedCard.isCheat,
     };
 
+    const resultSuits = [
+        ...normalizeSuitList(
+            conflict.inherentSuits
+        ),
+
+        ...normalizeSuitList(
+            conflict.situationalSuits
+        ),
+
+        ...(Object.hasOwn(
+            RED_JOKER_SUITS,
+            resolvedSuit
+        )
+            ? [resolvedSuit]
+            : [])
+    ];
+
+    conflict.availableTriggers =
+        getAvailableConflictTriggers(
+            conflict.sourceTriggers,
+            resultSuits
+        );
+
+    conflict.phase =
+        conflict.availableTriggers.length > 0
+            ? "triggering"
+            : "selected";
+
     const pile = getConflictPile();
 
     await pile.setFlag(
@@ -836,6 +890,98 @@ export async function selectActiveConflictCard({
     );
 
     return foundry.utils.deepClone(conflict);
+}
+
+export async function declareActiveConflictTrigger({
+                                                       conflictId,
+                                                       triggerId = null,
+                                                       declaredBy = game.user.id
+                                                   } = {}) {
+    requireGm();
+
+    const conflict = getActiveConflict();
+
+    if (!conflict) {
+        throw new Error(
+            "No active conflict exists."
+        );
+    }
+
+    if (conflict.id !== conflictId) {
+        throw new Error(
+            "The active conflict changed before the trigger was declared."
+        );
+    }
+
+    if (conflict.phase !== "triggering") {
+        throw new Error(
+            `Conflict cannot accept a trigger during phase "${conflict.phase}".`
+        );
+    }
+
+    const declaringUser =
+        game.users.get(declaredBy);
+
+    if (
+        conflict.selectedBy !== declaredBy &&
+        !declaringUser?.isGM
+    ) {
+        throw new Error(
+            "Only the player who selected the card may declare its trigger."
+        );
+    }
+
+    const normalizedTriggerId =
+        triggerId
+            ? String(triggerId)
+            : null;
+
+    let declaredTrigger = null;
+
+    if (normalizedTriggerId) {
+        declaredTrigger =
+            Array.from(
+                conflict.availableTriggers ?? []
+            ).find((trigger) =>
+                trigger.id === normalizedTriggerId
+            ) ?? null;
+
+        if (!declaredTrigger) {
+            throw new Error(
+                "The selected trigger is not available for this result."
+            );
+        }
+    }
+
+    conflict.declaredTriggerId =
+        declaredTrigger?.id ?? null;
+
+    conflict.declaredTrigger =
+        declaredTrigger
+            ? foundry.utils.deepClone(
+                declaredTrigger
+            )
+            : null;
+
+    conflict.triggerDeclaredBy =
+        declaredBy;
+
+    conflict.triggerDeclaredAt =
+        Date.now();
+
+    conflict.phase = "selected";
+
+    const pile = getConflictPile();
+
+    await pile.setFlag(
+        SYSTEM_ID,
+        ACTIVE_CONFLICT_FLAG,
+        conflict
+    );
+
+    return foundry.utils.deepClone(
+        conflict
+    );
 }
 
 export function getActiveConflictResult() {
@@ -906,21 +1052,10 @@ export function getActiveConflictResult() {
     ]
 
     const availableTriggers =
-        Array.from(
-            conflict.sourceTriggers ?? []
-        )
-            .map(trigger =>
-                normalizeConflictTrigger(trigger)
-            )
-            .filter(trigger =>
-                trigger.id &&
-                trigger.name &&
-                trigger.requiredSuits.length > 0 &&
-                hasRequiredSuits(
-                    resultSuits,
-                    trigger.requiredSuits
-                )
-            );
+        getAvailableConflictTriggers(
+            conflict.sourceTriggers,
+            resultSuits
+        );
 
     const tnSuits =
         normalizeSuitList(
@@ -1003,6 +1138,17 @@ export function getActiveConflictResult() {
         situationalSuits,
         resultSuits,
         availableTriggers,
+
+        declaredTriggerId:
+            conflict.declaredTriggerId ?? null,
+
+        declaredTrigger:
+            conflict.declaredTrigger
+                ? foundry.utils.deepClone(
+                    conflict.declaredTrigger
+                )
+                : null,
+
         tnSuits,
 
 
@@ -1072,29 +1218,35 @@ function renderSuitSymbols(
         .join("");
 }
 
-function renderAvailableTriggers(
-    triggers = []
+function renderDeclaredTrigger(
+    trigger = null
 ) {
-    const available =
-        Array.from(triggers ?? []);
-
-    if (available.length === 0) {
+    if (!trigger) {
         return "";
     }
 
-    const entries = available
-        .map(trigger => {
-            const requiredSuitsHtml =
-                renderSuitSymbols(
-                    trigger.requiredSuits,
-                    {
-                        requiredByTrigger:
-                        trigger.name
-                    }
-                );
+    const requiredSuitsHtml =
+        renderSuitSymbols(
+            trigger.requiredSuits,
+            {
+                requiredByTrigger:
+                trigger.name
+            }
+        );
 
-            return `
-                <details class="ttb-conflict-trigger">
+    return `
+        <section class="ttb-conflict-triggers">
+            <div class="ttb-conflict-triggers__heading">
+                Declared Trigger
+            </div>
+
+            <div class="ttb-conflict-triggers__list">
+                <details
+                    class="
+                        ttb-conflict-trigger
+                        ttb-conflict-trigger--declared
+                    "
+                >
                     <summary>
                         <span class="ttb-conflict-trigger__suits">
                             ${requiredSuitsHtml}
@@ -1116,18 +1268,6 @@ function renderAvailableTriggers(
                         ${escapeChat(trigger.description)}
                     </div>
                 </details>
-            `;
-        })
-        .join("");
-
-    return `
-        <section class="ttb-conflict-triggers">
-            <div class="ttb-conflict-triggers__heading">
-                Available Triggers
-            </div>
-
-            <div class="ttb-conflict-triggers__list">
-                ${entries}
             </div>
         </section>
     `;
@@ -1243,9 +1383,9 @@ function renderActiveConflictResult(result) {
             }
         );
 
-    const availableTriggersHtml =
-        renderAvailableTriggers(
-            result.availableTriggers
+    const declaredTriggerHtml =
+        renderDeclaredTrigger(
+            result.declaredTrigger
         );
 
     const otherCards =
@@ -1380,7 +1520,7 @@ function renderActiveConflictResult(result) {
                 </div>
             </div>
 
-            ${availableTriggersHtml}
+            ${declaredTriggerHtml}
         </div>
     `;
 }
@@ -1436,7 +1576,8 @@ export async function resolveActiveConflict({
     }
 
     const moved = await resolveCurrentConflict({
-        chat: false
+        chat: false,
+        clearStructuredState: false
     });
 
     const pile = getConflictPile();

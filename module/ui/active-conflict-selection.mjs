@@ -4,7 +4,8 @@ import {
 
 import {
     requestActiveConflict,
-    confirmActiveConflictSelection
+    confirmActiveConflictSelection,
+    confirmActiveConflictTrigger
 } from "../cards/conflict-socket.mjs";
 
 const {
@@ -62,6 +63,143 @@ async function chooseRedJokerSuit() {
     ].includes(suit)
         ? suit
         : null;
+}
+
+function renderTriggerSuitSymbols(
+    suits = []
+) {
+    const labels = {
+        rams: "Rams",
+        crows: "Crows",
+        tomes: "Tomes",
+        masks: "Masks"
+    };
+
+    return Array.from(suits ?? [])
+        .filter((suit) =>
+            Object.hasOwn(labels, suit)
+        )
+        .map((suit) => `
+            <span
+                class="
+                    ttb-conflict-suit
+                    ttb-conflict-suit--${suit}
+                "
+                data-tooltip="${labels[suit]}"
+                aria-label="${labels[suit]}"
+            ></span>
+        `)
+        .join("");
+}
+
+async function chooseActiveConflictTrigger(
+    triggers = []
+) {
+    const available =
+        Array.from(triggers ?? []);
+
+    if (available.length === 0) {
+        return null;
+    }
+
+    const triggerRows = available
+        .map((trigger) => `
+            <label class="ttb-trigger-choice">
+                <input
+                    type="radio"
+                    name="triggerId"
+                    value="${foundry.utils.escapeHTML(
+            trigger.id
+        )}"
+                >
+
+                <span class="ttb-trigger-choice__content">
+                    <span class="ttb-trigger-choice__heading">
+                        <span class="ttb-trigger-choice__suits">
+                            ${renderTriggerSuitSymbols(
+            trigger.requiredSuits
+        )}
+                        </span>
+
+                        <strong>
+                            ${foundry.utils.escapeHTML(
+            trigger.name
+        )}
+                        </strong>
+                    </span>
+
+                    ${
+            trigger.description
+                ? `
+                                <span class="ttb-trigger-choice__description">
+                                    ${foundry.utils.escapeHTML(
+                    trigger.description
+                )}
+                                </span>
+                            `
+                : ""
+        }
+                </span>
+            </label>
+        `)
+        .join("");
+
+    const triggerId =
+        await DialogV2.input({
+            window: {
+                title: "Declare Trigger"
+            },
+
+            position: {
+                width: 520
+            },
+
+            content: `
+                <div class="ttb-trigger-choice-dialog">
+                    <p>
+                        You may declare one available trigger.
+                    </p>
+
+                    <div class="ttb-trigger-choice-list">
+                        <label class="ttb-trigger-choice">
+                            <input
+                                type="radio"
+                                name="triggerId"
+                                value=""
+                                checked
+                            >
+
+                            <span class="ttb-trigger-choice__content">
+                                <strong>No Trigger</strong>
+
+                                <span class="ttb-trigger-choice__description">
+                                    Resolve without declaring a trigger.
+                                </span>
+                            </span>
+                        </label>
+
+                        ${triggerRows}
+                    </div>
+                </div>
+            `,
+
+            ok: {
+                label: "Resolve Conflict",
+                icon: "fas fa-check",
+
+                callback: (_event, button) => {
+                    return button.form
+                        .elements
+                        .triggerId
+                        .value;
+                }
+            },
+
+            rejectClose: false,
+            modal: true
+        });
+
+    return triggerId || null;
 }
 
 async function showConflictRequestError(
@@ -296,17 +434,33 @@ export class TTBActiveConflictSelection
                         }
                     }
 
-                    await confirmActiveConflictSelection({
-                        conflictId: this.conflictId,
+                    const confirmation =
+                        await confirmActiveConflictSelection({
+                            conflictId:
+                            this.conflictId,
 
-                        source:
-                        this.selectedSelection.source,
+                            source:
+                            this.selectedSelection.source,
 
-                        cardId:
-                        this.selectedSelection.cardId,
+                            cardId:
+                            this.selectedSelection.cardId,
 
-                        selectedSuit
-                    });
+                            selectedSuit
+                        });
+
+                    if (confirmation.requiresTrigger) {
+                        const triggerId =
+                            await chooseActiveConflictTrigger(
+                                confirmation.availableTriggers
+                            );
+
+                        await confirmActiveConflictTrigger({
+                            conflictId:
+                            this.conflictId,
+
+                            triggerId
+                        });
+                    }
 
                     ui.notifications.info(
                         "Conflict resolved."
@@ -363,15 +517,41 @@ export async function requestAndOpenActiveConflict(
     options = {}
 ) {
     try {
-        await requestActiveConflict(
-            options
-        );
+        const response =
+            await requestActiveConflict(
+                options
+            );
+
+        if (
+            response.conflict?.phase ===
+            "triggering"
+        ) {
+            const triggerId =
+                await chooseActiveConflictTrigger(
+                    response.conflict
+                        .availableTriggers
+                );
+
+            await confirmActiveConflictTrigger({
+                conflictId:
+                response.conflict.id,
+
+                triggerId
+            });
+
+            ui.notifications.info(
+                "Conflict resolved."
+            );
+
+            return null;
+        }
 
         /*
          * The GM has now created the conflict and completed
          * all required Fate card flips.
          */
         return openActiveConflictSelectionWindow();
+
     } catch (error) {
         console.error(
             "through-the-breach | Could not start active conflict",

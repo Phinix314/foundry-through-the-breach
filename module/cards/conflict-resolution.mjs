@@ -3,6 +3,7 @@ import { FATE_DISCARD_NAME, getActorTwistDiscard } from "./discard-piles.mjs";
 
 
 const SYSTEM_ID = "through-the-breach";
+const ACTIVE_CONFLICT_FLAG = "activeConflict";
 
 function getTtbFlag(card, key, fallback = null) {
     return card.getFlag(SYSTEM_ID, key) ?? fallback;
@@ -110,61 +111,196 @@ async function resolveDiscardDestination(card) {
     return null;
 }
 
-export async function resolveCurrentConflict({ chat = true } = {}) {
-    const conflictPile = game.cards.getName(CONFLICT_PILE_NAME);
-    if (!conflictPile) {
-        ui.notifications.error("Current Conflict pile does not exist.");
+export async function resolveCurrentConflict({
+                                                 chat = true,
+                                                 clearStructuredState = true
+                                             } = {}) {
+    if (!game.user.isGM) {
+        ui.notifications.warn(
+            "Only a GM may resolve the Current Conflict."
+        );
         return [];
     }
 
-    const conflictCards = getConflictCardsInOrder(conflictPile);
+    const conflictPile =
+        game.cards.getName(
+            CONFLICT_PILE_NAME
+        );
+
+    if (!conflictPile) {
+        ui.notifications.error(
+            "Current Conflict pile does not exist."
+        );
+        return [];
+    }
+
+    const structuredConflict =
+        conflictPile.getFlag(
+            SYSTEM_ID,
+            ACTIVE_CONFLICT_FLAG
+        ) ?? null;
+
+    const conflictCards =
+        getConflictCardsInOrder(
+            conflictPile
+        );
+
+    /*
+     * A structured conflict may still hold its lock even
+     * when no cards remain. The GM recovery action must
+     * be able to clear that state as well.
+     */
     if (conflictCards.length === 0) {
-        ui.notifications.warn("Current Conflict is empty.");
+        if (
+            structuredConflict &&
+            clearStructuredState
+        ) {
+            await conflictPile.unsetFlag(
+                SYSTEM_ID,
+                ACTIVE_CONFLICT_FLAG
+            );
+
+            ui.notifications.info(
+                "Structured conflict cleared."
+            );
+        } else {
+            ui.notifications.warn(
+                "Current Conflict is empty."
+            );
+        }
+
         return [];
     }
 
     const moved = [];
-    const touchedActorUuids = new Set();
+    const touchedActorUuids =
+        new Set();
 
     for (const card of conflictCards) {
-        const destination = await resolveDiscardDestination(card);
+        const destination =
+            await resolveDiscardDestination(
+                card
+            );
+
         if (!destination) continue;
 
-        const movedCard = await appendCardToDiscard(destination, conflictPile, card);
-        if (movedCard) {
-            moved.push({
-                card: movedCard,
-                destination: destination.name
-            });
+        const movedCard =
+            await appendCardToDiscard(
+                destination,
+                conflictPile,
+                card
+            );
 
-            const actorUuid = movedCard.getFlag(SYSTEM_ID, "actorUuid");
-            if (actorUuid) touchedActorUuids.add(actorUuid);
+        if (!movedCard) continue;
+
+        moved.push({
+            card: movedCard,
+            destination:
+            destination.name
+        });
+
+        const actorUuid =
+            movedCard.getFlag(
+                SYSTEM_ID,
+                "actorUuid"
+            );
+
+        if (actorUuid) {
+            touchedActorUuids.add(
+                actorUuid
+            );
         }
     }
 
+    const cardsRemaining =
+        conflictPile.cards.size;
+
+    let structuredStateCleared =
+        false;
+
+    /*
+     * Never remove the structured lock if some cards could
+     * not be discarded. That preserves the recoverable state.
+     */
+    if (
+        structuredConflict &&
+        clearStructuredState &&
+        cardsRemaining === 0
+    ) {
+        await conflictPile.unsetFlag(
+            SYSTEM_ID,
+            ACTIVE_CONFLICT_FLAG
+        );
+
+        structuredStateCleared = true;
+    }
+
+    if (cardsRemaining > 0) {
+        ui.notifications.error(
+            `${cardsRemaining} conflict card(s) could not be discarded. The conflict remains active.`
+        );
+    }
+
     if (chat) {
-        const lines = moved.map(({ card, destination }) => {
-            return `<li><strong>${foundry.utils.escapeHTML(card.name)}</strong> → ${foundry.utils.escapeHTML(destination)}</li>`;
-        }).join("");
+        const lines = moved
+            .map(({
+                      card,
+                      destination
+                  }) => {
+                return `
+                    <li>
+                        <strong>
+                            ${foundry.utils.escapeHTML(card.name)}
+                        </strong>
+                        →
+                        ${foundry.utils.escapeHTML(destination)}
+                    </li>
+                `;
+            })
+            .join("");
+
+        const title =
+            structuredStateCleared
+                ? "Conflict Cleared"
+                : cardsRemaining > 0
+                    ? "Conflict Partially Resolved"
+                    : "Conflict Resolved";
+
+        const explanation =
+            structuredStateCleared
+                ? "The unfinished structured conflict was cleared and its cards were discarded without producing a result."
+                : cardsRemaining > 0
+                    ? "Some cards could not be moved to their discard piles."
+                    : "Cards were moved to their discard piles.";
 
         await ChatMessage.create({
             content: `
-        <div class="ttb-chat-card ttb-fate-flip">
-          <h2>Conflict Resolved</h2>
-          <p>Cards were moved to their discard piles.</p>
-          <ul>${lines}</ul>
-        </div>
-      `,
+                <div class="ttb-chat-card ttb-fate-flip">
+                    <h2>${title}</h2>
+                    <p>${explanation}</p>
+                    <ul>${lines}</ul>
+                </div>
+            `,
+
             flags: {
                 [SYSTEM_ID]: {
-                    type: "resolveConflict"
+                    type:
+                        structuredStateCleared
+                            ? "clearStructuredConflict"
+                            : "resolveConflict"
                 }
             }
         });
     }
 
-    for (const actorUuid of touchedActorUuids) {
-        await game.throughTheBreach?.syncActorCardSummary?.(actorUuid);
+    for (
+        const actorUuid of
+        touchedActorUuids
+        ) {
+        await game.throughTheBreach
+            ?.syncActorCardSummary?.(
+                actorUuid
+            );
     }
 
     ui.players?.render?.(true);
