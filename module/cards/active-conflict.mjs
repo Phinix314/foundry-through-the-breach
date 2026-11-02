@@ -69,6 +69,70 @@ function hasRequiredSuits(
     return true;
 }
 
+function normalizeConflictTrigger(trigger = {}) {
+    const source = trigger ?? {};
+
+    return {
+        id:
+            String(source.id ?? ""),
+
+        name:
+            String(source.name ?? "").trim(),
+
+        description:
+            String(source.description ?? "").trim(),
+
+        requiredSuits:
+            normalizeSuitList(
+                source.requiredSuits
+            )
+    };
+}
+
+async function getSourceTriggers(
+    actorUuid,
+    source
+) {
+    if (
+        source?.type !== "skill" ||
+        !source.id
+    ) {
+        return [];
+    }
+
+    const actor =
+        await fromUuid(actorUuid);
+
+    if (!actor) {
+        throw new Error(
+            `Conflict actor could not be found: ${actorUuid}`
+        );
+    }
+
+    const skill =
+        Array.from(
+            actor.system.skills ?? []
+        ).find(candidate =>
+            candidate.id === source.id
+        );
+
+    if (!skill) {
+        throw new Error(
+            `Conflict skill could not be found: ${source.id}`
+        );
+    }
+
+    return Array.from(skill.triggers ?? [])
+        .map(trigger =>
+            normalizeConflictTrigger(trigger)
+        )
+        .filter(trigger =>
+            trigger.id &&
+            trigger.name &&
+            trigger.requiredSuits.length > 0
+        );
+}
+
 let conflictCreationPending = false;
 
 function requireGm() {
@@ -217,6 +281,12 @@ export async function createActiveConflict({
                 ? null
                 : integer(tn);
 
+        const sourceTriggers =
+            await getSourceTriggers(
+                actorUuid,
+                source
+            );
+
         const conflict = {
             version: 2,
             id: foundry.utils.randomID(16),
@@ -230,6 +300,8 @@ export async function createActiveConflict({
                 id: source.id ?? null,
                 label: source.label
             },
+
+            sourceTriggers,
 
             actingValue:
             normalizedActingValue,
@@ -831,7 +903,24 @@ export function getActiveConflictResult() {
         ...inherentSuits,
         ...situationalSuits,
         ...(cardSuit ? [cardSuit] : [])
-    ];
+    ]
+
+    const availableTriggers =
+        Array.from(
+            conflict.sourceTriggers ?? []
+        )
+            .map(trigger =>
+                normalizeConflictTrigger(trigger)
+            )
+            .filter(trigger =>
+                trigger.id &&
+                trigger.name &&
+                trigger.requiredSuits.length > 0 &&
+                hasRequiredSuits(
+                    resultSuits,
+                    trigger.requiredSuits
+                )
+            );
 
     const tnSuits =
         normalizeSuitList(
@@ -913,6 +1002,7 @@ export function getActiveConflictResult() {
         inherentSuits,
         situationalSuits,
         resultSuits,
+        availableTriggers,
         tnSuits,
 
 
@@ -947,7 +1037,8 @@ function renderSuitSymbols(
     suits = [],
     {
         sourceLabel = null,
-        requiredByTn = false
+        requiredByTn = false,
+        requiredByTrigger = null
     } = {}
 ) {
     return normalizeSuitList(suits)
@@ -957,9 +1048,11 @@ function renderSuitSymbols(
 
             const origin = requiredByTn
                 ? "Required by TN"
-                : sourceLabel
-                    ? `From ${sourceLabel}`
-                    : "";
+                : requiredByTrigger
+                    ? `Required by ${requiredByTrigger}`
+                    : sourceLabel
+                        ? `From ${sourceLabel}`
+                        : "";
 
             const tooltip = origin
                 ? `${suitLabel} — ${origin}`
@@ -977,6 +1070,67 @@ function renderSuitSymbols(
             `;
         })
         .join("");
+}
+
+function renderAvailableTriggers(
+    triggers = []
+) {
+    const available =
+        Array.from(triggers ?? []);
+
+    if (available.length === 0) {
+        return "";
+    }
+
+    const entries = available
+        .map(trigger => {
+            const requiredSuitsHtml =
+                renderSuitSymbols(
+                    trigger.requiredSuits,
+                    {
+                        requiredByTrigger:
+                        trigger.name
+                    }
+                );
+
+            return `
+                <details class="ttb-conflict-trigger">
+                    <summary>
+                        <span class="ttb-conflict-trigger__suits">
+                            ${requiredSuitsHtml}
+                        </span>
+
+                        <strong class="ttb-conflict-trigger__name">
+                            ${escapeChat(trigger.name)}
+                        </strong>
+
+                        <span
+                            class="ttb-conflict-trigger__indicator"
+                            aria-hidden="true"
+                        >
+                            ›
+                        </span>
+                    </summary>
+
+                    <div class="ttb-conflict-trigger__description">
+                        ${escapeChat(trigger.description)}
+                    </div>
+                </details>
+            `;
+        })
+        .join("");
+
+    return `
+        <section class="ttb-conflict-triggers">
+            <div class="ttb-conflict-triggers__heading">
+                Available Triggers
+            </div>
+
+            <div class="ttb-conflict-triggers__list">
+                ${entries}
+            </div>
+        </section>
+    `;
 }
 
 function renderActiveConflictResult(result) {
@@ -1089,6 +1243,11 @@ function renderActiveConflictResult(result) {
             }
         );
 
+    const availableTriggersHtml =
+        renderAvailableTriggers(
+            result.availableTriggers
+        );
+
     const otherCards =
         result.unselectedFateCards ?? [];
 
@@ -1188,8 +1347,8 @@ function renderActiveConflictResult(result) {
                         <strong
                             class="ttb-conflict-number ttb-conflict-number--result"
                             data-tooltip="${escapeChat(
-                                calculationTooltip
-                            )}"
+        calculationTooltip
+    )}"
                         >
                             <span class="ttb-conflict-number__value">
                                 ${result.total}
@@ -1220,6 +1379,8 @@ function renderActiveConflictResult(result) {
                     </div>
                 </div>
             </div>
+
+            ${availableTriggersHtml}
         </div>
     `;
 }
@@ -1259,7 +1420,7 @@ export async function resolveActiveConflict({
      */
     if (chat && !chatMessage) {
         chatMessage = await ChatMessage.create({
-            speaker: ChatMessage.getSpeaker({ actor }),
+            speaker: ChatMessage.getSpeaker({actor}),
             content: renderActiveConflictResult(
                 result,
                 actor

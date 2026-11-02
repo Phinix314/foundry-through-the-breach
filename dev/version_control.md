@@ -28,6 +28,7 @@
     - 0.0.8.1.4 Added Suit requirements for SKill tests as well as display in the card choice window
     - 0.0.8.1.5 Added ability to customize skills in ragards to inherent flip/av/suit modifier as well as changing used aspect.
     - 0.0.8.1.6 Added ability to add Triggers in the customize skill window.
+    - 0.0.8.1.7 Created Functionality and Visibility to created Triggers, now shwoing in chat window if avaliable.
 - 0.1.0  first usable table prototype
   
 
