@@ -191,11 +191,33 @@
                                                         value="{{skill.data.aspect}}"
                                                 />
 
-                                                <input
-                                                        type="hidden"
-                                                        name="system.skills.{{skill.index}}.triggers"
-                                                        value="{{skill.data.triggers}}"
-                                                />
+                                                {{#each skill.data.triggers as |trigger triggerIndex|}}
+                                                    <input
+                                                            type="hidden"
+                                                            name="system.skills.{{skill.index}}.triggers.{{triggerIndex}}.id"
+                                                            value="{{trigger.id}}"
+                                                    />
+
+                                                    <input
+                                                            type="hidden"
+                                                            name="system.skills.{{skill.index}}.triggers.{{triggerIndex}}.name"
+                                                            value="{{trigger.name}}"
+                                                    />
+
+                                                    <input
+                                                            type="hidden"
+                                                            name="system.skills.{{skill.index}}.triggers.{{triggerIndex}}.description"
+                                                            value="{{trigger.description}}"
+                                                    />
+
+                                                    {{#each trigger.requiredSuits as |suit suitIndex|}}
+                                                        <input
+                                                                type="hidden"
+                                                                name="system.skills.{{skill.index}}.triggers.{{triggerIndex}}.requiredSuits.{{suitIndex}}"
+                                                                value="{{suit}}"
+                                                        />
+                                                    {{/each}}
+                                                {{/each}}
 
                                                 <input
                                                         type="hidden"

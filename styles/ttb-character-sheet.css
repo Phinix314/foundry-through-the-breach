@@ -445,3 +445,214 @@ tr:hover
     width: auto;
     margin: 0;
 }
+
+/* ----------------------------------------- */
+/* Skill Customization: Triggers             */
+/* ----------------------------------------- */
+
+.ttb-skill-customization-triggers {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid
+    var(--color-border-light-primary);
+}
+
+.ttb-skill-trigger-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.ttb-skill-trigger-section-heading > strong {
+    font-size: 1rem;
+}
+
+.ttb-skill-trigger-section-heading > button {
+    width: auto;
+    min-height: 28px;
+    margin: 0;
+    padding: 3px 8px;
+    font-size: 0.8rem;
+}
+
+.ttb-skill-customization-triggers
+[data-trigger-list] {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    max-height: 230px;
+    overflow-y: auto;
+    padding-right: 3px;
+}
+
+.ttb-skill-trigger-empty {
+    margin: 4px 0;
+    font-size: 0.85rem;
+    font-style: italic;
+    opacity: 0.65;
+}
+
+.ttb-skill-trigger-entry {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 9px;
+    border: 1px solid
+    var(--color-border-light-primary);
+    border-radius: 4px;
+    background: rgb(255 255 255 / 0.035);
+}
+
+.ttb-skill-trigger-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    min-width: 0;
+}
+
+.ttb-skill-trigger-suits
+.ttb-conflict-suit {
+    flex: 0 0 auto;
+    width: 19px;
+    height: 19px;
+    box-sizing: border-box;
+    border-radius: 3px;
+    background-color: rgb(238 228 204 / 0.9);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 15px 15px;
+}
+
+
+.ttb-skill-trigger-suits {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 2px;
+    padding-top: 1px;
+}
+
+
+.ttb-skill-trigger-body {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+}
+
+.ttb-skill-trigger-body > strong {
+    display: block;
+    line-height: 1.2;
+}
+
+.ttb-skill-trigger-body > p {
+    width: 100%;
+    margin: 3px 0 0;
+    font-size: 0.85rem;
+    line-height: 1.3;
+    text-align: left;
+    white-space: pre-wrap;
+    opacity: 0.85;
+}v
+
+.ttb-skill-trigger-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+    margin-top: 1px;
+}
+
+.ttb-skill-trigger-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+}
+
+.ttb-skill-trigger-actions > button {
+    width: auto;
+    min-height: 25px;
+    margin: 0;
+    padding: 2px 7px;
+    font-size: 0.75rem;
+}
+
+
+/* ----------------------------------------- */
+/* Individual Trigger Editor                 */
+/* ----------------------------------------- */
+
+.ttb-skill-trigger-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.ttb-skill-trigger-editor textarea {
+    width: 100%;
+    min-height: 90px;
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+.ttb-skill-trigger-suit-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    min-height: 29px;
+}
+
+.ttb-skill-trigger-no-suits {
+    font-size: 0.8rem;
+    font-style: italic;
+    opacity: 0.65;
+}
+
+.ttb-skill-trigger-suit-picker {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto;
+    align-items: stretch;
+    gap: 6px;
+}
+
+.ttb-skill-trigger-suit-picker > select {
+    min-width: 0;
+}
+
+.ttb-skill-trigger-suit-picker > button {
+    width: auto;
+    min-height: 30px;
+    margin: 0;
+    padding: 3px 9px;
+}
+
+.ttb-skill-trigger-editor
+.ttb-skill-test-suit-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 5px 3px 8px;
+}
+
+.ttb-skill-trigger-editor
+.ttb-skill-test-suit-chip > button {
+    width: 17px;
+    height: 17px;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    line-height: 1;
+}
+
+.ttb-skill-trigger-editor
+input[name="triggerName"] {
+    text-align: left;
+}
