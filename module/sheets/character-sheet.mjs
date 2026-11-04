@@ -3,6 +3,10 @@ import {
 } from "../data/skill-catalog.mjs";
 
 import {
+    calculateCharacterDerivedValues
+} from "../data/character-data.mjs";
+
+import {
     openSkillTestDialog
 } from "../ui/skill-test-dialog.mjs";
 
@@ -181,6 +185,27 @@ export class TTBCharacterSheet extends ActorSheetV1 {
         const system = this.actor.system ?? {};
 
         context.system = system;
+
+        context.overview =
+            calculateCharacterDerivedValues(
+                system
+            );
+
+        const controllingUsers =
+            game.users.filter(
+                user =>
+                    !user.isGM &&
+                    this.actor.testUserPermission(
+                        user,
+                        "OWNER"
+                    )
+            );
+
+        context.controlledBy =
+            controllingUsers
+                .map(user => user.name)
+                .join(", ") ||
+            "Unassigned";
 
         const skillRows = prepareSkillRows(
             system.skills,

@@ -10,24 +10,57 @@
         />
 
         <div class="ttb-header-fields">
-            <label>
-                Actor Name
-                <input type="text" name="name" value="{{actor.name}}" />
-            </label>
-
-            <label>
+            <label class="ttb-header-field--name">
                 Fated Name
-                <input type="text" name="system.fatedName" value="{{system.fatedName}}" />
+                <input
+                        type="text"
+                        name="name"
+                        value="{{actor.name}}"
+                />
+            </label>
+
+            <div class="ttb-header-owner">
+                <span>Controlled by</span>
+                <strong>{{controlledBy}}</strong>
+            </div>
+
+            <label class="ttb-header-field--pursuit">
+                Current Pursuit
+                <input
+                        type="text"
+                        name="system.currentPursuit"
+                        value="{{system.currentPursuit}}"
+                />
             </label>
 
             <label>
-                Player Name
-                <input type="text" name="system.playerName" value="{{system.playerName}}" />
+                Station
+                <input
+                        type="text"
+                        name="system.station"
+                        value="{{system.station}}"
+                />
             </label>
 
             <label>
-                Allegiance
-                <input type="text" name="system.allegiance" value="{{system.allegiance}}" />
+                Experience
+                <input
+                        type="number"
+                        min="0"
+                        name="system.experience"
+                        value="{{system.experience}}"
+                />
+            </label>
+
+            <label>
+                Destiny Steps
+                <input
+                        type="number"
+                        min="0"
+                        max="5"
+                        name="system.destinySteps"
+                        value="{{system.destinySteps}}"
+                />
             </label>
         </div>
     </header>
@@ -41,59 +74,209 @@
     </nav>
 
     <section class="sheet-body">
-        <div class="tab" data-group="primary" data-tab="main">
+        <div
+                class="tab ttb-overview-tab"
+                data-group="primary"
+                data-tab="main"
+        >
             <section class="ttb-grid two">
                 <div class="ttb-box">
-                    <h2>Pursuits</h2>
+                    <h2>Physical Aspects</h2>
 
-                    <label>
-                        Pursuits
-                        <textarea name="system.pursuits">{{system.pursuits}}</textarea>
-                    </label>
+                    <div class="ttb-overview-aspect-grid">
+                        <label>
+                            Might
+                            <input
+                                    type="number"
+                                    name="system.aspects.might"
+                                    value="{{system.aspects.might}}"
+                            />
+                        </label>
 
-                    <label>
-                        Current Pursuit
-                        <input type="text" name="system.currentPursuit" value="{{system.currentPursuit}}" />
-                    </label>
+                        <label>
+                            Grace
+                            <input
+                                    type="number"
+                                    name="system.aspects.grace"
+                                    value="{{system.aspects.grace}}"
+                            />
+                        </label>
 
-                    <label>
-                        Characteristics
-                        <input type="text" name="system.characteristics" value="{{system.characteristics}}" />
-                    </label>
+                        <label>
+                            Speed
+                            <input
+                                    type="number"
+                                    name="system.aspects.speed"
+                                    value="{{system.aspects.speed}}"
+                            />
+                        </label>
+
+                        <label>
+                            Resilience
+                            <input
+                                    type="number"
+                                    name="system.aspects.resilience"
+                                    value="{{system.aspects.resilience}}"
+                            />
+                        </label>
+                    </div>
                 </div>
 
                 <div class="ttb-box">
-                    <h2>Aspects</h2>
+                    <h2>Mental Aspects</h2>
 
-                    <div class="ttb-grid two compact">
-                        <label>Might <input type="number" name="system.aspects.might" value="{{system.aspects.might}}" /></label>
-                        <label>Intellect <input type="number" name="system.aspects.intellect" value="{{system.aspects.intellect}}" /></label>
+                    <div class="ttb-overview-aspect-grid">
+                        <label>
+                            Intellect
+                            <input
+                                    type="number"
+                                    name="system.aspects.intellect"
+                                    value="{{system.aspects.intellect}}"
+                            />
+                        </label>
 
-                        <label>Grace <input type="number" name="system.aspects.grace" value="{{system.aspects.grace}}" /></label>
-                        <label>Charm <input type="number" name="system.aspects.charm" value="{{system.aspects.charm}}" /></label>
+                        <label>
+                            Charm
+                            <input
+                                    type="number"
+                                    name="system.aspects.charm"
+                                    value="{{system.aspects.charm}}"
+                            />
+                        </label>
 
-                        <label>Speed <input type="number" name="system.aspects.speed" value="{{system.aspects.speed}}" /></label>
-                        <label>Cunning <input type="number" name="system.aspects.cunning" value="{{system.aspects.cunning}}" /></label>
+                        <label>
+                            Cunning
+                            <input
+                                    type="number"
+                                    name="system.aspects.cunning"
+                                    value="{{system.aspects.cunning}}"
+                            />
+                        </label>
 
-                        <label>Resilience <input type="number" name="system.aspects.resilience" value="{{system.aspects.resilience}}" /></label>
-                        <label>Tenacity <input type="number" name="system.aspects.tenacity" value="{{system.aspects.tenacity}}" /></label>
+                        <label>
+                            Tenacity
+                            <input
+                                    type="number"
+                                    name="system.aspects.tenacity"
+                                    value="{{system.aspects.tenacity}}"
+                            />
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <section class="ttb-box">
+                <h2>Active Values</h2>
+
+                <div class="ttb-overview-active-values">
+                    <label class="ttb-overview-value">
+                        <span>Defense</span>
+                        <strong
+                                class="ttb-overview-calculated-value"
+                                data-tooltip="{{overview.defense.tooltip}}"
+                        >
+                            {{overview.defense.value}}
+                        </strong>
+                    </label>
+
+                    <label class="ttb-overview-value">
+                        <span>Willpower</span>
+                        <strong
+                                class="ttb-overview-calculated-value"
+                                data-tooltip="{{overview.willpower.tooltip}}"
+                        >
+                            {{overview.willpower.value}}
+                        </strong>
+                    </label>
+
+                    <label class="ttb-overview-value">
+                        <span>Initiative</span>
+                        <strong
+                                class="ttb-overview-calculated-value"
+                                data-tooltip="{{overview.initiative.tooltip}}"
+                        >
+                            {{overview.initiative.value}}
+                        </strong>
+                    </label>
+                </div>
+            </section>
+
+            <section class="ttb-grid two">
+                <div class="ttb-box">
+                    <h2>Wounds</h2>
+
+                    <div class="ttb-overview-wounds">
+                        <label>
+                            Current
+                            <input
+                                    type="number"
+                                    name="system.wounds.value"
+                                    value="{{system.wounds.value}}"
+                            />
+                        </label>
+
+                        <span class="ttb-overview-wounds__separator">
+                    /
+                </span>
+
+                        <label>
+                            Maximum
+                            <strong
+                                    class="ttb-overview-calculated-value"
+                                    data-tooltip="{{overview.wounds.tooltip}}"
+                            >
+                                {{overview.wounds.max}}
+                            </strong>
+                        </label>
                     </div>
                 </div>
 
-                <div class="ttb-box span-two">
-                    <h2>Derived Aspects</h2>
+                <div class="ttb-box">
+                    <h2>Movement</h2>
 
-                    <div class="ttb-grid four compact">
-                        <label>Defense <input type="text" name="system.derived.defense" value="{{system.derived.defense}}" /></label>
-                        <label>Armor <input type="text" name="system.derived.armor" value="{{system.derived.armor}}" /></label>
-                        <label>Willpower <input type="text" name="system.derived.willpower" value="{{system.derived.willpower}}" /></label>
-                        <label>Wounds <input type="text" name="system.derived.wounds" value="{{system.derived.wounds}}" /></label>
+                    <div class="ttb-overview-movement">
+                        <label>
+                            Walk
+                            <strong
+                                    class="ttb-overview-calculated-value"
+                                    data-tooltip="{{overview.walk.tooltip}}"
+                            >
+                                {{overview.walk.value}}
+                            </strong>
+                        </label>
 
-                        <label>Walk <input type="text" name="system.derived.walk" value="{{system.derived.walk}}" /></label>
-                        <label>Charge <input type="text" name="system.derived.charge" value="{{system.derived.charge}}" /></label>
-                        <label>Initiative <input type="text" name="system.derived.initiative" value="{{system.derived.initiative}}" /></label>
-                        <label>Height <input type="text" name="system.derived.height" value="{{system.derived.height}}" /></label>
+                        <label>
+                            Charge
+                            <strong
+                                    class="ttb-overview-calculated-value"
+                                    data-tooltip="{{overview.charge.tooltip}}"
+                            >
+                                {{overview.charge.value}}
+                            </strong>
+                        </label>
+
+                        <label>
+                            Height
+                            <strong
+                                    class="ttb-overview-calculated-value"
+                                    data-tooltip="{{overview.height.tooltip}}"
+                            >
+                                {{overview.height.value}}
+                            </strong>
+                        </label>
                     </div>
+                </div>
+            </section>
+
+            <section class="ttb-box ttb-overview-characteristics">
+                <h2>Characteristics</h2>
+
+                <div class="ttb-overview-characteristic-list">
+                    {{#each system.characteristics as |characteristic|}}
+                        <span class="ttb-overview-characteristic">
+                            {{characteristic}}
+                        </span>
+                    {{/each}}
                 </div>
             </section>
         </div>

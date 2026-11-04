@@ -30,14 +30,17 @@
     - 0.0.8.1.6 Added ability to add Triggers in the customize skill window.
     - 0.0.8.1.7 Added Skill Trigger creation, suit-requirement detection, and available-trigger display in chat.
     - 0.0.8.1.8 Creating initial Trigger Decleration/Resolve. Timing and autmatic effect are left out. 
+  - 0.0.8.2 Rework of the Main Tab as well as the consistent header. 
+  - 
 - 0.1.0  first usable table prototype
   
 
 # Untracked Tasks
 - improved charackter sheet.
   - Ability to pop out/Improve Talents.
-  - Skill modifier aggregation: Calculate each skill’s Misc modifier from its manual bonus plus talents, items, and effects. Preserve labeled source contributions for the Misc-column tooltip and use the same calculated total when starting conflicts.
   - Create/Update Fatedeck from Characktersheet.
+  - Display Defense/Willpower as well as Armor and Wounds in the combat tab. 
+  - Initiative flip
 
 
 # Untracked Ideas

@@ -656,3 +656,152 @@ tr:hover
 input[name="triggerName"] {
     text-align: left;
 }
+
+/* ----------------------------------------- */
+/* Character Sheet: Identity Header          */
+/* ----------------------------------------- */
+
+.ttb-character-sheet .ttb-header-fields {
+    display: grid;
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+    gap: 8px;
+    align-items: end;
+}
+
+.ttb-character-sheet .ttb-header-field--name {
+    grid-column: span 3;
+}
+
+.ttb-character-sheet .ttb-header-field--pursuit {
+    grid-column: span 2;
+}
+
+.ttb-character-sheet .ttb-header-owner {
+    grid-column: span 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 44px;
+    padding: 3px 8px;
+    border-left: 2px solid #5a4028;
+}
+
+.ttb-character-sheet .ttb-header-owner span {
+    font-size: 0.75rem;
+    font-weight: 700;
+    opacity: 0.7;
+}
+
+.ttb-character-sheet .ttb-header-owner strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ----------------------------------------- */
+/* Character Sheet: Overview                 */
+/* ----------------------------------------- */
+
+.ttb-character-sheet .ttb-overview-aspect-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.ttb-character-sheet .ttb-overview-active-values {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.ttb-character-sheet .ttb-overview-value {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr) 64px;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid #5a4028;
+    background: rgba(255, 250, 230, 0.42);
+}
+
+.ttb-character-sheet .ttb-overview-value input {
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.ttb-character-sheet .ttb-overview-wounds {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto
+        minmax(0, 1fr);
+    align-items: end;
+    gap: 10px;
+}
+
+.ttb-character-sheet
+.ttb-overview-wounds input {
+    text-align: center;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.ttb-character-sheet
+.ttb-overview-wounds__separator {
+    padding-bottom: 5px;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.ttb-character-sheet .ttb-overview-movement {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.ttb-character-sheet
+.ttb-overview-movement input {
+    text-align: center;
+    font-weight: 700;
+}
+
+.ttb-character-sheet
+.ttb-overview-characteristic-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.ttb-character-sheet
+.ttb-overview-characteristic {
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    padding: 3px 10px;
+    border: 1px solid #5a4028;
+    border-radius: 999px;
+    background: #2b1a12;
+    color: #e8d49f;
+    font-weight: 700;
+}
+
+.ttb-character-sheet
+.ttb-overview-calculated-value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-height: 32px;
+    padding: 4px 8px;
+    border: 1px solid #5a4028;
+    border-radius: 3px;
+    background: rgba(255, 250, 230, 0.65);
+    font-size: 1.1rem;
+    cursor: help;
+}
