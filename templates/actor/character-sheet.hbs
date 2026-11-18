@@ -12,6 +12,7 @@
         <div class="ttb-header-fields">
             <label class="ttb-header-field--name">
                 Fated Name
+
                 <input
                         type="text"
                         name="name"
@@ -26,6 +27,7 @@
 
             <label class="ttb-header-field--pursuit">
                 Current Pursuit
+
                 <input
                         type="text"
                         name="system.currentPursuit"
@@ -35,6 +37,7 @@
 
             <label>
                 Station
+
                 <input
                         type="text"
                         name="system.station"
@@ -44,6 +47,7 @@
 
             <label>
                 Experience
+
                 <input
                         type="number"
                         min="0"
@@ -54,6 +58,7 @@
 
             <label>
                 Destiny Steps
+
                 <input
                         type="number"
                         min="0"
@@ -86,6 +91,7 @@
                     <div class="ttb-overview-aspect-grid">
                         <label>
                             Might
+
                             <input
                                     type="number"
                                     name="system.aspects.might"
@@ -95,6 +101,7 @@
 
                         <label>
                             Grace
+
                             <input
                                     type="number"
                                     name="system.aspects.grace"
@@ -104,6 +111,7 @@
 
                         <label>
                             Speed
+
                             <input
                                     type="number"
                                     name="system.aspects.speed"
@@ -113,6 +121,7 @@
 
                         <label>
                             Resilience
+
                             <input
                                     type="number"
                                     name="system.aspects.resilience"
@@ -128,6 +137,7 @@
                     <div class="ttb-overview-aspect-grid">
                         <label>
                             Intellect
+
                             <input
                                     type="number"
                                     name="system.aspects.intellect"
@@ -137,6 +147,7 @@
 
                         <label>
                             Charm
+
                             <input
                                     type="number"
                                     name="system.aspects.charm"
@@ -146,6 +157,7 @@
 
                         <label>
                             Cunning
+
                             <input
                                     type="number"
                                     name="system.aspects.cunning"
@@ -155,6 +167,7 @@
 
                         <label>
                             Tenacity
+
                             <input
                                     type="number"
                                     name="system.aspects.tenacity"
@@ -169,35 +182,80 @@
                 <h2>Active Values</h2>
 
                 <div class="ttb-overview-active-values">
-                    <label class="ttb-overview-value">
-                        <span>Defense</span>
+                    <div class="ttb-overview-value">
+                        <span class="ttb-overview-stat-heading">
+                            <span>Defense</span>
+
+                            {{#if editable}}
+                                <button
+                                        type="button"
+                                        class="ttb-overview-modifier-button"
+                                        data-overview-modifier="defense"
+                                        title="Modify Defense"
+                                        aria-label="Modify Defense"
+                                >
+                                    <i class="fas fa-gear"></i>
+                                </button>
+                            {{/if}}
+                        </span>
+
                         <strong
                                 class="ttb-overview-calculated-value"
                                 data-tooltip="{{overview.defense.tooltip}}"
                         >
                             {{overview.defense.value}}
                         </strong>
-                    </label>
+                    </div>
 
-                    <label class="ttb-overview-value">
-                        <span>Willpower</span>
+                    <div class="ttb-overview-value">
+                        <span class="ttb-overview-stat-heading">
+                            <span>Willpower</span>
+
+                            {{#if editable}}
+                                <button
+                                        type="button"
+                                        class="ttb-overview-modifier-button"
+                                        data-overview-modifier="willpower"
+                                        title="Modify Willpower"
+                                        aria-label="Modify Willpower"
+                                >
+                                    <i class="fas fa-gear"></i>
+                                </button>
+                            {{/if}}
+                        </span>
+
                         <strong
                                 class="ttb-overview-calculated-value"
                                 data-tooltip="{{overview.willpower.tooltip}}"
                         >
                             {{overview.willpower.value}}
                         </strong>
-                    </label>
+                    </div>
 
-                    <label class="ttb-overview-value">
-                        <span>Initiative</span>
+                    <div class="ttb-overview-value">
+                        <span class="ttb-overview-stat-heading">
+                            <span>Initiative</span>
+
+                            {{#if editable}}
+                                <button
+                                        type="button"
+                                        class="ttb-overview-modifier-button"
+                                        data-overview-modifier="initiative"
+                                        title="Modify Initiative"
+                                        aria-label="Modify Initiative"
+                                >
+                                    <i class="fas fa-gear"></i>
+                                </button>
+                            {{/if}}
+                        </span>
+
                         <strong
                                 class="ttb-overview-calculated-value"
                                 data-tooltip="{{overview.initiative.tooltip}}"
                         >
                             {{overview.initiative.value}}
                         </strong>
-                    </label>
+                    </div>
                 </div>
             </section>
 
@@ -208,6 +266,7 @@
                     <div class="ttb-overview-wounds">
                         <label>
                             Current
+
                             <input
                                     type="number"
                                     name="system.wounds.value"
@@ -216,11 +275,26 @@
                         </label>
 
                         <span class="ttb-overview-wounds__separator">
-                    /
-                </span>
+                            /
+                        </span>
 
                         <label>
-                            Maximum
+                            <span class="ttb-overview-stat-heading">
+                                <span>Maximum</span>
+
+                                {{#if editable}}
+                                    <button
+                                            type="button"
+                                            class="ttb-overview-modifier-button"
+                                            data-overview-modifier="wounds"
+                                            title="Modify Maximum Wounds"
+                                            aria-label="Modify Maximum Wounds"
+                                    >
+                                        <i class="fas fa-gear"></i>
+                                    </button>
+                                {{/if}}
+                            </span>
+
                             <strong
                                     class="ttb-overview-calculated-value"
                                     data-tooltip="{{overview.wounds.tooltip}}"
@@ -236,7 +310,22 @@
 
                     <div class="ttb-overview-movement">
                         <label>
-                            Walk
+                            <span class="ttb-overview-stat-heading">
+                                <span>Walk</span>
+
+                                {{#if editable}}
+                                    <button
+                                            type="button"
+                                            class="ttb-overview-modifier-button"
+                                            data-overview-modifier="walk"
+                                            title="Modify Walk"
+                                            aria-label="Modify Walk"
+                                    >
+                                        <i class="fas fa-gear"></i>
+                                    </button>
+                                {{/if}}
+                            </span>
+
                             <strong
                                     class="ttb-overview-calculated-value"
                                     data-tooltip="{{overview.walk.tooltip}}"
@@ -246,7 +335,22 @@
                         </label>
 
                         <label>
-                            Charge
+                            <span class="ttb-overview-stat-heading">
+                                <span>Charge</span>
+
+                                {{#if editable}}
+                                    <button
+                                            type="button"
+                                            class="ttb-overview-modifier-button"
+                                            data-overview-modifier="charge"
+                                            title="Modify Charge"
+                                            aria-label="Modify Charge"
+                                    >
+                                        <i class="fas fa-gear"></i>
+                                    </button>
+                                {{/if}}
+                            </span>
+
                             <strong
                                     class="ttb-overview-calculated-value"
                                     data-tooltip="{{overview.charge.tooltip}}"
@@ -256,7 +360,22 @@
                         </label>
 
                         <label>
-                            Height
+                            <span class="ttb-overview-stat-heading">
+                                <span>Height</span>
+
+                                {{#if editable}}
+                                    <button
+                                            type="button"
+                                            class="ttb-overview-modifier-button"
+                                            data-overview-modifier="height"
+                                            title="Modify Height"
+                                            aria-label="Modify Height"
+                                    >
+                                        <i class="fas fa-gear"></i>
+                                    </button>
+                                {{/if}}
+                            </span>
+
                             <strong
                                     class="ttb-overview-calculated-value"
                                     data-tooltip="{{overview.height.tooltip}}"
@@ -269,13 +388,44 @@
             </section>
 
             <section class="ttb-box ttb-overview-characteristics">
-                <h2>Characteristics</h2>
+                <div class="ttb-characteristics-heading">
+                    <h2>Characteristics</h2>
+
+                    {{#if editable}}
+                        <button
+                                type="button"
+                                class="ttb-characteristic-add-button"
+                                data-action="add-characteristic"
+                                title="Add Characteristic"
+                        >
+                            <i class="fas fa-plus"></i>
+                            <span>Add</span>
+                        </button>
+                    {{/if}}
+                </div>
 
                 <div class="ttb-overview-characteristic-list">
-                    {{#each system.characteristics as |characteristic|}}
+                    {{#each characteristics as |characteristic|}}
                         <span class="ttb-overview-characteristic">
-                            {{characteristic}}
-                        </span>
+                <span>{{characteristic}}</span>
+
+                            {{#if @root.editable}}
+                                <button
+                                        type="button"
+                                        class="ttb-characteristic-remove-button"
+                                        data-action="remove-characteristic"
+                                        data-characteristic-index="{{@index}}"
+                                        title="Remove {{characteristic}}"
+                                        aria-label="Remove {{characteristic}}"
+                                >
+                        ×
+                    </button>
+                            {{/if}}
+            </span>
+                    {{else}}
+                        <span class="ttb-characteristics-empty">
+                No Characteristics
+            </span>
                     {{/each}}
                 </div>
             </section>
@@ -299,9 +449,9 @@
                                     open
                             >
                                 <summary class="ttb-skill-group-heading">
-                            <span class="ttb-skill-group-title">
-                                {{group.label}} Skills
-                            </span>
+                                    <span class="ttb-skill-group-title">
+                                        {{group.label}} Skills
+                                    </span>
 
                                     <button
                                             type="button"
@@ -430,12 +580,14 @@
                                                             data-skill-id="{{skill.data.id}}"
                                                             title="Test {{skill.data.name}}"
                                                     >
-                                                    <span
-                                                            class="ttb-skill-test-icon"
-                                                            aria-hidden="true"
-                                                    ></span>
+                                                        <span
+                                                                class="ttb-skill-test-icon"
+                                                                aria-hidden="true"
+                                                        ></span>
 
-                                                        <span>{{skill.data.name}}</span>
+                                                        <span>
+                                                            {{skill.data.name}}
+                                                        </span>
                                                     </button>
 
                                                     {{#if @root.editable}}
@@ -451,7 +603,6 @@
                                                         </button>
                                                     {{/if}}
                                                 </div>
-
                                             </td>
 
                                             <td class="ttb-skill-rating">
@@ -465,8 +616,6 @@
                                                         aria-label="{{skill.data.name}} Rank"
                                                 />
                                             </td>
-
-
 
                                             <td
                                                     class="ttb-skill-aspect"
@@ -502,35 +651,119 @@
             </div>
         </div>
 
-        <div class="tab" data-group="primary" data-tab="combat">
+        <div
+                class="tab"
+                data-group="primary"
+                data-tab="combat"
+        >
             {{#each rows.attacks as |row|}}
                 <div class="ttb-box attack-block">
                     <h2>Attack</h2>
 
                     <div class="ttb-grid four compact">
-                        <label>Name <input type="text" name="system.attacks.{{row.index}}.name" value="{{row.data.name}}" /></label>
-                        <label>AV <input type="text" name="system.attacks.{{row.index}}.av" value="{{row.data.av}}" /></label>
-                        <label>Range <input type="text" name="system.attacks.{{row.index}}.range" value="{{row.data.range}}" /></label>
-                        <label>Damage <input type="text" name="system.attacks.{{row.index}}.damage" value="{{row.data.damage}}" /></label>
+                        <label>
+                            Name
 
-                        <label>Special <input type="text" name="system.attacks.{{row.index}}.special" value="{{row.data.special}}" /></label>
-                        <label>Capacity <input type="text" name="system.attacks.{{row.index}}.capacity" value="{{row.data.capacity}}" /></label>
-                        <label>Reload <input type="text" name="system.attacks.{{row.index}}.reload" value="{{row.data.reload}}" /></label>
-                        <label>TN <input type="text" name="system.attacks.{{row.index}}.tn" value="{{row.data.tn}}" /></label>
+                            <input
+                                    type="text"
+                                    name="system.attacks.{{row.index}}.name"
+                                    value="{{row.data.name}}"
+                            />
+                        </label>
+
+                        <label>
+                            AV
+
+                            <input
+                                    type="text"
+                                    name="system.attacks.{{row.index}}.av"
+                                    value="{{row.data.av}}"
+                            />
+                        </label>
+
+                        <label>
+                            Range
+
+                            <input
+                                    type="text"
+                                    name="system.attacks.{{row.index}}.range"
+                                    value="{{row.data.range}}"
+                            />
+                        </label>
+
+                        <label>
+                            Damage
+
+                            <input
+                                    type="text"
+                                    name="system.attacks.{{row.index}}.damage"
+                                    value="{{row.data.damage}}"
+                            />
+                        </label>
+
+                        <label>
+                            Special
+
+                            <input
+                                    type="text"
+                                    name="system.attacks.{{row.index}}.special"
+                                    value="{{row.data.special}}"
+                            />
+                        </label>
+
+                        <label>
+                            Capacity
+
+                            <input
+                                    type="text"
+                                    name="system.attacks.{{row.index}}.capacity"
+                                    value="{{row.data.capacity}}"
+                            />
+                        </label>
+
+                        <label>
+                            Reload
+
+                            <input
+                                    type="text"
+                                    name="system.attacks.{{row.index}}.reload"
+                                    value="{{row.data.reload}}"
+                            />
+                        </label>
+
+                        <label>
+                            TN
+
+                            <input
+                                    type="text"
+                                    name="system.attacks.{{row.index}}.tn"
+                                    value="{{row.data.tn}}"
+                            />
+                        </label>
                     </div>
 
                     <label>
                         Triggers
-                        <textarea name="system.attacks.{{row.index}}.triggers">{{row.data.triggers}}</textarea>
+
+                        <textarea
+                                name="system.attacks.{{row.index}}.triggers"
+                        >{{row.data.triggers}}</textarea>
                     </label>
                 </div>
             {{/each}}
         </div>
 
-        <div class="tab" data-group="primary" data-tab="notes">
+        <div
+                class="tab"
+                data-group="primary"
+                data-tab="notes"
+        >
             <section class="ttb-grid two">
                 <div class="ttb-box">
-                    <h2>Talents / Manifested Powers / Magical Theories</h2>
+                    <h2>
+                        Talents / Manifested Powers /
+                        Magical Theories
+                    </h2>
 
                     <table class="ttb-table">
                         <thead>
@@ -539,11 +772,25 @@
                             <th>Description</th>
                         </tr>
                         </thead>
+
                         <tbody>
                         {{#each rows.talents as |row|}}
                             <tr>
-                                <td><input type="text" name="system.talents.{{row.index}}.name" value="{{row.data.name}}" /></td>
-                                <td><input type="text" name="system.talents.{{row.index}}.description" value="{{row.data.description}}" /></td>
+                                <td>
+                                    <input
+                                            type="text"
+                                            name="system.talents.{{row.index}}.name"
+                                            value="{{row.data.name}}"
+                                    />
+                                </td>
+
+                                <td>
+                                    <input
+                                            type="text"
+                                            name="system.talents.{{row.index}}.description"
+                                            value="{{row.data.description}}"
+                                    />
+                                </td>
                             </tr>
                         {{/each}}
                         </tbody>
@@ -560,11 +807,25 @@
                             <th>Notes</th>
                         </tr>
                         </thead>
+
                         <tbody>
                         {{#each rows.equipment as |row|}}
                             <tr>
-                                <td><input type="text" name="system.equipment.{{row.index}}.name" value="{{row.data.name}}" /></td>
-                                <td><input type="text" name="system.equipment.{{row.index}}.notes" value="{{row.data.notes}}" /></td>
+                                <td>
+                                    <input
+                                            type="text"
+                                            name="system.equipment.{{row.index}}.name"
+                                            value="{{row.data.name}}"
+                                    />
+                                </td>
+
+                                <td>
+                                    <input
+                                            type="text"
+                                            name="system.equipment.{{row.index}}.notes"
+                                            value="{{row.data.notes}}"
+                                    />
+                                </td>
                             </tr>
                         {{/each}}
                         </tbody>
@@ -572,40 +833,79 @@
 
                     <label>
                         Scrip
-                        <input type="text" name="system.scrip" value="{{system.scrip}}" />
+
+                        <input
+                                type="text"
+                                name="system.scrip"
+                                value="{{system.scrip}}"
+                        />
                     </label>
 
                     <h2>Grimoire</h2>
 
                     <label>
                         Magia
-                        <textarea name="system.grimoire.magia">{{system.grimoire.magia}}</textarea>
+
+                        <textarea
+                                name="system.grimoire.magia"
+                        >{{system.grimoire.magia}}</textarea>
                     </label>
 
                     <label>
                         Immuto
-                        <textarea name="system.grimoire.immuto">{{system.grimoire.immuto}}</textarea>
+
+                        <textarea
+                                name="system.grimoire.immuto"
+                        >{{system.grimoire.immuto}}</textarea>
                     </label>
 
                     <label>
                         Special
-                        <textarea name="system.grimoire.special">{{system.grimoire.special}}</textarea>
+
+                        <textarea
+                                name="system.grimoire.special"
+                        >{{system.grimoire.special}}</textarea>
                     </label>
                 </div>
             </section>
         </div>
 
-        <div class="tab" data-group="primary" data-tab="destiny">
+        <div
+                class="tab"
+                data-group="primary"
+                data-tab="destiny"
+        >
             <section class="ttb-grid two">
                 <div class="ttb-box">
                     <h2>Destiny</h2>
 
                     {{#each rows.destiny as |row|}}
                         <div class="destiny-row">
-                            <input type="text" name="system.destiny.{{row.index}}.label" value="{{row.data.label}}" />
-                            <input type="text" name="system.destiny.{{row.index}}.text" value="{{row.data.text}}" placeholder="Destiny text" />
-                            <input type="text" name="system.destiny.{{row.index}}.card" value="{{row.data.card}}" placeholder="Card" />
-                            <input type="checkbox" name="system.destiny.{{row.index}}.checked" {{checked row.data.checked}} />
+                            <input
+                                    type="text"
+                                    name="system.destiny.{{row.index}}.label"
+                                    value="{{row.data.label}}"
+                            />
+
+                            <input
+                                    type="text"
+                                    name="system.destiny.{{row.index}}.text"
+                                    value="{{row.data.text}}"
+                                    placeholder="Destiny text"
+                            />
+
+                            <input
+                                    type="text"
+                                    name="system.destiny.{{row.index}}.card"
+                                    value="{{row.data.card}}"
+                                    placeholder="Card"
+                            />
+
+                            <input
+                                    type="checkbox"
+                                    name="system.destiny.{{row.index}}.checked"
+                                {{checked row.data.checked}}
+                            />
                         </div>
                     {{/each}}
                 </div>
@@ -614,10 +914,45 @@
                     <h2>Twist Deck</h2>
 
                     <div class="ttb-grid two compact">
-                        <label>Masks <input type="text" name="system.twistDeck.masks" value="{{system.twistDeck.masks}}" /></label>
-                        <label>Tomes <input type="text" name="system.twistDeck.tomes" value="{{system.twistDeck.tomes}}" /></label>
-                        <label>Rams <input type="text" name="system.twistDeck.rams" value="{{system.twistDeck.rams}}" /></label>
-                        <label>Crows <input type="text" name="system.twistDeck.crows" value="{{system.twistDeck.crows}}" /></label>
+                        <label>
+                            Masks
+
+                            <input
+                                    type="text"
+                                    name="system.twistDeck.masks"
+                                    value="{{system.twistDeck.masks}}"
+                            />
+                        </label>
+
+                        <label>
+                            Tomes
+
+                            <input
+                                    type="text"
+                                    name="system.twistDeck.tomes"
+                                    value="{{system.twistDeck.tomes}}"
+                            />
+                        </label>
+
+                        <label>
+                            Rams
+
+                            <input
+                                    type="text"
+                                    name="system.twistDeck.rams"
+                                    value="{{system.twistDeck.rams}}"
+                            />
+                        </label>
+
+                        <label>
+                            Crows
+
+                            <input
+                                    type="text"
+                                    name="system.twistDeck.crows"
+                                    value="{{system.twistDeck.crows}}"
+                            />
+                        </label>
                     </div>
                 </div>
             </section>

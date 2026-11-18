@@ -126,8 +126,8 @@ function finishCalculation({
         manual === 0
             ? ""
             : manual > 0
-                ? ` + Manual ${manual}`
-                : ` - Manual ${Math.abs(manual)}`;
+                ? ` + Misc. ${manual}`
+                : ` - Misc. ${Math.abs(manual)}`;
 
     return {
         value,

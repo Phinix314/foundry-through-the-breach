@@ -31,13 +31,13 @@
     - 0.0.8.1.7 Added Skill Trigger creation, suit-requirement detection, and available-trigger display in chat.
     - 0.0.8.1.8 Creating initial Trigger Decleration/Resolve. Timing and autmatic effect are left out. 
   - 0.0.8.2 Rework of the Main Tab as well as the consistent header. 
-  - 
+    - 0.0.8.2.1 Adding the creation of characteristics as tags to the characters 
 - 0.1.0  first usable table prototype
   
 
 # Untracked Tasks
 - improved charackter sheet.
-  - Ability to pop out/Improve Talents.
+  - Ability to pop out/Improve Talents. 
   - Create/Update Fatedeck from Characktersheet.
   - Display Defense/Willpower as well as Armor and Wounds in the combat tab. 
   - Initiative flip

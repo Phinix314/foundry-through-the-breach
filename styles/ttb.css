@@ -72,6 +72,83 @@
     background: #5a321f;
 }
 
+.ttb-character-sheet
+.ttb-characteristics-heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #3a2618;
+}
+
+.ttb-character-sheet
+.ttb-characteristics-heading h2 {
+    flex: 1;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.ttb-character-sheet
+.ttb-characteristic-add-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: auto;
+    height: 24px;
+    min-height: 24px;
+    margin: 0;
+    padding: 2px 7px;
+    font-size: 0.72rem;
+    line-height: 1;
+}
+
+.ttb-character-sheet
+.ttb-overview-characteristic {
+    gap: 6px;
+}
+
+.ttb-character-sheet
+.ttb-characteristic-remove-button {
+    width: 16px;
+    height: 16px;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    color: inherit;
+    font-size: 1rem;
+    line-height: 1;
+    opacity: 0.65;
+}
+
+.ttb-character-sheet
+.ttb-characteristic-remove-button:hover {
+    color: #ff8b7c;
+    opacity: 1;
+}
+
+.ttb-character-sheet
+.ttb-characteristics-empty {
+    font-size: 0.85rem;
+    font-style: italic;
+    opacity: 0.65;
+}
+
+.ttb-add-characteristic-dialog label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.ttb-add-characteristic-dialog input {
+    width: 100%;
+}
+
 .ttb-grid {
     display: grid;
     gap: 12px;

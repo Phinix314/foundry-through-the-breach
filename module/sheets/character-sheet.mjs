@@ -14,6 +14,11 @@ import {
     openSkillCustomizationDialog
 } from "../ui/skill-customization-dialog.mjs";
 
+import {
+    openOverviewModifierDialog,
+    openAddCharacteristicDialog
+} from "../ui/overview-customization-dialog.mjs";
+
 const SYSTEM_ID = "through-the-breach";
 
 const ActorSheetV1 =
@@ -49,6 +54,18 @@ const SKILL_COLUMN_LAYOUT = [
         ]
     }
 ];
+
+function prepareCharacteristics(characteristics) {
+    if (!Array.isArray(characteristics)) {
+        return [];
+    }
+
+    return characteristics
+        .map(characteristic =>
+            String(characteristic ?? "").trim()
+        )
+        .filter(Boolean);
+}
 
 function rowData(array, count, fallback = {}) {
     return Array.from({length: count}, (_, index) => ({
@@ -191,6 +208,11 @@ export class TTBCharacterSheet extends ActorSheetV1 {
                 system
             );
 
+        context.characteristics =
+            prepareCharacteristics(
+                system.characteristics
+            );
+
         const controllingUsers =
             game.users.filter(
                 user =>
@@ -231,6 +253,189 @@ export class TTBCharacterSheet extends ActorSheetV1 {
         console.log("TTB | getData done", context);
 
         return context;
+    }
+
+    async _onCustomizeOverview(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const modifierId =
+            event.currentTarget.dataset
+                .overviewModifier;
+
+        const system =
+            this.actor.system;
+
+        const configurations = {
+            defense: {
+                label: "Defense",
+                path:
+                    "system.activeValues.defense.manualModifier",
+                value:
+                system.activeValues
+                    ?.defense
+                    ?.manualModifier
+            },
+
+            willpower: {
+                label: "Willpower",
+                path:
+                    "system.activeValues.willpower.manualModifier",
+                value:
+                system.activeValues
+                    ?.willpower
+                    ?.manualModifier
+            },
+
+            initiative: {
+                label: "Initiative",
+                path:
+                    "system.activeValues.initiative.manualModifier",
+                value:
+                system.activeValues
+                    ?.initiative
+                    ?.manualModifier
+            },
+
+            wounds: {
+                label: "Maximum Wounds",
+                path:
+                    "system.wounds.manualMaximumModifier",
+                value:
+                system.wounds
+                    ?.manualMaximumModifier
+            },
+
+            walk: {
+                label: "Walk",
+                path:
+                    "system.movement.walk.manualModifier",
+                value:
+                system.movement
+                    ?.walk
+                    ?.manualModifier
+            },
+
+            charge: {
+                label: "Charge",
+                path:
+                    "system.movement.charge.manualModifier",
+                value:
+                system.movement
+                    ?.charge
+                    ?.manualModifier
+            },
+
+            height: {
+                label: "Height",
+                path:
+                    "system.movement.height.manualModifier",
+                value:
+                system.movement
+                    ?.height
+                    ?.manualModifier
+            }
+        };
+
+        const configuration =
+            configurations[modifierId];
+
+        if (!configuration) {
+            ui.notifications.error(
+                `Unknown calculated value: ${modifierId}`
+            );
+            return;
+        }
+
+        const modifier =
+            await openOverviewModifierDialog({
+                label: configuration.label,
+                value: configuration.value
+            });
+
+        if (
+            modifier === null ||
+            modifier === undefined
+        ) {
+            return;
+        }
+
+        await this.actor.update({
+            [configuration.path]: modifier
+        });
+    }
+
+    async _onAddCharacteristic(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const characteristic =
+            await openAddCharacteristicDialog();
+
+        if (!characteristic) {
+            return;
+        }
+
+        const characteristics =
+            prepareCharacteristics(
+                this.actor.system.characteristics
+            );
+
+        const alreadyExists =
+            characteristics.some(
+                existing =>
+                    existing.toLocaleLowerCase() ===
+                    characteristic.toLocaleLowerCase()
+            );
+
+        if (alreadyExists) {
+            ui.notifications.warn(
+                `${characteristic} is already present.`
+            );
+            return;
+        }
+
+        await this.actor.update({
+            "system.characteristics": [
+                ...characteristics,
+                characteristic
+            ]
+        });
+    }
+
+    async _onRemoveCharacteristic(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const index =
+            Number.parseInt(
+                event.currentTarget.dataset
+                    .characteristicIndex,
+                10
+            );
+
+        const characteristics =
+            prepareCharacteristics(
+                this.actor.system.characteristics
+            );
+
+        if (
+            !Number.isInteger(index) ||
+            index < 0 ||
+            index >= characteristics.length
+        ) {
+            ui.notifications.error(
+                "Characteristic could not be found."
+            );
+            return;
+        }
+
+        characteristics.splice(index, 1);
+
+        await this.actor.update({
+            "system.characteristics":
+            characteristics
+        });
     }
 
     async _onCustomizeSkill(event) {
@@ -433,6 +638,18 @@ export class TTBCharacterSheet extends ActorSheetV1 {
                 );
             });
 
+        root
+            .querySelectorAll(
+                "[data-overview-modifier]"
+            )
+            .forEach((button) => {
+                button.addEventListener(
+                    "click",
+                    event =>
+                        this._onCustomizeOverview(event)
+                );
+            });
+
         this.collapsedSkillCategories ??=
             new Set();
 
@@ -465,6 +682,28 @@ export class TTBCharacterSheet extends ActorSheetV1 {
                                 .add(category);
                         }
                     }
+                );
+            });
+
+        root
+            .querySelector(
+                '[data-action="add-characteristic"]'
+            )
+            ?.addEventListener(
+                "click",
+                event =>
+                    this._onAddCharacteristic(event)
+            );
+
+        root
+            .querySelectorAll(
+                '[data-action="remove-characteristic"]'
+            )
+            .forEach((button) => {
+                button.addEventListener(
+                    "click",
+                    event =>
+                        this._onRemoveCharacteristic(event)
                 );
             });
 
