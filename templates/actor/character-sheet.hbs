@@ -268,9 +268,13 @@
                             Current
 
                             <input
-                                    type="number"
-                                    name="system.wounds.value"
+                                    type="text"
+                                    inputmode="numeric"
+                                    class="ttb-wounds-current-input"
+                                    data-wounds-current
                                     value="{{system.wounds.value}}"
+                                    title="Enter a value, +healing, or -damage"
+                                    aria-label="Current Wounds"
                             />
                         </label>
 
@@ -656,7 +660,162 @@
                 data-group="primary"
                 data-tab="combat"
         >
+            <section class="ttb-box">
+                <h2>Combat Values</h2>
+
+                <div class="ttb-combat-values">
+                    <div class="ttb-combat-value">
+                <span class="ttb-overview-stat-heading">
+                    <span>Defense</span>
+
+                    {{#if editable}}
+                        <button
+                                type="button"
+                                class="ttb-overview-modifier-button"
+                                data-overview-modifier="defense"
+                                title="Modify Defense"
+                                aria-label="Modify Defense"
+                        >
+                            <i class="fas fa-gear"></i>
+                        </button>
+                    {{/if}}
+                </span>
+
+                        <strong
+                                class="ttb-overview-calculated-value"
+                                data-tooltip="{{overview.defense.tooltip}}"
+                        >
+                            {{overview.defense.value}}
+                        </strong>
+                    </div>
+
+                    <div class="ttb-combat-value">
+                <span class="ttb-overview-stat-heading">
+                    <span>Willpower</span>
+
+                    {{#if editable}}
+                        <button
+                                type="button"
+                                class="ttb-overview-modifier-button"
+                                data-overview-modifier="willpower"
+                                title="Modify Willpower"
+                                aria-label="Modify Willpower"
+                        >
+                            <i class="fas fa-gear"></i>
+                        </button>
+                    {{/if}}
+                </span>
+
+                        <strong
+                                class="ttb-overview-calculated-value"
+                                data-tooltip="{{overview.willpower.tooltip}}"
+                        >
+                            {{overview.willpower.value}}
+                        </strong>
+                    </div>
+
+                    <div class="ttb-combat-value">
+                <span class="ttb-overview-stat-heading">
+                    <span>Initiative</span>
+
+                    {{#if editable}}
+                        <button
+                                type="button"
+                                class="ttb-overview-modifier-button"
+                                data-overview-modifier="initiative"
+                                title="Modify Initiative"
+                                aria-label="Modify Initiative"
+                        >
+                            <i class="fas fa-gear"></i>
+                        </button>
+                    {{/if}}
+                </span>
+
+                        <strong
+                                class="ttb-overview-calculated-value"
+                                data-tooltip="{{overview.initiative.tooltip}}"
+                        >
+                            {{overview.initiative.value}}
+                        </strong>
+                    </div>
+
+                    <div class="ttb-combat-value">
+                <span class="ttb-overview-stat-heading">
+                    <span>Wounds</span>
+
+                    {{#if editable}}
+                        <button
+                                type="button"
+                                class="ttb-overview-modifier-button"
+                                data-overview-modifier="wounds"
+                                title="Modify Maximum Wounds"
+                                aria-label="Modify Maximum Wounds"
+                        >
+                            <i class="fas fa-gear"></i>
+                        </button>
+                    {{/if}}
+                </span>
+
+                        <div class="ttb-combat-wounds">
+                            <button
+                                    type="button"
+                                    class="ttb-wounds-adjust-button"
+                                    data-wounds-delta="-1"
+                                    title="Suffer 1 damage"
+                                    aria-label="Suffer 1 damage"
+                            >
+                                <i class="fas fa-minus"></i>
+                            </button>
+
+                            <div class="ttb-combat-wounds__values">
+                                <input
+                                        type="number"
+                                        class="ttb-combat-wounds__current"
+                                        data-wounds-current
+                                        value="{{system.wounds.value}}"
+                                        max="{{overview.wounds.max}}"
+                                        title="Current Wounds"
+                                        aria-label="Current Wounds"
+                                />
+
+                                <span>/</span>
+
+                                <strong
+                                        data-tooltip="{{overview.wounds.tooltip}}"
+                                >
+                                    {{overview.wounds.max}}
+                                </strong>
+                            </div>
+
+                            <button
+                                    type="button"
+                                    class="ttb-wounds-adjust-button"
+                                    data-wounds-delta="1"
+                                    title="Heal 1 Wound"
+                                    aria-label="Heal 1 Wound"
+                            >
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <label class="ttb-combat-value">
+                        <span>Armor</span>
+
+                        <input
+                                type="number"
+                                name="system.armor.value"
+                                value="{{system.armor.value}}"
+                                min="0"
+                                max="3"
+                                step="1"
+                        />
+                    </label>
+                </div>
+            </section>
+
             {{#each rows.attacks as |row|}}
+
                 <div class="ttb-box attack-block">
                     <h2>Attack</h2>
 

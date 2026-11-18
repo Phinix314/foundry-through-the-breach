@@ -255,6 +255,117 @@ export class TTBCharacterSheet extends ActorSheetV1 {
         return context;
     }
 
+    async _setCurrentWounds(value) {
+        const requestedValue =
+            Number.parseInt(value, 10);
+
+        if (!Number.isFinite(requestedValue)) {
+            ui.notifications.warn(
+                "Current Wounds must be a number."
+            );
+            return;
+        }
+
+        const maximumWounds =
+            Number(
+                this.actor.system.wounds?.max ??
+                requestedValue
+            );
+
+        const nextValue =
+            Math.min(
+                requestedValue,
+                maximumWounds
+            );
+
+        await this.actor.update({
+            "system.wounds.value": nextValue
+        });
+    }
+
+    async _onAdjustWounds(event) {
+        event.preventDefault();
+
+        const delta =
+            Number.parseInt(
+                event.currentTarget.dataset
+                    .woundsDelta,
+                10
+            );
+
+        if (!Number.isFinite(delta)) {
+            return;
+        }
+
+        const currentValue =
+            Number(
+                this.actor.system.wounds?.value ??
+                0
+            );
+
+        await this._setCurrentWounds(
+            currentValue + delta
+        );
+    }
+
+    async _onSetCurrentWounds(event) {
+        const input =
+            event.currentTarget;
+
+        const enteredValue =
+            String(input.value ?? "").trim();
+
+        const currentValue =
+            Number(
+                this.actor.system.wounds?.value ??
+                0
+            );
+
+        let nextValue;
+
+        /*
+         * +2 or -2 modifies the current value.
+         */
+        if (/^[+-]\d+$/.test(enteredValue)) {
+            nextValue =
+                currentValue +
+                Number(enteredValue);
+        }
+
+        /*
+         * =2 or =-2 explicitly sets the value.
+         */
+        else if (/^=[+-]?\d+$/.test(enteredValue)) {
+            nextValue =
+                Number(
+                    enteredValue.slice(1)
+                );
+        }
+
+        /*
+         * A normal positive number sets the value.
+         */
+        else if (/^\d+$/.test(enteredValue)) {
+            nextValue =
+                Number(enteredValue);
+        }
+
+        else {
+            ui.notifications.warn(
+                "Enter a number, +healing, or -damage."
+            );
+
+            input.value =
+                String(currentValue);
+
+            return;
+        }
+
+        await this._setCurrentWounds(
+            nextValue
+        );
+    }
+
     async _onCustomizeOverview(event) {
         event.preventDefault();
         event.stopPropagation();
@@ -647,6 +758,48 @@ export class TTBCharacterSheet extends ActorSheetV1 {
                     "click",
                     event =>
                         this._onCustomizeOverview(event)
+                );
+            });
+
+        root
+            .querySelectorAll(
+                "[data-wounds-delta]"
+            )
+            .forEach((button) => {
+                button.addEventListener(
+                    "click",
+                    event =>
+                        this._onAdjustWounds(event)
+                );
+            });
+
+        root
+            .querySelectorAll(
+                "[data-wounds-current]"
+            )
+            .forEach((input) => {
+                input.addEventListener(
+                    "focus",
+                    event =>
+                        event.currentTarget.select()
+                );
+
+                input.addEventListener(
+                    "change",
+                    event =>
+                        this._onSetCurrentWounds(event)
+                );
+
+                input.addEventListener(
+                    "keydown",
+                    event => {
+                        if (event.key !== "Enter") {
+                            return;
+                        }
+
+                        event.preventDefault();
+                        event.currentTarget.blur();
+                    }
                 );
             });
 
