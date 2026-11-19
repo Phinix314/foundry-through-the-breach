@@ -4,6 +4,7 @@
   "description": "Unofficial Through the Breach system for Foundry VTT",
   "version": "0.0.8.2",
   "socket": true,
+  "primaryTokenAttribute": "wounds",
   "compatibility": {
     "minimum": "14",
     "verified": "14.360",

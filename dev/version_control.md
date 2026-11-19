@@ -33,6 +33,7 @@
   - 0.0.8.2 Rework of the Main Tab as well as the consistent header. 
     - 0.0.8.2.1 Adding the creation of characteristics as tags to the characters 
     - 0.0.8.2.2 Syncing Wound counter from Main Tab / Combat Tab and allowing relative input (for setting negative numbers =-2
+    - 0.0.8.2.3 Linked wounds to token and created an hp bar (going to -21). Testing on multi client outstanding.
 - 0.1.0  first usable table prototype
   
 

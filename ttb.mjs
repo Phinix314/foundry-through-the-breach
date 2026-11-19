@@ -117,6 +117,14 @@ import {
     requestAndOpenActiveConflict
 } from "./module/ui/active-conflict-selection.mjs";
 
+import {
+    TTBActor
+} from "./module/documents/ttb-actor.mjs";
+
+import {
+    TTBToken
+} from "./module/canvas/ttb-token.mjs";
+
 const SYSTEM_ID = "through-the-breach";
 
 async function ensureActorCardStacks(actor, { notify = false } = {}) {
@@ -139,7 +147,21 @@ function actorCardStacksNeedSync(changes) {
 Hooks.once("init", () => {
     console.log(`${SYSTEM_ID} | init`);
 
-    CONFIG.Actor.dataModels.character = TTBCharacterData;
+    CONFIG.Actor.trackableAttributes = {
+        character: {
+            bar: ["wounds"],
+            value: []
+        }
+    };
+
+    CONFIG.Token.objectClass =
+        TTBToken;
+
+    CONFIG.Actor.documentClass =
+        TTBActor;
+
+    CONFIG.Actor.dataModels.character =
+        TTBCharacterData;
 
     Actors.registerSheet(SYSTEM_ID, TTBCharacterSheet, {
         types: ["character"],
@@ -282,6 +304,20 @@ Hooks.once("ready", async () => {
     }
 });
 
+Hooks.on("preCreateActor", (actor) => {
+    if (actor.type !== "character") {
+        return;
+    }
+
+    actor.updateSource({
+        "prototypeToken.bar1.attribute":
+            "wounds",
+
+        "prototypeToken.displayBars":
+        CONST.TOKEN_DISPLAY_MODES.OWNER
+    });
+});
+
 Hooks.on("createActor", async (actor) => {
     if (!game.user.isGM) return;
     if (actor.type !== "character") return;
@@ -305,4 +341,13 @@ Hooks.on("updateActor", async (actor, changes) => {
     } catch (error) {
         console.error(`${SYSTEM_ID} | Failed to sync actor card stacks`, error);
     }
+
+    window.requestAnimationFrame(() => {
+        for (
+            const token
+            of actor.getActiveTokens()
+            ) {
+            token.drawBars();
+        }
+    });
 });
